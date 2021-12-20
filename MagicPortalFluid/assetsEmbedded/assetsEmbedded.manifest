@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 1748747425
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: exampleswordtest
+      Dependencies: {}
+    Info_1:
+      Name: portalmagicfluid
+      Dependencies: {}
