@@ -1,5 +1,5 @@
 # RareMagicPortal
-~Magical Portal Fluid~
+Magical Portal Fluid
 
 
 Tired of Portals be the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
