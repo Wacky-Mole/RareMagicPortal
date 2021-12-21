@@ -30,12 +30,12 @@ namespace RareMagicPortal
 {
 	[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 	[BepInDependency(Jotunn.Main.ModGuid)]
-	//[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+	[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
 	internal class MagicPortalFluid : BaseUnityPlugin
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.0.0";
+		public const string PluginVersion = "1.0.1";
 
 		// Use this class to add your own localization to the game
 		// https://valheim-modding.github.io/Jotunn/tutorials/localization.html
@@ -62,7 +62,7 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{
 				{
-					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoadRecipes());
+					//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoadRecipes());
 					LoadAllRecipeData(reload: true); // while loading on world screen
 				}
 			}
@@ -104,10 +104,6 @@ namespace RareMagicPortal
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
-			// Jotunn comes with MonoMod Detours enabled for hooking Valheim's code
-			// https://github.com/MonoMod/MonoMod
-			On.FejdStartup.Awake += FejdStartup_Awake;
-			//ItemManager.OnItemsRegistered += StartingitemPrefab;
 			AddLocalizations();
 
 
@@ -115,24 +111,13 @@ namespace RareMagicPortal
 
 		}
 
-		private void FejdStartup_Awake(On.FejdStartup.orig_Awake orig, FejdStartup self)
-		{
-			// This code runs before Valheim's FejdStartup.Awake
-			//Jotunn.Logger.LogInfo("FejdStartup is going to awake");
-
-			// Call this method so the original game method is invoked
-			orig(self);
-
-			// This code runs after Valheim's FejdStartup.Awake
-			//Jotunn.Logger.LogInfo("FejdStartup has awoken");
-		}
 
 		// end startup
 
 		private void LoadAssets()
 		{
 			portalmagicfluid = AssetUtils.LoadAssetBundleFromResources("portalmagicfluid", typeof(MagicPortalFluid).Assembly);
-			Jotunn.Logger.LogInfo($"Embedded resources: {string.Join(",", typeof(MagicPortalFluid).Assembly.GetManifestResourceNames())}");
+			//Jotunn.Logger.LogInfo($"Embedded resources: {string.Join(",", typeof(MagicPortalFluid).Assembly.GetManifestResourceNames())}");
 
 		}
 
@@ -205,18 +190,12 @@ namespace RareMagicPortal
 				firstTime = false;
 
 			}
-			/*
-			var prefab2 = ObjectDB.instance.GetItemPrefab("Wood");
-			Player prefab1 = PrefabManager.Cache.GetPrefab<Player>("Player");
-			prefab1.m_defaultItems.AddItem(prefab2);
-			//ItemManager.OnItemsRegistered -= StartingitemPrefab;
-			*/
 		}
 
 
 		public static void Dbgl(string str = "", bool pref = true)
 		{
-			if (true) // debug
+			if (false) // debug
 			{
 				Debug.Log((pref ? (typeof(MagicPortalFluid).Namespace + " ") : "") + str);
 			}

@@ -1,10 +1,10 @@
 ﻿{
   "name": "RareMagicPortal",
   "description": "",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.1502",
-    "Jötunn"
+    "denikson-BepInExPack_Valheim-5.4.1700",
+    " ValheimModding-Jotunn-2.4.5"
   ]
 }
