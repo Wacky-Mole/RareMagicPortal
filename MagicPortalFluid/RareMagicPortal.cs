@@ -28,6 +28,7 @@ using RareMagicPortal;
 
 namespace RareMagicPortal
 {
+	//extra
 	[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 	[BepInDependency(Jotunn.Main.ModGuid)]
 	[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]

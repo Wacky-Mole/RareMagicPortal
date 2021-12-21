@@ -61,7 +61,7 @@ if ($Target.Equals("Debug")) {
     #[Environment]::SetEnvironmentVariable('DNSPY_UNITY_DBG2','','User')
 }
 
-if($Target.Equals("Release")) {
+if($Target.Equals("Debug")) {
     Write-Host "Packaging for ThunderStore..."
     $Package="Package"
     $PackagePath="$ProjectPath\$Package"

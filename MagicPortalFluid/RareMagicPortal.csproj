@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\JotunnLib.2.3.12\build\JotunnLib.props" Condition="Exists('..\packages\JotunnLib.2.3.12\build\JotunnLib.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DB3679D9-1575-4996-AC3A-6DCCA6529D6C}</ProjectGuid>
     <OutputType>Library</OutputType>
