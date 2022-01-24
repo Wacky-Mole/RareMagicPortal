@@ -24,6 +24,7 @@ using UnityEngine.UI;
 using Logger = Jotunn.Logger;
 using HarmonyLib;
 using RareMagicPortal;
+using ServerSync;
 
 
 namespace RareMagicPortal
@@ -36,11 +37,16 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.0.1";
+		public const string PluginVersion = "1.2.0";
 
 		// Use this class to add your own localization to the game
 		// https://valheim-modding.github.io/Jotunn/tutorials/localization.html
 		//public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
+
+		// setting up for configSync
+		ServerSync.ConfigSync configSync = new ServerSync.ConfigSync(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = "1.2.0" };
+		private readonly Harmony _harmony = new Harmony(PluginGUID);
+
 
 		private AssetBundle portalmagicfluid;
 		private CustomLocalization Localization;
@@ -52,7 +58,7 @@ namespace RareMagicPortal
 		private static List<RecipeData> recipeDatas = new List<RecipeData>();
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
-		public static bool FluidYesorNo = false; // don't disable
+		public static bool FluidYesorNo = false; //default
 
 
 
@@ -94,8 +100,10 @@ namespace RareMagicPortal
 
 		private void Awake()
 		{
+			_serverConfigLocked = Config.Bind("General", "Force Server Config", true, "Force Server Config");
+			_ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked); // kind of weird - It's serversync code to add the _serverConfigLocked variable as the boolean that determines if you should have a locked config or not.
+
 			CreateConfigValues();
-			ReadAndWriteConfigValues();
 			LoadAssets();
 			itemModCreation();
 			
@@ -314,47 +322,52 @@ namespace RareMagicPortal
 			});
 
 		}
+		public static ConfigEntry<bool>?
+		  _serverConfigLocked; // Needed bind for ServerSync's "Force Server Config" config bind.
+		private static ConfigEntry<int>? _FluidAmountStart;
+		private static ConfigEntry<bool>? _DisableMod;
 
 		private void CreateConfigValues()
-		{
-			Config.SaveOnConfigSet = true;
-
-
-			// Add server config which gets pushed to all clients connecting and can only be edited by admins
-			// In local/single player games the player is always considered the admin
-
-			Config.Bind("Server config", "FluidYesorNo", false,
-							new ConfigDescription("Disable PortalFluid requirement?", null,
-								new ConfigurationManagerAttributes { IsAdminOnly = true }));
-			Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
-				new ConfigDescription("How much PortalMagicFluid to start with on a new character?", null,
-					new ConfigurationManagerAttributes { IsAdminOnly = true }));
+        {  
 			
 
+			_DisableMod = config("Synced With Server", "FluidYesorNo", false,
+                "Disable PortalFluid requirement??");
 
-			// You can subscribe to a global event when config got synced initially and on changes
-			SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
-			{
-				if (attr.InitialSynchronization)
-				{
-					Jotunn.Logger.LogMessage("Initial Config sync event received");
-				}
-				else
-				{
-					Jotunn.Logger.LogMessage("Config sync event received");
-				}
-			};
+			_FluidAmountStart = config("Synced With Server", "PortalMagicFluidSpawn", 3,
+                "How much PortalMagicFluid to start with on a new character?");
+
+		
 		}
 
-		private void ReadAndWriteConfigValues()
-		{
-			 FluidYesorNo = (bool)Config["Server config", "FluidYesorNo"].BoxedValue;
-			 PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
+		private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
+            bool synchronizedSetting = true)
+        {
+            ConfigDescription extendedDescription =
+                new(
+                    description.Description +
+                    (synchronizedSetting ? " [Synced with Server]" : " [Not Synced with Server]"),
+                    description.AcceptableValues, description.Tags);
+            ConfigEntry<T> configEntry = Config.Bind(group, name, value, extendedDescription);       
 
-			//Config["Client config", "LocalBool"].BoxedValue = true;
-		}
+            SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+            syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
+
+            return configEntry;
+        }
+
+        private ConfigEntry<T> config<T>(string group, string name, T value, string description,
+            bool synchronizedSetting = true)
+        {
+            return config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+        }
+
+        private class ConfigurationManagerAttributes
+        {
+            public bool? Browsable = false;
+        }
+
 
 	}
-	// end of namespace class
 
-}
+}// end of namespace class
