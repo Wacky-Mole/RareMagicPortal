@@ -107,7 +107,6 @@ namespace RareMagicPortal
 			LoadAssets();
 			itemModCreation();
 			
-
 			context = this;
 
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
@@ -329,8 +328,6 @@ namespace RareMagicPortal
 
 		private void CreateConfigValues()
         {  
-			
-
 			_DisableMod = config("Synced With Server", "FluidYesorNo", false,
                 "Disable PortalFluid requirement??");
 
@@ -340,8 +337,7 @@ namespace RareMagicPortal
 		
 		}
 
-		private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
-            bool synchronizedSetting = true)
+		private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
         {
             ConfigDescription extendedDescription =
                 new(
@@ -356,8 +352,7 @@ namespace RareMagicPortal
             return configEntry;
         }
 
-        private ConfigEntry<T> config<T>(string group, string name, T value, string description,
-            bool synchronizedSetting = true)
+        private ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true)
         {
             return config(group, name, value, new ConfigDescription(description), synchronizedSetting);
         }
