@@ -52,7 +52,7 @@ namespace RareMagicPortal
 		private static List<RecipeData> recipeDatas = new List<RecipeData>();
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
-		public static bool FluidYesorNo = false; // don't disable
+		public static bool DisablePortalJuice = false; // don't disable
         private ConfigEntry<bool> ConfigFluid;
         private ConfigEntry<int> ConfigSpawn;
 
@@ -151,7 +151,7 @@ namespace RareMagicPortal
 					m_resItem = ObjectDB.instance.GetItemPrefab("FineWood").GetComponent<ItemDrop>(),
 					m_recover = true
 				});
-				if (!FluidYesorNo) { // make this more dynamic
+				if (!DisablePortalJuice) { // make this more dynamic
 					requirements.Add(new Piece.Requirement
 					{
 						m_amount = 1,
@@ -184,7 +184,7 @@ namespace RareMagicPortal
 		private static void StartingitemPrefab()
 		{
 
-			if (firstTime && !FluidYesorNo && PortalMagicFluidSpawn != 0)
+			if (firstTime && PortalMagicFluidSpawn != 0)
 			{
 				Jotunn.Logger.LogInfo("New Starting Item Set");
 				Inventory inventory = ((Humanoid)Player.m_localPlayer).m_inventory;
@@ -324,7 +324,7 @@ namespace RareMagicPortal
 			// Add server config which gets pushed to all clients connecting and can only be edited by admins
 			// In local/single player games the player is always considered the admin
 
-			ConfigFluid = Config.Bind("Server config", "FluidYesorNo", false,
+			ConfigFluid = Config.Bind("Server config", "DisablePortalJuice", false,
 							new ConfigDescription("Disable PortalFluid requirement?", null,
 								new ConfigurationManagerAttributes { IsAdminOnly = true }));
 			ConfigSpawn = Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
@@ -340,32 +340,33 @@ namespace RareMagicPortal
 				{
 					Jotunn.Logger.LogMessage("Initial Config sync event received");
 					PortalMagicFluidSpawn = ConfigSpawn.Value;
-					if (FluidYesorNo != ConfigFluid.Value)
+					if (DisablePortalJuice != ConfigFluid.Value)
 					{
-						FluidYesorNo = ConfigFluid.Value; // to late to change spawn amount now
+						DisablePortalJuice = ConfigFluid.Value; // to late to change spawn amount now
 						PortalChanger();
-						Jotunn.Logger.LogMessage("Is portal Fluid disabled?: " + FluidYesorNo + "amount of Starting Fluid Set: "+ PortalMagicFluidSpawn);
+						Jotunn.Logger.LogMessage("Is portal Fluid disabled?: " + DisablePortalJuice + "amount of Starting Fluid Set: "+ PortalMagicFluidSpawn);
 					}
 				}
 				else
 				{
 					Jotunn.Logger.LogMessage("Config sync event received");
-					if (FluidYesorNo != ConfigFluid.Value)
+					if (DisablePortalJuice != ConfigFluid.Value)
                     {
-						FluidYesorNo = ConfigFluid.Value; // to late to change spawn amount now
+						DisablePortalJuice = ConfigFluid.Value; // too late to change spawn amount now
 						PortalChanger();
+						Jotunn.Logger.LogMessage("Trying to change Portal Requirements mid game");
+						// unlikely to fire as nothing is firing  
 
-                    }
+					}
 				}
 			};
 		}
 
 		private void ReadAndWriteConfigValues()
 		{
-			FluidYesorNo = (bool)Config["Server config", "FluidYesorNo"].BoxedValue;
+			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
 
-			//Config["Client config", "LocalBool"].BoxedValue = true;
 		}
 
 	}
