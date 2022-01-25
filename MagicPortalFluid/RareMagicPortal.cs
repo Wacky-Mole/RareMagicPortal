@@ -36,7 +36,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.0.1";
+		public const string PluginVersion = "1.1.1";
 
 		// Use this class to add your own localization to the game
 		// https://valheim-modding.github.io/Jotunn/tutorials/localization.html
@@ -53,10 +53,10 @@ namespace RareMagicPortal
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
 		public static bool FluidYesorNo = false; // don't disable
+        private ConfigEntry<bool> ConfigFluid;
+        private ConfigEntry<int> ConfigSpawn;
 
-
-
-		[HarmonyPatch(typeof(ZNetScene), "Awake")]
+        [HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
 		private static class ZNetScene_Awake_Patch
 		{
@@ -142,8 +142,6 @@ namespace RareMagicPortal
 		// JVL changer
 		private static void PortalChanger()
 		{
-			if (!FluidYesorNo)
-			{
 				var paul = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL
 																			//GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); // better, but not instanced
 				List<Piece.Requirement> requirements = new List<Piece.Requirement>();
@@ -153,12 +151,14 @@ namespace RareMagicPortal
 					m_resItem = ObjectDB.instance.GetItemPrefab("FineWood").GetComponent<ItemDrop>(),
 					m_recover = true
 				});
-				requirements.Add(new Piece.Requirement
-				{
-					m_amount = 1,
-					m_resItem = ObjectDB.instance.GetItemPrefab("PortalMagicFluid").GetComponent<ItemDrop>(),
-					m_recover = true
-				});
+				if (!FluidYesorNo) { // make this more dynamic
+					requirements.Add(new Piece.Requirement
+					{
+						m_amount = 1,
+						m_resItem = ObjectDB.instance.GetItemPrefab("PortalMagicFluid").GetComponent<ItemDrop>(),
+						m_recover = true
+					});
+				}
 				requirements.Add(new Piece.Requirement
 				{
 					m_amount = 10,
@@ -173,7 +173,7 @@ namespace RareMagicPortal
 				});
 
 				paul.GetComponent<Piece>().m_resources = requirements.ToArray();
-			}
+			
 		}
 
 		private static void StartingFirsttime()
@@ -324,10 +324,10 @@ namespace RareMagicPortal
 			// Add server config which gets pushed to all clients connecting and can only be edited by admins
 			// In local/single player games the player is always considered the admin
 
-			Config.Bind("Server config", "FluidYesorNo", false,
+			ConfigFluid = Config.Bind("Server config", "FluidYesorNo", false,
 							new ConfigDescription("Disable PortalFluid requirement?", null,
 								new ConfigurationManagerAttributes { IsAdminOnly = true }));
-			Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
+			ConfigSpawn = Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
 				new ConfigDescription("How much PortalMagicFluid to start with on a new character?", null,
 					new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
@@ -339,10 +339,23 @@ namespace RareMagicPortal
 				if (attr.InitialSynchronization)
 				{
 					Jotunn.Logger.LogMessage("Initial Config sync event received");
+					PortalMagicFluidSpawn = ConfigSpawn.Value;
+					if (FluidYesorNo != ConfigFluid.Value)
+					{
+						FluidYesorNo = ConfigFluid.Value; // to late to change spawn amount now
+						PortalChanger();
+						Jotunn.Logger.LogMessage("Is portal Fluid disabled?: " + FluidYesorNo + "amount of Starting Fluid Set: "+ PortalMagicFluidSpawn);
+					}
 				}
 				else
 				{
 					Jotunn.Logger.LogMessage("Config sync event received");
+					if (FluidYesorNo != ConfigFluid.Value)
+                    {
+						FluidYesorNo = ConfigFluid.Value; // to late to change spawn amount now
+						PortalChanger();
+
+                    }
 				}
 			};
 		}
