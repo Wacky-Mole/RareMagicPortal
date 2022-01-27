@@ -10,8 +10,8 @@
     <RootNamespace>RareMagicPortal</RootNamespace>
     <AssemblyName>RareMagicPortal</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-	  <LangVersion>9.0</LangVersion>
-	  <FileAlignment>512</FileAlignment>
+    <LangVersion>9.0</LangVersion>
+    <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -98,6 +98,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ILRepack.targets" />
+    <None Include="LICENSE" />
     <None Include="packages.config" />
     <EmbeddedResource Include="assetsEmbedded\portalmagicfluid" />
   </ItemGroup>
