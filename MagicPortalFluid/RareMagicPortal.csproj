@@ -98,7 +98,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ILRepack.targets" />
-    <None Include="LICENSE" />
     <None Include="packages.config" />
     <EmbeddedResource Include="assetsEmbedded\portalmagicfluid" />
   </ItemGroup>
