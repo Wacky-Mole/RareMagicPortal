@@ -24,6 +24,8 @@ using UnityEngine.UI;
 using Logger = Jotunn.Logger;
 using HarmonyLib;
 using RareMagicPortal;
+//using PieceManager;
+//using ServerSync;
 
 
 namespace RareMagicPortal
@@ -36,13 +38,14 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.1.1";
+		public const string PluginVersion = "1.2.0";
+        
 
-		// Use this class to add your own localization to the game
-		// https://valheim-modding.github.io/Jotunn/tutorials/localization.html
-		//public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
+        // Use this class to add your own localization to the game
+        // https://valheim-modding.github.io/Jotunn/tutorials/localization.html
+        //public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
 
-		private AssetBundle portalmagicfluid;
+        private AssetBundle portalmagicfluid;
 		private CustomLocalization Localization;
 		private static MagicPortalFluid context;
 		public static ConfigEntry<bool> modEnabled;
@@ -53,10 +56,18 @@ namespace RareMagicPortal
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
 		public static bool DisablePortalJuice = false; // don't disable
-        private ConfigEntry<bool> ConfigFluid;
-        private ConfigEntry<int> ConfigSpawn;
+		public static string TabletoAddTo;
+		public static string DefaultTable = "$piece_workbench";
+		public static bool piecehaslvl = false;
+		public static string PiecetoLookFor = "portal_wood"; //name
+		public static Piece funwords;
+		public static string PieceTokenLookFor = "$piece_portal"; //m_name
 
-        [HarmonyPatch(typeof(ZNetScene), "Awake")]
+		private ConfigEntry<bool> ConfigFluid;
+        private ConfigEntry<int> ConfigSpawn;
+		private ConfigEntry<string> ConfigTable;
+
+		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
 		private static class ZNetScene_Awake_Patch
 		{
@@ -90,6 +101,92 @@ namespace RareMagicPortal
 
 			}
 
+		}
+		/*
+		[HarmonyPatch(typeof(Player), "Message")]
+		private class Player_UpdatePlacement_Quick
+        {
+			[HarmonyPrefix]
+			static bool Prefix(ref Player __instance, string msg)
+            {
+				if (msg == Player.$msg_missingrequirement ){
+					MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, "Forge Failure");
+				}
+				piecehaslvl = true;
+				return true;
+            }
+
+		}
+		*/
+
+
+		[HarmonyPatch(typeof(Player), "HaveRequirements")]
+		[HarmonyPatch(new Type[] { typeof(Piece), typeof(Player.RequirementMode) })]
+		private static class Player_HaveRequirementsLvl_Patch
+		{
+			[HarmonyPrefix]
+			static bool Prefix(Piece piece, ref Player __instance,  out Vector3 __state )
+
+			{
+				
+				if (__instance.transform.position != null)
+					__state = __instance.transform.position; // save position //must be assigned
+				else
+					__state = new Vector3(0, 0, 0); // just in case
+
+
+				funwords = __instance.m_buildPieces.GetSelectedPiece();
+
+				if ( funwords.name == PiecetoLookFor) //__instance.m_placementGhost.name
+					piecehaslvl = true;
+  
+				return true;
+
+			}
+			[HarmonyPostfix]
+			 static bool Postfix(bool __result, Piece piece, Player.RequirementMode mode, Vector3 __state )
+			{
+				{
+					if (__result)// Only care if true for specific piece
+                    {
+                        if (piece.name == PiecetoLookFor && piecehaslvl) // portal
+						{
+							var paulstation = CraftingStation.HaveBuildStationInRange(piece.m_craftingStation.m_name, __state);
+							var paullvl = paulstation.GetLevel();
+							
+							if (paullvl > 3) // just for testing
+                            {
+								piecehaslvl = false;
+								return true;
+                            }
+							if (piecehaslvl)
+							{
+
+								piecehaslvl = false;
+							}
+
+
+							return false;
+						}
+						return __result;
+                    }
+					return __result;
+				}
+			}
+		}
+
+
+		[HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
+		[HarmonyPrefix]
+		private static bool PlacePortalFinalCheck(ref Player __instance, ref Piece piece)
+		{
+			if (piece == null) return true;
+			WardMonoscript component5 = piece.GetComponent<WardMonoscript>();
+			float radius = component5 ? component5.GetWardRadius() : 0.0f;
+			if (WardMonoscript.CheckAccess(__instance.m_placementGhost.transform.position, radius, flash: false,
+					wardCheck: true)) return true;
+			__instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
+			return false;
 		}
 
 		private void Awake()
@@ -142,9 +239,12 @@ namespace RareMagicPortal
 		// JVL changer
 		private static void PortalChanger()
 		{
-				var paul = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL
-																			//GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); // better, but not instanced
-				List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+			var peter = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
+
+			// GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer												 
+
+
+			List <Piece.Requirement> requirements = new List<Piece.Requirement>();
 				requirements.Add(new Piece.Requirement
 				{
 					m_amount = 20,
@@ -172,8 +272,25 @@ namespace RareMagicPortal
 					m_recover = true
 				});
 
-				paul.GetComponent<Piece>().m_resources = requirements.ToArray();
+			//paul.GetComponent<Piece>().m_resources = requirements.ToArray();
+
+
+			//var joshy = GameObject.Instantiate(p)
+			//GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
+			//  james =  GetRecipeDataByName("portal_wood");
+			//GameObject  john =  GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == james.name);
+			//john.GetComponent<Piece>().m_craftingStation = GetCraftingStation(james.craftingStation);
+			//john.GetComponent<Piece>().m_resources = requirements.ToArray();
+			//var risky = PrefabManager.Instance.GetPrefab("forge_ext3").AddComponent<CraftingStation>();
+			//risky.m_name = "paulshome";
+
+				Piece petercomponent = peter.GetComponent<Piece>();
+				petercomponent.m_craftingStation = GetCraftingStation("$piece_forge"); // sets crafting station workbench/forge /ect
+				petercomponent.m_resources = requirements.ToArray();
 			
+			
+
+
 		}
 
 		private static void StartingFirsttime()
@@ -181,6 +298,7 @@ namespace RareMagicPortal
 			firstTime = true;
 
 		}
+
 		private static void StartingitemPrefab()
 		{
 
@@ -217,6 +335,22 @@ namespace RareMagicPortal
 			}
 		}
 
+		private static CraftingStation GetCraftingStation(string name)
+		{
+			if (name == "")
+			{
+				return null;
+			}
+			foreach (Recipe recipe in ObjectDB.instance.m_recipes)
+			{
+				if (recipe?.m_craftingStation?.m_name == name)
+				{
+					//Jotunn.Logger.LogMessage("got crafting station " + name);
+					return recipe.m_craftingStation;
+				}
+			}
+			return null;
+		}
 
 		private static List<GameObject> GetPieces()
 		{
@@ -327,8 +461,13 @@ namespace RareMagicPortal
 			ConfigFluid = Config.Bind("Server config", "DisablePortalJuice", false,
 							new ConfigDescription("Disable PortalFluid requirement?", null,
 								new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
 			ConfigSpawn = Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
 				new ConfigDescription("How much PortalMagicFluid to start with on a new character?", null,
+					new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+			ConfigTable = Config.Bind("Server config", "TabletoAddTo", DefaultTable,
+				new ConfigDescription("Which workbench should the Portal be required to be near by? Default is $piece_workbench , $piece_forge , $piece_artisanstation . Pick one a valid table otherwise default is workbench", null,
 					new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
 
@@ -366,6 +505,7 @@ namespace RareMagicPortal
 		{
 			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
+			TabletoAddTo = (string)Config["Server config", "TabletoAddTo"].BoxedValue;
 
 		}
 

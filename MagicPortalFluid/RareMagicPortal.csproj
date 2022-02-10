@@ -98,6 +98,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ILRepack.targets" />
+    <None Include="LICENSE" />
     <None Include="packages.config" />
     <EmbeddedResource Include="assetsEmbedded\portalmagicfluid" />
   </ItemGroup>
@@ -108,6 +109,9 @@
     <None Include="Package\manifest.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Libs\PieceManager.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Libs\ServerSync.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
