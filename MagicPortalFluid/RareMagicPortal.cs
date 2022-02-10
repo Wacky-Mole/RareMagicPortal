@@ -62,6 +62,7 @@ namespace RareMagicPortal
 		public static string PiecetoLookFor = "portal_wood"; //name
 		public static string PieceTokenLookFor = "$piece_portal"; //m_name
 		public static int CraftingStationlvl = 1;
+		public static Vector3 tempvalue;
 		//public static string CraftingStationName;
 
 		private ConfigEntry<bool> ConfigFluid;
@@ -104,6 +105,7 @@ namespace RareMagicPortal
 			}
 
 		}
+		/*
 
 		[HarmonyPatch(typeof(Player), "HaveRequirements")]
 		[HarmonyPatch(new Type[] { typeof(Piece), typeof(Player.RequirementMode) })]
@@ -146,25 +148,41 @@ namespace RareMagicPortal
 				}
 			}
 		}
-
+		*/
 
 		[HarmonyPatch(typeof(Player), "PlacePiece")]
 		private static class Player_MessageforPortal_Patch
         {
 			[HarmonyPrefix]
 			private static bool Prefix(ref Player __instance, ref Piece piece)
-			
+
+			{
+				if (piece == null) return true;
+
+				if (piece.name == PiecetoLookFor && !__instance.m_noPlacementCost) // portal
+				{
+					if (__instance.transform.position != null)
+						tempvalue = __instance.transform.position; // save position //must be assigned
+					else
+						tempvalue = new Vector3(0, 0, 0); // shouldn't ever be called 
+
+					var paulstation = CraftingStation.HaveBuildStationInRange(piece.m_craftingStation.m_name, tempvalue);
+					var paullvl = paulstation.GetLevel();
+
+					if (paullvl + 1 > CraftingStationlvl) // just for testing
 					{
-						if (piece == null) return true;
-			
-						if (piece.name == PiecetoLookFor && !piecehaslvl && !__instance.m_noPlacementCost)
-						{
-							__instance.Message(MessageHud.MessageType.Center, "Need a Level " + CraftingStationlvl + " " + piece.m_craftingStation.name +" for placement");
-							piecehaslvl = false;
-							return false;
-						}
-						return true;
+						piecehaslvl = true;
 					}
+					else
+					{
+						__instance.Message(MessageHud.MessageType.Center, "Need a Level " + CraftingStationlvl + " " + piece.m_craftingStation.name + " for placement");
+						piecehaslvl = false;
+						return false;
+					}
+				}
+				return true;
+			}
+					
         }
 		
 		
@@ -209,8 +227,6 @@ namespace RareMagicPortal
 			var magicjuice_prefab = portalmagicfluid.LoadAsset<GameObject>("PortalMagicFluid");
 			var portaljuice = new CustomItem(magicjuice_prefab, fixReference: false);
 			ItemManager.Instance.AddItem(portaljuice);
-
-
 
 		}
 
@@ -501,6 +517,7 @@ namespace RareMagicPortal
 			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
 				CraftingStationlvl = 1;
+			Jotunn.Logger.LogInfo("Configs changed PortalMagic");
 
 
 
