@@ -38,7 +38,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.2.0";
+		public const string PluginVersion = "1.3.0";
         
 
         // Use this class to add your own localization to the game
@@ -60,12 +60,14 @@ namespace RareMagicPortal
 		public static string DefaultTable = "$piece_workbench";
 		public static bool piecehaslvl = false;
 		public static string PiecetoLookFor = "portal_wood"; //name
-		public static Piece funwords;
 		public static string PieceTokenLookFor = "$piece_portal"; //m_name
+		public static int CraftingStationlvl = 1;
+		//public static string CraftingStationName;
 
 		private ConfigEntry<bool> ConfigFluid;
         private ConfigEntry<int> ConfigSpawn;
 		private ConfigEntry<string> ConfigTable;
+		private ConfigEntry<int> ConfigTableLvl;
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
@@ -102,23 +104,6 @@ namespace RareMagicPortal
 			}
 
 		}
-		/*
-		[HarmonyPatch(typeof(Player), "Message")]
-		private class Player_UpdatePlacement_Quick
-        {
-			[HarmonyPrefix]
-			static bool Prefix(ref Player __instance, string msg)
-            {
-				if (msg == Player.$msg_missingrequirement ){
-					MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, "Forge Failure");
-				}
-				piecehaslvl = true;
-				return true;
-            }
-
-		}
-		*/
-
 
 		[HarmonyPatch(typeof(Player), "HaveRequirements")]
 		[HarmonyPatch(new Type[] { typeof(Piece), typeof(Player.RequirementMode) })]
@@ -126,19 +111,11 @@ namespace RareMagicPortal
 		{
 			[HarmonyPrefix]
 			static bool Prefix(Piece piece, ref Player __instance,  out Vector3 __state )
-
-			{
-				
+			{	
 				if (__instance.transform.position != null)
 					__state = __instance.transform.position; // save position //must be assigned
 				else
 					__state = new Vector3(0, 0, 0); // just in case
-
-
-				funwords = __instance.m_buildPieces.GetSelectedPiece();
-
-				if ( funwords.name == PiecetoLookFor) //__instance.m_placementGhost.name
-					piecehaslvl = true;
   
 				return true;
 
@@ -149,45 +126,48 @@ namespace RareMagicPortal
 				{
 					if (__result)// Only care if true for specific piece
                     {
-                        if (piece.name == PiecetoLookFor && piecehaslvl) // portal
+                        if (piece.name == PiecetoLookFor) // portal
 						{
 							var paulstation = CraftingStation.HaveBuildStationInRange(piece.m_craftingStation.m_name, __state);
 							var paullvl = paulstation.GetLevel();
-							
-							if (paullvl > 3) // just for testing
+							//Jotunn.Logger.LogInfo(paullvl + " " + CraftingStationlvl + " station name " +paulstation);
+
+
+							if (paullvl+1 > CraftingStationlvl) // just for testing
                             {
-								piecehaslvl = false;
-								return true;
+								piecehaslvl = true;
+								return __result;
                             }
-							if (piecehaslvl)
-							{
-
-								piecehaslvl = false;
-							}
-
-
-							return false;
+							return __result;
 						}
 						return __result;
                     }
-					return __result;
+					return __result; // returns result but checks lvl with piecehaslvl
 				}
 			}
 		}
 
 
-		[HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
-		[HarmonyPrefix]
-		private static bool PlacePortalFinalCheck(ref Player __instance, ref Piece piece)
-		{
-			if (piece == null) return true;
-			WardMonoscript component5 = piece.GetComponent<WardMonoscript>();
-			float radius = component5 ? component5.GetWardRadius() : 0.0f;
-			if (WardMonoscript.CheckAccess(__instance.m_placementGhost.transform.position, radius, flash: false,
-					wardCheck: true)) return true;
-			__instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
-			return false;
-		}
+		[HarmonyPatch(typeof(Player), "PlacePiece")]
+		private static class Player_MessageforPortal_Patch
+        {
+			[HarmonyPrefix]
+			private static bool Prefix(ref Player __instance, ref Piece piece)
+			
+					{
+						if (piece == null) return true;
+			
+						if (piece.name == PiecetoLookFor && !piecehaslvl && !__instance.m_noPlacementCost)
+						{
+							__instance.Message(MessageHud.MessageType.Center, "Need a Level " + CraftingStationlvl + " " + piece.m_craftingStation.name +" for placement");
+							piecehaslvl = false;
+							return false;
+						}
+						return true;
+					}
+        }
+		
+		
 
 		private void Awake()
 		{
@@ -272,6 +252,12 @@ namespace RareMagicPortal
 					m_recover = true
 				});
 
+			var CraftingStationforPaul = GetCraftingStation(TabletoAddTo);
+			if (CraftingStationforPaul == null)
+            {
+				CraftingStationforPaul.m_name = DefaultTable;
+            }
+
 			//paul.GetComponent<Piece>().m_resources = requirements.ToArray();
 
 
@@ -284,9 +270,9 @@ namespace RareMagicPortal
 			//var risky = PrefabManager.Instance.GetPrefab("forge_ext3").AddComponent<CraftingStation>();
 			//risky.m_name = "paulshome";
 
-				Piece petercomponent = peter.GetComponent<Piece>();
-				petercomponent.m_craftingStation = GetCraftingStation("$piece_forge"); // sets crafting station workbench/forge /ect
-				petercomponent.m_resources = requirements.ToArray();
+			Piece petercomponent = peter.GetComponent<Piece>();
+			petercomponent.m_craftingStation = GetCraftingStation(CraftingStationforPaul.m_name); // sets crafting station workbench/forge /ect
+			petercomponent.m_resources = requirements.ToArray();
 			
 			
 
@@ -466,8 +452,12 @@ namespace RareMagicPortal
 				new ConfigDescription("How much PortalMagicFluid to start with on a new character?", null,
 					new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
-			ConfigTable = Config.Bind("Server config", "TabletoAddTo", DefaultTable,
-				new ConfigDescription("Which workbench should the Portal be required to be near by? Default is $piece_workbench , $piece_forge , $piece_artisanstation . Pick one a valid table otherwise default is workbench", null,
+			ConfigTable = Config.Bind("Server config", "CraftingStation_Requirement", DefaultTable,
+				new ConfigDescription("Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation "  + System.Environment.NewLine + "Pick a valid table otherwise default is workbench", null,
+					new ConfigurationManagerAttributes { IsAdminOnly = true })); // $piece_workbench , $piece_forge , $piece_artisanstation
+
+			ConfigTableLvl = Config.Bind("Server config", "Level_of_CraftingStation_Req", 1,
+				new ConfigDescription("What level of CraftingStation is required for placing Portal?", null,
 					new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
 
@@ -477,10 +467,12 @@ namespace RareMagicPortal
 			{
 				if (attr.InitialSynchronization)
 				{
-					Jotunn.Logger.LogMessage("Initial Config sync event received");
-					PortalMagicFluidSpawn = ConfigSpawn.Value;
-					if (DisablePortalJuice != ConfigFluid.Value)
+					Jotunn.Logger.LogMessage("Initial Config sync event received for PortalMagic");
+					PortalMagicFluidSpawn = ConfigSpawn.Value; // no update needed as first time char creation
+					CraftingStationlvl = ConfigTableLvl.Value; // checked at every event
+					if (DisablePortalJuice != ConfigFluid.Value || TabletoAddTo != ConfigTable.Value)
 					{
+						TabletoAddTo = ConfigTable.Value;
 						DisablePortalJuice = ConfigFluid.Value; // to late to change spawn amount now
 						PortalChanger();
 						Jotunn.Logger.LogMessage("Is portal Fluid disabled?: " + DisablePortalJuice + "amount of Starting Fluid Set: "+ PortalMagicFluidSpawn);
@@ -488,13 +480,13 @@ namespace RareMagicPortal
 				}
 				else
 				{
-					Jotunn.Logger.LogMessage("Config sync event received");
-					if (DisablePortalJuice != ConfigFluid.Value)
+					Jotunn.Logger.LogMessage("Config sync event received for PortalMagic");
+					CraftingStationlvl = ConfigTableLvl.Value; // checked at every event
+					if (DisablePortalJuice != ConfigFluid.Value || TabletoAddTo != ConfigTable.Value)
                     {
 						DisablePortalJuice = ConfigFluid.Value; // too late to change spawn amount now
 						PortalChanger();
 						Jotunn.Logger.LogMessage("Trying to change Portal Requirements mid game");
-						// unlikely to fire as nothing is firing  
 
 					}
 				}
@@ -505,7 +497,12 @@ namespace RareMagicPortal
 		{
 			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
-			TabletoAddTo = (string)Config["Server config", "TabletoAddTo"].BoxedValue;
+			TabletoAddTo = (string)Config["Server config", "CraftingStation_Requirement"].BoxedValue;
+			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
+			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
+				CraftingStationlvl = 1;
+
+
 
 		}
 
