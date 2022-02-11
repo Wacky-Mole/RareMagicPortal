@@ -52,6 +52,8 @@ namespace RareMagicPortal
 		public static ConfigEntry<bool> isDebug;
 		public static bool firstTime = false;
 		public static ConfigEntry<int> nexusID;
+		private static string ConfigFileName = PluginGUID + ".cfg"; // Thank Azumatt
+		private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 		private static List<RecipeData> recipeDatas = new List<RecipeData>();
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
@@ -64,6 +66,8 @@ namespace RareMagicPortal
 		public static int CraftingStationlvl = 1;
 		public static Vector3 tempvalue;
 		//public static string CraftingStationName;
+		public static bool Admin = false;
+		public static bool loadfilesonce = false;
 
 		private ConfigEntry<bool> ConfigFluid;
         private ConfigEntry<int> ConfigSpawn;
@@ -105,50 +109,6 @@ namespace RareMagicPortal
 			}
 
 		}
-		/*
-
-		[HarmonyPatch(typeof(Player), "HaveRequirements")]
-		[HarmonyPatch(new Type[] { typeof(Piece), typeof(Player.RequirementMode) })]
-		private static class Player_HaveRequirementsLvl_Patch
-		{
-			[HarmonyPrefix]
-			static bool Prefix(Piece piece, ref Player __instance,  out Vector3 __state )
-			{	
-				if (__instance.transform.position != null)
-					__state = __instance.transform.position; // save position //must be assigned
-				else
-					__state = new Vector3(0, 0, 0); // just in case
-  
-				return true;
-
-			}
-			[HarmonyPostfix]
-			 static bool Postfix(bool __result, Piece piece, Player.RequirementMode mode, Vector3 __state )
-			{
-				{
-					if (__result)// Only care if true for specific piece
-                    {
-                        if (piece.name == PiecetoLookFor) // portal
-						{
-							var paulstation = CraftingStation.HaveBuildStationInRange(piece.m_craftingStation.m_name, __state);
-							var paullvl = paulstation.GetLevel();
-							//Jotunn.Logger.LogInfo(paullvl + " " + CraftingStationlvl + " station name " +paulstation);
-
-
-							if (paullvl+1 > CraftingStationlvl) // just for testing
-                            {
-								piecehaslvl = true;
-								return __result;
-                            }
-							return __result;
-						}
-						return __result;
-                    }
-					return __result; // returns result but checks lvl with piecehaslvl
-				}
-			}
-		}
-		*/
 
 		[HarmonyPatch(typeof(Player), "PlacePiece")]
 		private static class Player_MessageforPortal_Patch
@@ -201,6 +161,7 @@ namespace RareMagicPortal
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
 			AddLocalizations();
+			SetupWatcher();
 
 
 			Jotunn.Logger.LogInfo("MagicPortalFluid has loaded start assets");
@@ -230,10 +191,47 @@ namespace RareMagicPortal
 
 		}
 
-		// changing portals section
+		private void SetupWatcher() // Thx Azumatt
+		{
+			FileSystemWatcher watcher = new(BepInEx.Paths.ConfigPath, ConfigFileName);
+			watcher.Changed += ReadConfigValues;
+			watcher.Created += ReadConfigValues;
+			watcher.Renamed += ReadConfigValues;
+			watcher.IncludeSubdirectories = true;
+			watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+			watcher.EnableRaisingEvents = true;
+		}
 
-		// JVL changer
-		private static void PortalChanger()
+		private void ReadConfigValues(object sender, FileSystemEventArgs e) // Thx Azumatt
+        {
+            if (!File.Exists(ConfigFileFullPath)) return;
+			Admin = SynchronizationManager.Instance.PlayerIsAdmin;
+			//Jotunn.Logger.LogInfo("ReadConfigValues called- checking admin status");
+
+			if (Admin)
+            {
+                try
+                {
+					Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
+					ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
+					Jotunn.Logger.LogInfo("ReadConfigValues loaded- you are an admin");
+					Jotunn.Logger.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
+					PortalChanger();
+					
+
+				}
+                catch
+                {
+                    Jotunn.Logger.LogInfo($"There was an issue loading your {ConfigFileName}");
+                    Jotunn.Logger.LogInfo("Please check your config entries for spelling and format!");
+                }
+            } else Jotunn.Logger.LogInfo("You are not admin - so no files changed");
+		}
+
+        // changing portals section
+
+        // JVL changer
+        private static void PortalChanger()
 		{
 			var peter = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
 
@@ -481,6 +479,7 @@ namespace RareMagicPortal
 			// You can subscribe to a global event when config got synced initially and on changes
 			SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
 			{
+				
 				if (attr.InitialSynchronization)
 				{
 					Jotunn.Logger.LogMessage("Initial Config sync event received for PortalMagic");
@@ -491,7 +490,7 @@ namespace RareMagicPortal
 						TabletoAddTo = ConfigTable.Value;
 						DisablePortalJuice = ConfigFluid.Value; // to late to change spawn amount now
 						PortalChanger();
-						Jotunn.Logger.LogMessage("Is portal Fluid disabled?: " + DisablePortalJuice + "amount of Starting Fluid Set: "+ PortalMagicFluidSpawn);
+						Jotunn.Logger.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: "+ PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
 					}
 				}
 				else
@@ -500,9 +499,10 @@ namespace RareMagicPortal
 					CraftingStationlvl = ConfigTableLvl.Value; // checked at every event
 					if (DisablePortalJuice != ConfigFluid.Value || TabletoAddTo != ConfigTable.Value)
                     {
-						DisablePortalJuice = ConfigFluid.Value; // too late to change spawn amount now
+						TabletoAddTo = ConfigTable.Value;
+						DisablePortalJuice = ConfigFluid.Value; 
 						PortalChanger();
-						Jotunn.Logger.LogMessage("Trying to change Portal Requirements mid game");
+						Jotunn.Logger.LogInfo("Trying to change Portal Requirements mid game");
 
 					}
 				}
@@ -511,15 +511,13 @@ namespace RareMagicPortal
 
 		private void ReadAndWriteConfigValues()
 		{
+			//Jotunn.Logger.LogInfo("Reached Read and Write");
 			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
 			TabletoAddTo = (string)Config["Server config", "CraftingStation_Requirement"].BoxedValue;
 			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
 				CraftingStationlvl = 1;
-			Jotunn.Logger.LogInfo("Configs changed PortalMagic");
-
-
 
 		}
 
