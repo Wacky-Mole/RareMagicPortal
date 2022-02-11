@@ -1,10 +1,9 @@
 ﻿{
   "name": "RareMagicPortal",
-  "description": "",
-  "version_number": "1.0.1",
-  "website_url": "Mod for chaning the Portal Recipe",
+  "version_number": "1.3.0",
+  "website_url": "",
+  "description": "Adds rare magical requirements to making Portals",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.1700",
-    " ValheimModding-Jotunn-2.4.5"
+    "ValheimModding-Jotunn-2.4.5"
   ]
 }
