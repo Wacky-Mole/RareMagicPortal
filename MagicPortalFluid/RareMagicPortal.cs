@@ -135,7 +135,10 @@ namespace RareMagicPortal
 					}
 					else
 					{
-						__instance.Message(MessageHud.MessageType.Center, "Need a Level " + CraftingStationlvl + " " + piece.m_craftingStation.name + " for placement");
+						string worktablename = piece.m_craftingStation.name;
+						GameObject temp = GetPieces().Find(g => Utils.GetPrefabName(g) == worktablename);
+						var name = temp.GetComponent<Piece>().m_name;
+						__instance.Message(MessageHud.MessageType.Center, "Need a Level " + CraftingStationlvl + " " + name + " for placement");
 						piecehaslvl = false;
 						return false;
 					}
@@ -235,10 +238,11 @@ namespace RareMagicPortal
 		{
 			var peter = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
 
-			// GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer												 
+			// GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer			
+			// GameObject go = GetPieces().Find(g => Utils.GetPrefabName(g) == name); // might work better									 
 
 
-			List <Piece.Requirement> requirements = new List<Piece.Requirement>();
+			List<Piece.Requirement> requirements = new List<Piece.Requirement>();
 				requirements.Add(new Piece.Requirement
 				{
 					m_amount = 20,
