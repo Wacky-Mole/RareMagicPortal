@@ -25,7 +25,7 @@ using Logger = Jotunn.Logger;
 using HarmonyLib;
 using RareMagicPortal;
 //using PieceManager;
-//using ServerSync;
+using ServerSync;
 
 
 namespace RareMagicPortal
@@ -38,7 +38,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.3.0";
+		public const string PluginVersion = "1.3.1";
         
 
         // Use this class to add your own localization to the game
@@ -81,8 +81,8 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{
 				{
-					//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoadRecipes());
-					LoadAllRecipeData(reload: true); // while loading on world screen
+					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoadRecipes()); // important
+					//LoadAllRecipeData(reload: true); // while loading on world screen
 				}
 			}
 		}
@@ -236,64 +236,52 @@ namespace RareMagicPortal
         // JVL changer
         private static void PortalChanger()
 		{
-			var peter = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
+			//var peterj = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
 
-			// GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer			
-			// GameObject go = GetPieces().Find(g => Utils.GetPrefabName(g) == name); // might work better									 
-
-
-			List<Piece.Requirement> requirements = new List<Piece.Requirement>();
-				requirements.Add(new Piece.Requirement
+			 var peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
+			if (peter != null)
 				{
-					m_amount = 20,
-					m_resItem = ObjectDB.instance.GetItemPrefab("FineWood").GetComponent<ItemDrop>(),
-					m_recover = true
-				});
-				if (!DisablePortalJuice) { // make this more dynamic
-					requirements.Add(new Piece.Requirement
+								 
+					List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+						requirements.Add(new Piece.Requirement
+						{
+							m_amount = 20,
+							m_resItem = ObjectDB.instance.GetItemPrefab("FineWood").GetComponent<ItemDrop>(),
+							m_recover = true
+						});
+						if (!DisablePortalJuice) { // make this more dynamic
+							requirements.Add(new Piece.Requirement
+							{
+								m_amount = 1,
+								m_resItem = ObjectDB.instance.GetItemPrefab("PortalMagicFluid").GetComponent<ItemDrop>(),
+								m_recover = true
+							});
+						}
+						requirements.Add(new Piece.Requirement
+						{
+							m_amount = 10,
+							m_resItem = ObjectDB.instance.GetItemPrefab("GreydwarfEye").GetComponent<ItemDrop>(),
+							m_recover = true
+						});
+						requirements.Add(new Piece.Requirement
+						{
+							m_amount = 2,
+							m_resItem = ObjectDB.instance.GetItemPrefab("SurtlingCore").GetComponent<ItemDrop>(),
+							m_recover = true
+						});
+
+					var CraftingStationforPaul = GetCraftingStation(TabletoAddTo);
+					if (CraftingStationforPaul == null)
 					{
-						m_amount = 1,
-						m_resItem = ObjectDB.instance.GetItemPrefab("PortalMagicFluid").GetComponent<ItemDrop>(),
-						m_recover = true
-					});
-				}
-				requirements.Add(new Piece.Requirement
-				{
-					m_amount = 10,
-					m_resItem = ObjectDB.instance.GetItemPrefab("GreydwarfEye").GetComponent<ItemDrop>(),
-					m_recover = true
-				});
-				requirements.Add(new Piece.Requirement
-				{
-					m_amount = 2,
-					m_resItem = ObjectDB.instance.GetItemPrefab("SurtlingCore").GetComponent<ItemDrop>(),
-					m_recover = true
-				});
+						CraftingStationforPaul.m_name = DefaultTable;
+					}
 
-			var CraftingStationforPaul = GetCraftingStation(TabletoAddTo);
-			if (CraftingStationforPaul == null)
-            {
-				CraftingStationforPaul.m_name = DefaultTable;
-            }
+					Piece petercomponent = peter.GetComponent<Piece>();
+					petercomponent.m_craftingStation = GetCraftingStation(CraftingStationforPaul.m_name); // sets crafting station workbench/forge /ect
+					petercomponent.m_resources = requirements.ToArray();
 
-			//paul.GetComponent<Piece>().m_resources = requirements.ToArray();
-
-
-			//var joshy = GameObject.Instantiate(p)
-			//GameObject peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
-			//  james =  GetRecipeDataByName("portal_wood");
-			//GameObject  john =  GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == james.name);
-			//john.GetComponent<Piece>().m_craftingStation = GetCraftingStation(james.craftingStation);
-			//john.GetComponent<Piece>().m_resources = requirements.ToArray();
-			//var risky = PrefabManager.Instance.GetPrefab("forge_ext3").AddComponent<CraftingStation>();
-			//risky.m_name = "paulshome";
-
-			Piece petercomponent = peter.GetComponent<Piece>();
-			petercomponent.m_craftingStation = GetCraftingStation(CraftingStationforPaul.m_name); // sets crafting station workbench/forge /ect
-			petercomponent.m_resources = requirements.ToArray();
-			
-			
-
+            }		// if loop	
+																			  			
 
 		}
 
@@ -327,14 +315,16 @@ namespace RareMagicPortal
 
 		public static IEnumerator DelayedLoadRecipes()
 		{
-			yield return null;
+			yield return new WaitForSeconds(0.1f);
 			LoadAllRecipeData(reload: true);
+			yield break;
 		}
 
 		private static void LoadAllRecipeData(bool reload)
 		{
 			if (reload) // waits until the last seconds to reference and overwrite
 			{
+
 				PortalChanger();
 			}
 		}
