@@ -11,49 +11,66 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
-using Jotunn.Configs;
-using Jotunn.Entities;
-using Jotunn.GUI;
-using Jotunn.Managers;
-using Jotunn.Utils;
+//using Jotunn.Configs;
+//using Jotunn.Entities;
+//using Jotunn.GUI;
+//using Jotunn.Managers;
+//using Jotunn.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Logger = Jotunn.Logger;
+//using Logger = Jotunn.Logger;
 using HarmonyLib;
 using RareMagicPortal;
 //using PieceManager;
 using ServerSync;
+using ItemManager;
+using BepInEx.Logging;
 
 
 namespace RareMagicPortal
 {
 	//extra
 	[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-	[BepInDependency(Jotunn.Main.ModGuid)]
-	[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+	//[BepInDependency(Jotunn.Main.ModGuid)]
+	//[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
 	internal class MagicPortalFluid : BaseUnityPlugin
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.3.1";
-        
+		public const string PluginVersion = "1.4.0";
 
-        // Use this class to add your own localization to the game
-        // https://valheim-modding.github.io/Jotunn/tutorials/localization.html
-        //public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
+		internal const string ModName = PluginName;
+		internal const string ModVersion = PluginVersion;
+		internal const string Author = "WackyMole";
+		private const string ModGUID = Author + "." + ModName;
+		private static string ConfigFileName = PluginGUID + ".cfg";
+		private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole.RareMagicPortal.cfg";
 
-        private AssetBundle portalmagicfluid;
-		private CustomLocalization Localization;
+		internal static string ConnectionError = "";
+
+		private readonly Harmony _harmony = new(ModGUID);
+
+		public static readonly ManualLogSource RareMagicPortal =
+			BepInEx.Logging.Logger.CreateLogSource(ModName);
+
+		private static readonly ConfigSync ConfigSync = new(ModGUID)
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "1.4.0" };
+
+
+
+		// Use this class to add your own localization to the game
+		// https://valheim-modding.github.io/Jotunn/tutorials/localization.html
+		//public static CustomLocalization Localization = LocalizationManager.Instance.GetLocalization();
+
+		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
 		public static ConfigEntry<bool> modEnabled;
 		public static ConfigEntry<bool> isDebug;
 		public static bool firstTime = false;
 		public static ConfigEntry<int> nexusID;
-		private static string ConfigFileName = PluginGUID + ".cfg"; // Thank Azumatt
-		private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 		private static List<RecipeData> recipeDatas = new List<RecipeData>();
 		private static string assetPath;
 		public static int PortalMagicFluidSpawn = 3; // default
@@ -66,13 +83,13 @@ namespace RareMagicPortal
 		public static int CraftingStationlvl = 1;
 		public static Vector3 tempvalue;
 		//public static string CraftingStationName;
-		public static bool Admin = false;
 		public static bool loadfilesonce = false;
+		bool admin = !ConfigSync.IsLocked; 
 
-		private ConfigEntry<bool> ConfigFluid;
-        private ConfigEntry<int> ConfigSpawn;
-		private ConfigEntry<string> ConfigTable;
-		private ConfigEntry<int> ConfigTableLvl;
+		private static ConfigEntry<bool>? ConfigFluid;
+        private static ConfigEntry<int>? ConfigSpawn;
+		private static ConfigEntry<string>? ConfigTable;
+		private static ConfigEntry<int>? ConfigTableLvl;
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
@@ -148,26 +165,24 @@ namespace RareMagicPortal
 					
         }
 		
-		
 
 		private void Awake()
 		{
 			CreateConfigValues();
 			ReadAndWriteConfigValues();
 			LoadAssets();
-			itemModCreation();
-
 
 			context = this;
 
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
-			AddLocalizations();
+			//AddLocalizations();
 			SetupWatcher();
+			
 
 
-			Jotunn.Logger.LogInfo("MagicPortalFluid has loaded start assets");
+			RareMagicPortal.LogInfo("MagicPortalFluid has loaded start assets");
 
 		}
 
@@ -176,22 +191,19 @@ namespace RareMagicPortal
 
 		private void LoadAssets()
 		{
-			portalmagicfluid = AssetUtils.LoadAssetBundleFromResources("portalmagicfluid", typeof(MagicPortalFluid).Assembly);
-			//Jotunn.Logger.LogInfo($"Embedded resources: {string.Join(",", typeof(MagicPortalFluid).Assembly.GetManifestResourceNames())}");
+			Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
+			//portalmagicfluid = AssetUtils.LoadAssetBundleFromResources("portalmagicfluid", typeof(MagicPortalFluid).Assembly);
+			//RareMagicPortal.LogInfo($"Embedded resources: {string.Join(",", typeof(MagicPortalFluid).Assembly.GetManifestResourceNames())}");
+			portalmagicfluid.Name.English("Magical Portal Fluid");
+			portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
+			//ItemManager.PrefabManager.RegisterAssetBundle("portalmagicfluid", "assetsEmbedded");
+			//ItemManager.PrefabManager.RegisterPrefab
 
 		}
 
 		private void UnLoadAssets()
 		{
 			portalmagicfluid.Unload(false);
-		}
-
-		private void itemModCreation()
-		{
-			var magicjuice_prefab = portalmagicfluid.LoadAsset<GameObject>("PortalMagicFluid");
-			var portaljuice = new CustomItem(magicjuice_prefab, fixReference: false);
-			ItemManager.Instance.AddItem(portaljuice);
-
 		}
 
 		private void SetupWatcher() // Thx Azumatt
@@ -208,27 +220,36 @@ namespace RareMagicPortal
 		private void ReadConfigValues(object sender, FileSystemEventArgs e) // Thx Azumatt
         {
             if (!File.Exists(ConfigFileFullPath)) return;
-			Admin = SynchronizationManager.Instance.PlayerIsAdmin;
-			//Jotunn.Logger.LogInfo("ReadConfigValues called- checking admin status");
+			//RareMagicPortal.LogInfo("ReadConfigValues called- checking admin status");
 
-			if (Admin)
+			if (admin)
             {
+				
                 try
                 {
 					Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
 					ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
-					Jotunn.Logger.LogInfo("ReadConfigValues loaded- you are an admin");
-					Jotunn.Logger.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
 					PortalChanger();
-					
+
+					if (ConfigSync.IsSourceOfTruth)
+					{
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin-maybe");
+					}
+					else
+					{
+						// false so remote config is being used
+						RareMagicPortal.LogInfo("ReadConfigValues Server values loaded");
+						RareMagicPortal.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
+					}
+
 
 				}
                 catch
                 {
-                    Jotunn.Logger.LogInfo($"There was an issue loading your {ConfigFileName}");
-                    Jotunn.Logger.LogInfo("Please check your config entries for spelling and format!");
+					RareMagicPortal.LogInfo($"There was an issue loading your {ConfigFileName}");
+					RareMagicPortal.LogInfo("Please check your config entries for spelling and format!");
                 }
-            } else Jotunn.Logger.LogInfo("You are not admin - so no files changed");
+            } else RareMagicPortal.LogInfo("You are not admin - so no files changed");
 		}
 
         // changing portals section
@@ -296,7 +317,7 @@ namespace RareMagicPortal
 
 			if (firstTime && PortalMagicFluidSpawn != 0)
 			{
-				Jotunn.Logger.LogInfo("New Starting Item Set");
+				RareMagicPortal.LogInfo("New Starting Item Set");
 				Inventory inventory = ((Humanoid)Player.m_localPlayer).m_inventory;
 				inventory.AddItem("PortalMagicFluid", PortalMagicFluidSpawn, 1, 0, 0L, "");
 				firstTime = false;
@@ -429,83 +450,66 @@ namespace RareMagicPortal
 			return recipeData;
 		}
 
-		// Adds hardcoded localizations
-		private void AddLocalizations()
+		#region ConfigOptions
+
+		private static ConfigEntry<bool>? _serverConfigLocked;
+
+		private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
+			bool synchronizedSetting = true)
 		{
-			// Create a custom Localization instance and add it to the Manager
-			Localization = new CustomLocalization();
-			LocalizationManager.Instance.AddLocalization(Localization);
+			ConfigDescription extendedDescription =
+				new(
+					description.Description +
+					(synchronizedSetting ? " [Synced with Server]" : " [Not Synced with Server]"),
+					description.AcceptableValues, description.Tags);
+			ConfigEntry<T> configEntry = Config.Bind(group, name, value, extendedDescription);
+			//var configEntry = Config.Bind(group, name, value, description);
 
-			// Add translations for our custom skill
-			Localization.AddTranslation("English", new Dictionary<string, string>
-			{
-				{"portalmagicfluid", "Magical Portal Fluid" }, {"portalmagicfluid_description", "Once a mythical essence, now made real with Odin's blessing"}
-			});
+			SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+			syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
 
+			return configEntry;
 		}
 
-		private void CreateConfigValues()
+		private ConfigEntry<T> config<T>(string group, string name, T value, string description,
+			bool synchronizedSetting = true)
 		{
-			Config.SaveOnConfigSet = true;
+			return config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+		}
 
+		private class ConfigurationManagerAttributes
+		{
+			public bool? Browsable = false;
+		}
 
-			// Add server config which gets pushed to all clients connecting and can only be edited by admins
-			// In local/single player games the player is always considered the admin
+		#endregion
+	
 
-			ConfigFluid = Config.Bind("Server config", "DisablePortalJuice", false,
-							new ConfigDescription("Disable PortalFluid requirement?", null,
-								new ConfigurationManagerAttributes { IsAdminOnly = true }));
+	private void CreateConfigValues()
+		{
+		_serverConfigLocked = config("General", "Force Server Config", true, "Force Server Config");
+		_ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
-			ConfigSpawn = Config.Bind("Server config", "PortalMagicFluidSpawn", 3,
-				new ConfigDescription("How much PortalMagicFluid to start with on a new character?", null,
-					new ConfigurationManagerAttributes { IsAdminOnly = true }));
+		// Add server config which gets pushed to all clients connecting and can only be edited by admins
+		// In local/single player games the player is always considered the admin
 
-			ConfigTable = Config.Bind("Server config", "CraftingStation_Requirement", DefaultTable,
-				new ConfigDescription("Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation "  + System.Environment.NewLine + "Pick a valid table otherwise default is workbench", null,
-					new ConfigurationManagerAttributes { IsAdminOnly = true })); // $piece_workbench , $piece_forge , $piece_artisanstation
+		ConfigFluid = config("Server config", "DisablePortalJuice", false,
+							"Disable PortalFluid requirement?");
 
-			ConfigTableLvl = Config.Bind("Server config", "Level_of_CraftingStation_Req", 1,
-				new ConfigDescription("What level of CraftingStation is required for placing Portal?", null,
-					new ConfigurationManagerAttributes { IsAdminOnly = true }));
+			ConfigSpawn = config("Server config", "PortalMagicFluidSpawn", 3,
+				"How much PortalMagicFluid to start with on a new character?");
 
+			ConfigTable = config("Server config", "CraftingStation_Requirement", DefaultTable,
+				"Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation "  + System.Environment.NewLine + "Pick a valid table otherwise default is workbench"); // $piece_workbench , $piece_forge , $piece_artisanstation
 
+			ConfigTableLvl = config("Server config", "Level_of_CraftingStation_Req", 1,
+				"What level of CraftingStation is required for placing Portal?");
 
-			// You can subscribe to a global event when config got synced initially and on changes
-			SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
-			{
-				
-				if (attr.InitialSynchronization)
-				{
-					Jotunn.Logger.LogMessage("Initial Config sync event received for PortalMagic");
-					PortalMagicFluidSpawn = ConfigSpawn.Value; // no update needed as first time char creation
-					CraftingStationlvl = ConfigTableLvl.Value; // checked at every event
-					if (DisablePortalJuice != ConfigFluid.Value || TabletoAddTo != ConfigTable.Value)
-					{
-						TabletoAddTo = ConfigTable.Value;
-						DisablePortalJuice = ConfigFluid.Value; // to late to change spawn amount now
-						PortalChanger();
-						Jotunn.Logger.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: "+ PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
-					}
-				}
-				else
-				{
-					Jotunn.Logger.LogMessage("Config sync event received for PortalMagic");
-					CraftingStationlvl = ConfigTableLvl.Value; // checked at every event
-					if (DisablePortalJuice != ConfigFluid.Value || TabletoAddTo != ConfigTable.Value)
-                    {
-						TabletoAddTo = ConfigTable.Value;
-						DisablePortalJuice = ConfigFluid.Value; 
-						PortalChanger();
-						Jotunn.Logger.LogInfo("Trying to change Portal Requirements mid game");
-
-					}
-				}
-			};
 		}
 
 		private void ReadAndWriteConfigValues()
 		{
-			//Jotunn.Logger.LogInfo("Reached Read and Write");
+			//RareMagicPortal.LogInfo("Reached Read and Write");
 			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
 			TabletoAddTo = (string)Config["Server config", "CraftingStation_Requirement"].BoxedValue;
