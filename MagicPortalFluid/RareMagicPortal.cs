@@ -11,17 +11,11 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
-//using Jotunn.Configs;
-//using Jotunn.Entities;
-//using Jotunn.GUI;
-//using Jotunn.Managers;
-//using Jotunn.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-//using Logger = Jotunn.Logger;
 using HarmonyLib;
 using RareMagicPortal;
 //using PieceManager;
@@ -40,7 +34,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.4.0";
+		public const string PluginVersion = "1.4.1";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -84,7 +78,7 @@ namespace RareMagicPortal
 		public static Vector3 tempvalue;
 		//public static string CraftingStationName;
 		public static bool loadfilesonce = false;
-		bool admin = !ConfigSync.IsLocked; 
+		 
 
 		private static ConfigEntry<bool>? ConfigFluid;
         private static ConfigEntry<int>? ConfigSpawn;
@@ -221,12 +215,12 @@ namespace RareMagicPortal
         {
             if (!File.Exists(ConfigFileFullPath)) return;
 			//RareMagicPortal.LogInfo("ReadConfigValues called- checking admin status");
-
+			bool admin = !ConfigSync.IsLocked;
 			if (admin)
-            {
-				
-                try
-                {
+			{
+
+				try
+				{
 					Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
 					ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
 					PortalChanger();
@@ -238,18 +232,49 @@ namespace RareMagicPortal
 					else
 					{
 						// false so remote config is being used
-						RareMagicPortal.LogInfo("ReadConfigValues Server values loaded");
-						RareMagicPortal.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
+						RareMagicPortal.LogInfo("Server values loaded");
+						//RareMagicPortal.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
 					}
 
 
 				}
-                catch
-                {
+				catch
+				{
 					RareMagicPortal.LogInfo($"There was an issue loading your {ConfigFileName}");
 					RareMagicPortal.LogInfo("Please check your config entries for spelling and format!");
-                }
-            } else RareMagicPortal.LogInfo("You are not admin - so no files changed");
+				}
+			}
+			else
+			{
+				RareMagicPortal.LogInfo("You are not ServerSync admin - But you probably a local admin");
+				try
+				{
+					
+
+					if (ConfigSync.IsSourceOfTruth)
+					{
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- You are an local admin");
+						Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
+						ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
+						PortalChanger();
+					}
+					else
+					{
+						// false so remote config is being used
+						RareMagicPortal.LogInfo("You Shouldn't reach this normally");
+						//RareMagicPortal.LogInfo("Is portal Fluid disabled?: " + DisablePortalJuice + " amount of Starting Fluid Set: " + PortalMagicFluidSpawn + " Crafting Station " + TabletoAddTo + " LVL " + CraftingStationlvl);
+					}
+
+
+				}
+				catch
+				{
+					RareMagicPortal.LogInfo($"There was an issue loading your {ConfigFileName}");
+					RareMagicPortal.LogInfo("Please check your config entries for spelling and format!");
+				}
+
+
+			}
 		}
 
         // changing portals section
