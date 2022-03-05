@@ -1,5 +1,6 @@
 # RareMagicPortal
-Magical Portal Fluid + JVLServerSync + CraftingStation + CraftingStationLVL
+
+Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL
 
 
 Tired of Portals be the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
@@ -16,25 +17,31 @@ Has four Server configurable values which are sync to client:
 
 Admin can spawn in more items with name 'PortalMagicFluid'
 
-Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scare resource. 
+Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scarce resource.
 Other mods can allow it to be bought at the trader for high prices, gambled on or become rare drops from bosses.
 ﻿
 Could be combined with WayShrine https://www.nexusmods.com/valheim/mods/1298 to create interesting maps.
 
-Requires JVL and its dependencies.
+Does not require JVL as of 1.4.0
 
 The server will send the server config to overwrite client config on connect. The mod looks for changes in the .cfg and with ConfigurationManager
-You can change midgame as an admin in 1.3.0 now!
+You can change midgame as an admin in 1.3.0 now!  - 1.4.1 ServerSync does not update admin status in middle of game.
 
 It is better to set the starting quantity amount to 0 for Dedicated servers and let ServerCharacters mod handle the first time spawn in amounts.
 https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 First Mod: Download and enjoy.
 No known conflicts.
-
 ChangeLog:
-
-
+        
+        Version 1.5.0
+            Fixed another ServerSync bug, cleaned up log outputs.
+        Version 1.4.1
+            Fixed Single Player bug. 1.4.0 Removed JVL requirements.
+        Version 1.4.0
+            ﻿Removed JVL requirements from the Mod. Fixed Station Lvl message to display ingame station name.
+        Version 1.3.0
+            Added CraftingStation and CraftingStation lvl to config! You can now change midgame by editing cfg or with ConfigurationManager
         Version 1.1.1
             Fixed Server Sync. - Now with moar Server Sync!
         Version 1.00
