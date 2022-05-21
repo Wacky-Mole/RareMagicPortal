@@ -34,7 +34,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.5.0";
+		public const string PluginVersion = "1.6.0";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -51,7 +51,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "1.5.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "1.6.0" };
 
 
 
@@ -72,28 +72,33 @@ namespace RareMagicPortal
 		public static string TabletoAddTo;
 		public static string DefaultTable = "$piece_workbench";
 		public static bool piecehaslvl = false;
+		public static bool CreatorOnly = true;
+		public static float PortalHealth = 400f;
 		public static string PiecetoLookFor = "portal_wood"; //name
 		public static string PieceTokenLookFor = "$piece_portal"; //m_name
 		public static int CraftingStationlvl = 1;
 		public static Vector3 tempvalue;
 		//public static string CraftingStationName;
 		public static bool loadfilesonce = false;
-		 
+
 
 		private static ConfigEntry<bool>? ConfigFluid;
-        private static ConfigEntry<int>? ConfigSpawn;
+		private static ConfigEntry<int>? ConfigSpawn;
 		private static ConfigEntry<string>? ConfigTable;
 		private static ConfigEntry<int>? ConfigTableLvl;
+		private static ConfigEntry<bool>? ConfigCreator;
+		private static ConfigEntry<float>? ConfiglHealth;
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
-		private static class ZNetScene_Awake_Patch
+		private static class ZNetScene_Awake_PatchWRare
 		{
 			private static void Postfix()
 			{
 				{
-					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoadRecipes()); // important
-					//LoadAllRecipeData(reload: true); // while loading on world screen
+					RareMagicPortal.LogInfo("Setting MagicPortal Fluid Afterdelay");
+					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
+																					//LoadAllRecipeData(reload: true); // while loading on world screen
 				}
 			}
 		}
@@ -119,6 +124,33 @@ namespace RareMagicPortal
 
 			}
 
+		}
+
+
+		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
+		private static class Player_CheckforOwnerP
+		{
+			[HarmonyPrefix]
+			private static bool Prefix(ref Player __instance, ref Piece piece)
+			{
+				if (piece == null) 
+					return true;
+
+				if (piece.name == PiecetoLookFor && !__instance.m_noPlacementCost) // portal
+                {
+					bool bool2 = piece.IsCreator();
+					if (bool2 || !CreatorOnly)
+                    { // can remove because is creator or creator only mode is foff
+						return true;
+
+                    }else
+                    {
+						__instance.Message(MessageHud.MessageType.Center, "You are not the portal Creator - Go axe a stump");
+						return false;
+					}
+                }
+				return true;
+			}
 		}
 
 		[HarmonyPatch(typeof(Player), "PlacePiece")]
@@ -218,14 +250,14 @@ namespace RareMagicPortal
 			bool admin= !ConfigSync.IsLocked; // or locked?
 			if (admin)
 			{
-				RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an ServerSync admin-maybe");
+				RareMagicPortal.LogInfo("ReadConfigValues loaded");
 				try
 				{
 					
 
 					if (ConfigSync.IsSourceOfTruth)
 					{
-						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin-maybe with Force Server Config = false");
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin-maybe");
 						Config.Reload();
 						ReadAndWriteConfigValues();
 						PortalChanger();
@@ -248,7 +280,7 @@ namespace RareMagicPortal
 			}
 			else
 			{
-				RareMagicPortal.LogInfo("You are not ServerSync admin");
+				RareMagicPortal.LogInfo("You are not ServerSync admin"); 
 				try
 				{
 					
@@ -283,17 +315,15 @@ namespace RareMagicPortal
 		}
 
         // changing portals section
-
-        // JVL changer
         private static void PortalChanger()
-		{
-			//var peterj = PrefabManager.Instance.GetPrefab("portal_wood"); // this is iffy // JVL			
-
+		{	
 			 var peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
 			if (peter != null)
 				{
-								 
-					List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+					WearNTear por =  peter.GetComponent<WearNTear>();
+					por.m_health = PortalHealth; // set New Portal Health
+
+				List<Piece.Requirement> requirements = new List<Piece.Requirement>();
 						requirements.Add(new Piece.Requirement
 						{
 							m_amount = 20,
@@ -364,9 +394,9 @@ namespace RareMagicPortal
 			}
 		}
 
-		public static IEnumerator DelayedLoadRecipes()
+		public static IEnumerator DelayedLoad()
 		{
-			yield return new WaitForSeconds(0.1f);
+			yield return new WaitForSeconds(0.3f);
 			LoadAllRecipeData(reload: true);
 			yield break;
 		}
@@ -535,15 +565,23 @@ namespace RareMagicPortal
 			ConfigTableLvl = config("Server config", "Level_of_CraftingStation_Req", 1,
 				"What level of CraftingStation is required for placing Portal?");
 
-		}
+			ConfigCreator = config("Server config", "OnlyCreatorCanDeconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
 
-		private void ReadAndWriteConfigValues()
+			ConfiglHealth = config("Server config", "Portal_Health", 400f, "Health of Portal");
+
+
+	}
+
+	private void ReadAndWriteConfigValues()
 		{
 			//RareMagicPortal.LogInfo("Reached Read and Write");
 			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
 			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
 			TabletoAddTo = (string)Config["Server config", "CraftingStation_Requirement"].BoxedValue;
 			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
+			CreatorOnly = (bool)Config["Server config", "OnlyCreatorCanDeconstruct"].BoxedValue;
+			PortalHealth = (float)Config["Server config", "Portal_Health"].BoxedValue;
+
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
 				CraftingStationlvl = 1;
 
