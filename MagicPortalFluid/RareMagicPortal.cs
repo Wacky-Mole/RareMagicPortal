@@ -142,12 +142,12 @@ namespace RareMagicPortal
 				Piece.GetAllPiecesInRadius(__instance.transform.position, 5f, emptyPiece);
 				//long playerID = Game.instance.GetPlayerProfile().GetPlayerID();
 				foreach (var piece in emptyPiece)
-                {
+				{
 					if (piece.m_name == "portal_wood")
-                    {
+					{
 						portal = piece;
-                    }
-                }
+					}
+				}
 				if (portal != null)
                 {
 					bool sameperson = false;
