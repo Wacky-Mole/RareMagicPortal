@@ -2,6 +2,8 @@
 
 Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL
 
+Allows you to limit the amount of portals per character. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
+Increase PVP and multiply cooperation by making portals a scarce resource. 
 
 Tired of Portals be the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
 to see more PVP or more cooperation between your buddies and their bases?
@@ -34,6 +36,11 @@ First Mod: Download and enjoy.
 No known conflicts.
 ChangeLog:
         
+
+        Version 1.6.0
+            Added two New Configs: Portal Health and OnlyCreatorCanDeconstruct ( still allows someone to destory it)
+        Version 1.5.1
+            Fixed potential SinglePlayer Bug
         Version 1.5.0
             Fixed another ServerSync bug, cleaned up log outputs.
         Version 1.4.1

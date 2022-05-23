@@ -73,6 +73,7 @@ namespace RareMagicPortal
 		public static string DefaultTable = "$piece_workbench";
 		public static bool piecehaslvl = false;
 		public static bool CreatorOnly = true;
+		public static bool CreatorLock = false;
 		public static float PortalHealth = 400f;
 		public static string PiecetoLookFor = "portal_wood"; //name
 		public static string PieceTokenLookFor = "$piece_portal"; //m_name
@@ -88,6 +89,7 @@ namespace RareMagicPortal
 		private static ConfigEntry<int>? ConfigTableLvl;
 		private static ConfigEntry<bool>? ConfigCreator;
 		private static ConfigEntry<float>? ConfiglHealth;
+		private static ConfigEntry<bool>? ConfigCreatorLock;
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
@@ -126,8 +128,45 @@ namespace RareMagicPortal
 
 		}
 
+		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Interact))]
+		[HarmonyPrefix]
+		private static bool PortalCheckOutside(TeleportWorld __instance, Humanoid human, bool hold)
+		{
+			if (hold)
+				return false;
+			if (__instance.m_nview.IsValid())
+			{
+				Player closestPlayer = Player.GetClosestPlayer(__instance.m_proximityRoot.position, 5f);
+				Piece portal = null;
+				var emptyPiece = new List<Piece>();
+				Piece.GetAllPiecesInRadius(__instance.transform.position, 5f, emptyPiece);
+				//long playerID = Game.instance.GetPlayerProfile().GetPlayerID();
+				foreach (var piece in emptyPiece)
+                {
+					if (piece.m_name == "portal_wood")
+                    {
+						portal = piece;
+                    }
+                }
+				if (portal != null)
+                {
+					bool sameperson = false;
+					if (portal.m_creator == closestPlayer.GetPlayerID())
+						sameperson = true;
 
-		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
+					if (sameperson || !sameperson && !CreatorLock  || closestPlayer.m_noPlacementCost)
+                    {
+						return true;
+                    } // Only creator || not creator and not in lock mode || not in noplacementcost mode
+					return false; // noncreator doesn't have permiss
+				}		
+				return true;				
+            }
+			return true;
+		}
+
+
+			[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
 		private static class Player_CheckforOwnerP
 		{
 			[HarmonyPrefix]
@@ -138,7 +177,7 @@ namespace RareMagicPortal
 
 				if (piece.name == PiecetoLookFor && !__instance.m_noPlacementCost) // portal
                 {
-					bool bool2 = piece.IsCreator();
+					bool bool2 = piece.IsCreator();// nice
 					if (bool2 || !CreatorOnly)
                     { // can remove because is creator or creator only mode is foff
 						return true;
@@ -569,8 +608,10 @@ namespace RareMagicPortal
 
 			ConfiglHealth = config("Server config", "Portal_Health", 400f, "Health of Portal");
 
+			ConfigCreatorLock = config("Server config", "OnlyCreatorCanChange", false, "Only Creator can change Portal name");
 
-	}
+
+		}
 
 	private void ReadAndWriteConfigValues()
 		{
@@ -581,6 +622,7 @@ namespace RareMagicPortal
 			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
 			CreatorOnly = (bool)Config["Server config", "OnlyCreatorCanDeconstruct"].BoxedValue;
 			PortalHealth = (float)Config["Server config", "Portal_Health"].BoxedValue;
+			CreatorLock = (bool)Config["Server config", "OnlyCreatorCanChange"].BoxedValue;
 
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
 				CraftingStationlvl = 1;
