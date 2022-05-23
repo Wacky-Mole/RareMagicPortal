@@ -167,7 +167,7 @@ namespace RareMagicPortal
 		}
 
 
-			[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
+		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
 		private static class Player_CheckforOwnerP
 		{
 			[HarmonyPrefix]
@@ -357,13 +357,13 @@ namespace RareMagicPortal
         // changing portals section
         private static void PortalChanger()
 		{	
-			 var peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
+			var peter = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == "portal_wood"); //item prefab loaded from hammer
 			if (peter != null)
 				{
 					WearNTear por =  peter.GetComponent<WearNTear>();
 					por.m_health = PortalHealth; // set New Portal Health
 
-				List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+					List<Piece.Requirement> requirements = new List<Piece.Requirement>();
 						requirements.Add(new Piece.Requirement
 						{
 							m_amount = 20,
