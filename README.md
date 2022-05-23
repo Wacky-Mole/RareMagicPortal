@@ -1,6 +1,6 @@
 # RareMagicPortal
 
-Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL
+Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth
 
 Allows you to limit the amount of portals per character. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
 Increase PVP and multiply cooperation by making portals a scarce resource. 
@@ -11,11 +11,14 @@ Well, I've a mod for you!
 
 Set a starting amount of PortalMagicFluid per new character.  This mod changes the recipe for portals and requires a new unique item called PortalMagicFluid. One Magical Portal Fluid per Portal.
 
-Has four Server configurable values which are sync to client:
+Has 7 (Seven) Server configurable values which are sync to client as of 1.6.0
 1)Turn on and off the new portal requirements (true, false)
 2) Starting quantity of PortalMagicFluid (default 3)( int 0-250) [ Only applies to brand new character on first spawn in]
 3) CraftingStation required nearby - Default is $piece_workbench for workbench.
 4) Level required for that craftingStation to be able to build this piece. - I think unique to this mod. - Default 1
+5) OnlyCreatorCanDeconstruct - Default is true; Can still be destoryed
+6) Portal Health: Default 400
+7) Only the Creator can change the Portal Name : Default false;
 
 Admin can spawn in more items with name 'PortalMagicFluid'
 
@@ -38,7 +41,7 @@ ChangeLog:
         
 
         Version 1.6.0
-            Added two New Configs: Portal Health and OnlyCreatorCanDeconstruct ( still allows someone to destory it)
+            Added three New Configs: Portal Health, OnlyCreatorCanDeconstruct (  destroy possible), OnlyCreatorCanRename
         Version 1.5.1
             Fixed potential SinglePlayer Bug
         Version 1.5.0
