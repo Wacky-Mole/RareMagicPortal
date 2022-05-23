@@ -158,6 +158,7 @@ namespace RareMagicPortal
                     {
 						return true;
                     } // Only creator || not creator and not in lock mode || not in noplacementcost mode
+					human.Message(MessageHud.MessageType.Center, "Only the Owner Can change Name");
 					return false; // noncreator doesn't have permiss
 				}		
 				return true;				
