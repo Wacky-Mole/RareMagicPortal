@@ -1,17 +1,19 @@
 ManifestFileVersion: 0
-CRC: 3288117896
+CRC: 3839780607
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b79a6889590c84e1e6b298d92e150e7b
+    Hash: 13d4fb9abde80ec854cdb30ba0a31eae
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2c38fe503752489e75f1260d637aeba7
+    Hash: aaa37c9d21447fdf4450e7e8322aa29a
 HashAppended: 0
 ClassTypes:
 - Class: 1
   Script: {instanceID: 0}
 - Class: 4
+  Script: {instanceID: 0}
+- Class: 20
   Script: {instanceID: 0}
 - Class: 21
   Script: {instanceID: 0}
@@ -28,6 +30,8 @@ ClassTypes:
 - Class: 54
   Script: {instanceID: 0}
 - Class: 65
+  Script: {instanceID: 0}
+- Class: 81
   Script: {instanceID: 0}
 - Class: 108
   Script: {instanceID: 0}
@@ -50,4 +54,5 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/CustomItems/PortalMagicFluid.prefab
+- Assets/CustomItems/PortalCrystal.prefab
 Dependencies: []

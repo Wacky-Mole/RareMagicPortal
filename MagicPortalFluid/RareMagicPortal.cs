@@ -34,7 +34,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "1.6.0";
+		public const string PluginVersion = "2.0.0";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -51,7 +51,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "1.6.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.0.0" };
 
 
 
@@ -258,12 +258,12 @@ namespace RareMagicPortal
 		private void LoadAssets()
 		{
 			Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
-			//portalmagicfluid = AssetUtils.LoadAssetBundleFromResources("portalmagicfluid", typeof(MagicPortalFluid).Assembly);
-			//RareMagicPortal.LogInfo($"Embedded resources: {string.Join(",", typeof(MagicPortalFluid).Assembly.GetManifestResourceNames())}");
 			portalmagicfluid.Name.English("Magical Portal Fluid");
 			portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
-			//ItemManager.PrefabManager.RegisterAssetBundle("portalmagicfluid", "assetsEmbedded");
-			//ItemManager.PrefabManager.RegisterPrefab
+			Item portalmagiccrystal = new("portalmagicfluid", "portalmagiccrystal", "assetsEmbedded");
+			portalmagicfluid.Name.English("Portal Essence Crystal");
+			portalmagicfluid.Description.English("Unlock Traveling Odin's Crystals");
+
 
 		}
 
