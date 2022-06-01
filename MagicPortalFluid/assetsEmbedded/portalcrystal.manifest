@@ -1,0 +1,53 @@
+ManifestFileVersion: 0
+CRC: 4028356035
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: a2a79b7416d1fc0413f5ca4f371700ee
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 02ff58479f2a94823dc5cdc54fe7659a
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: d8d531e381601b94c984221b5db7323d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ce0660cf497ffea489c9c606137e6a86, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/CustomItems/PortalCrystal.prefab
+Dependencies: []
