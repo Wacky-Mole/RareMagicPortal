@@ -67,6 +67,11 @@ namespace RareMagicPortal
 		public static ConfigEntry<int> nexusID;
 		private static List<RecipeData> recipeDatas = new List<RecipeData>();
 		private static string assetPath;
+		public static string PiecetoLookFor = "portal_wood"; //name
+		public static string PieceTokenLookFor = "$piece_portal"; //m_name
+		public static Vector3 tempvalue;
+		public static bool loadfilesonce = false;
+
 		public static int PortalMagicFluidSpawn = 3; // default
 		public static bool DisablePortalJuice = false; // don't disable
 		public static string TabletoAddTo;
@@ -75,12 +80,11 @@ namespace RareMagicPortal
 		public static bool CreatorOnly = true;
 		public static bool CreatorLock = false;
 		public static float PortalHealth = 400f;
-		public static string PiecetoLookFor = "portal_wood"; //name
-		public static string PieceTokenLookFor = "$piece_portal"; //m_name
 		public static int CraftingStationlvl = 1;
-		public static Vector3 tempvalue;
-		//public static string CraftingStationName;
-		public static bool loadfilesonce = false;
+		public static int MagicPortalFluidValue = 300;
+		public static bool EnableCrystals = false;
+		public static int CrystalsConsumable = 1;
+		public static int CurrentCrystalCount;
 
 
 		private static ConfigEntry<bool>? ConfigFluid;
@@ -90,6 +94,12 @@ namespace RareMagicPortal
 		private static ConfigEntry<bool>? ConfigCreator;
 		private static ConfigEntry<float>? ConfiglHealth;
 		private static ConfigEntry<bool>? ConfigCreatorLock;
+		private static ConfigEntry<int>? ConfigFluidValue;
+		private static ConfigEntry<bool>? ConfigEnableCrystals;
+		private static ConfigEntry<int>? ConfigCrystalsConsumable;
+
+
+		public static ItemDrop.ItemData Crystal { get; private set; }
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
@@ -165,6 +175,82 @@ namespace RareMagicPortal
             }
 			return true;
 		}
+
+
+		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Teleport))]  // for Crystals
+		static class TeleportWorld_Teleport_CheckforCrystal
+		{
+			[HarmonyPrefix]
+			private static bool Prefix(TeleportWorld __instance, ref Player player)
+			{
+				if (EnableCrystals)
+				{
+					ItemDrop.ItemData Crystal = null;
+					//ItemDrop.ItemData Crystal = ObjectDB.instance.GetItemPrefab("PortalCrystal").GetComponent<ItemDrop>().m_itemData; // IDK this wasn't working
+					//CurrentCrystalCount = player.m_inventory.CountItems("$portalmagiccrystal"); 
+					string nameC = "$portalmagiccrystal";
+					List<ItemDrop.ItemData> GetItem = player.m_inventory.GetAllItems();
+					CurrentCrystalCount = 0;
+					foreach (ItemDrop.ItemData item in GetItem)
+					{
+						if (item.m_shared.m_name == nameC)
+						{
+							CurrentCrystalCount += item.m_stack;
+							Crystal = item;
+						}
+					}
+					if (CurrentCrystalCount > 0)
+					{
+						if (CrystalsConsumable > 0) // if enough for teleport
+						{
+							if (!player.IsTeleportable())
+							{
+								player.Message(MessageHud.MessageType.Center, "$msg_noteleport");
+								return false;
+							}
+							Piece portal = null;
+							var emptyPiece = new List<Piece>();
+							Piece.GetAllPiecesInRadius(__instance.transform.position, 2f, emptyPiece);
+							foreach (var piece in emptyPiece)
+							{
+								if (piece.m_name == "portal_wood")
+								{
+									portal = piece;
+								}
+							}
+							if (portal != null)
+                            {
+
+                            }
+							player.m_inventory.RemoveItem(Crystal, CrystalsConsumable);
+							if (CrystalsConsumable > 1)
+                            {
+								player.Message(MessageHud.MessageType.TopLeft, $"Consumed {CrystalsConsumable} Portal Crystals");
+							} else
+                            {
+								player.Message(MessageHud.MessageType.TopLeft, $" One Portal Crystal Consumed");
+                            }
+							
+							return true;
+						}
+						player.Message(MessageHud.MessageType.TopLeft, $"Portal Crystal Grants Access");
+						return true;
+					}
+					else
+					{
+						player.Message(MessageHud.MessageType.Center, "No Portal Crystals");
+						return false;
+					}
+				}
+				else return true;
+			}
+
+		}
+		[HarmonyPostfix]
+		private static void Postfix(ref Player player)
+        {
+
+        }
 
 
 		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
@@ -243,7 +329,6 @@ namespace RareMagicPortal
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
-			//AddLocalizations();
 			SetupWatcher();
 			
 
@@ -260,9 +345,10 @@ namespace RareMagicPortal
 			Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
 			portalmagicfluid.Name.English("Magical Portal Fluid");
 			portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
-			Item portalmagiccrystal = new("portalmagicfluid", "portalmagiccrystal", "assetsEmbedded");
-			portalmagicfluid.Name.English("Portal Essence Crystal");
-			portalmagicfluid.Description.English("Unlock Traveling Odin's Crystals");
+			
+			Item PortalCrystal = new("portalcrystal", "PortalCrystal", "assetsEmbedded");
+			PortalCrystal.Name.English("Portal Essence Crystal");
+			PortalCrystal.Description.English("Unlock Traveling Odin's Crystals");
 
 
 		}
@@ -486,41 +572,6 @@ namespace RareMagicPortal
 			}
 			return list;
 		}
-
-		private static RecipeData GetRecipeDataByName(string name)
-		{
-			GameObject itemPrefab = ObjectDB.instance.GetItemPrefab(name);
-			if (itemPrefab == null)
-			{
-				return GetPieceRecipeByName(name);
-			}
-			ItemDrop.ItemData itemData = itemPrefab.GetComponent<ItemDrop>().m_itemData;
-			if (itemData == null)
-			{
-				Dbgl("Item data not found!");
-				return null;
-			}
-			Recipe recipe = ObjectDB.instance.GetRecipe(itemData);
-			if (!recipe)
-			{
-				Dbgl("Recipe not found!");
-				return null;
-			}
-			RecipeData recipeData = new RecipeData
-			{
-				name = name,
-				amount = recipe.m_amount,
-				craftingStation = (recipe.m_craftingStation?.m_name ?? ""),
-				minStationLevel = recipe.m_minStationLevel
-			};
-			Piece.Requirement[] resources = recipe.m_resources;
-			foreach (Piece.Requirement requirement in resources)
-			{
-				recipeData.reqs.Add($"{Utils.GetPrefabName(requirement.m_resItem.gameObject)}:{requirement.m_amount}:{requirement.m_amountPerLevel}:{requirement.m_recover}");
-			}
-			return recipeData;
-		}
-
 		private static RecipeData GetPieceRecipeByName(string name)
 		{
 			GameObject gameObject = GetPieces().Find((GameObject g) => Utils.GetPrefabName(g) == name);
@@ -593,37 +644,47 @@ namespace RareMagicPortal
 		// Add server config which gets pushed to all clients connecting and can only be edited by admins
 		// In local/single player games the player is always considered the admin
 
-		ConfigFluid = config("Server config", "DisablePortalJuice", false,
+			ConfigFluid = config("PortalJuice", "DisablePortalJuice", false,
 							"Disable PortalFluid requirement?");
 
-			ConfigSpawn = config("Server config", "PortalMagicFluidSpawn", 3,
+			ConfigSpawn = config("PortalJuice", "PortalMagicFluidSpawn", 3,
 				"How much PortalMagicFluid to start with on a new character?");
 
-			ConfigTable = config("Server config", "CraftingStation_Requirement", DefaultTable,
+			ConfigFluidValue = config("PortalJuice", "PortalJuiceValue", 300, "What is the value of MagicPortalJuice? " + System.Environment.NewLine + "A Value of 0, makes item not saleable to trader");
+
+			ConfigTable = config("Portal Config", "CraftingStation_Requirement", DefaultTable,
 				"Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation "  + System.Environment.NewLine + "Pick a valid table otherwise default is workbench"); // $piece_workbench , $piece_forge , $piece_artisanstation
 
-			ConfigTableLvl = config("Server config", "Level_of_CraftingStation_Req", 1,
+			ConfigTableLvl = config("Portal Config", "Level_of_CraftingStation_Req", 1,
 				"What level of CraftingStation is required for placing Portal?");
 
-			ConfigCreator = config("Server config", "OnlyCreatorCanDeconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
+			ConfigCreator = config("Portal Config", "OnlyCreatorCanDeconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
 
-			ConfiglHealth = config("Server config", "Portal_Health", 400f, "Health of Portal");
+			ConfiglHealth = config("Portal Config", "Portal_Health", 400f, "Health of Portal");
 
-			ConfigCreatorLock = config("Server config", "OnlyCreatorCanChange", false, "Only Creator can change Portal name");
+			ConfigCreatorLock = config("Portal Config", "OnlyCreatorCanChange", false, "Only Creator can change Portal name");
 
+			ConfigEnableCrystals = config("Portal Crystals", "Portal_Crystal_Enable", false, "Enable Portal Crystals");
 
-		}
+			ConfigCrystalsConsumable = config("Portal Crystals", "Crystal_Consume_Default", 1, "How many Crystals to Consume on Teleporting by Default, 0 is No Consumption");
+
+	}
 
 	private void ReadAndWriteConfigValues()
 		{
 			//RareMagicPortal.LogInfo("Reached Read and Write");
-			DisablePortalJuice = (bool)Config["Server config", "DisablePortalJuice"].BoxedValue;
-			PortalMagicFluidSpawn = (int)Config["Server config", "PortalMagicFluidSpawn"].BoxedValue;
-			TabletoAddTo = (string)Config["Server config", "CraftingStation_Requirement"].BoxedValue;
-			CraftingStationlvl = (int)Config["Server config", "Level_of_CraftingStation_Req"].BoxedValue;
-			CreatorOnly = (bool)Config["Server config", "OnlyCreatorCanDeconstruct"].BoxedValue;
-			PortalHealth = (float)Config["Server config", "Portal_Health"].BoxedValue;
-			CreatorLock = (bool)Config["Server config", "OnlyCreatorCanChange"].BoxedValue;
+			DisablePortalJuice = (bool)Config["PortalJuice", "DisablePortalJuice"].BoxedValue;
+			PortalMagicFluidSpawn = (int)Config["PortalJuice", "PortalMagicFluidSpawn"].BoxedValue;
+			TabletoAddTo = (string)Config["Portal Config", "CraftingStation_Requirement"].BoxedValue;
+			CraftingStationlvl = (int)Config["Portal Config", "Level_of_CraftingStation_Req"].BoxedValue;
+			CreatorOnly = (bool)Config["Portal Config", "OnlyCreatorCanDeconstruct"].BoxedValue;
+			PortalHealth = (float)Config["Portal Config", "Portal_Health"].BoxedValue;
+			CreatorLock = (bool)Config["Portal Config", "OnlyCreatorCanChange"].BoxedValue;
+			MagicPortalFluidValue = (int)Config["PortalJuice", "PortalJuiceValue"].BoxedValue;
+			EnableCrystals = (bool)Config["Portal Crystals", "Portal_Crystal_Enable"].BoxedValue;
+			CrystalsConsumable = (int)Config["Portal Crystals", "Crystal_Consume_Default"].BoxedValue;
+
+
 
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
 				CraftingStationlvl = 1;

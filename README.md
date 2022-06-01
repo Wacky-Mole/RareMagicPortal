@@ -1,11 +1,13 @@
 # RareMagicPortal
 
-Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth
+Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth + Crystal Economy. 
+
+Includes pictures
 
 Allows you to limit the amount of portals per character. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
 Increase PVP and multiply cooperation by making portals a scarce resource. 
 
-Tired of Portals be the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
+Tired of Portals being the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
 to see more PVP or more cooperation between your buddies and their bases?
 Well, I've a mod for you!
 
@@ -15,7 +17,7 @@ Has 7 (Seven) Server configurable values which are sync to client as of 1.6.0
 
 1)Turn on and off the new portal requirements (true, false)
 
-2) Starting quantity of PortalMagicFluid (default 3)( int 0-250) [ Only applies to brand new character on first spawn in]
+2) Starting quantity of PortalMagicFluid (default 3)[ Only applies to brand new character on first spawn in]
 
 3) CraftingStation required nearby - Default is $piece_workbench for workbench.
 
@@ -34,11 +36,6 @@ Other mods can allow it to be bought at the trader for high prices, gambled on o
 ﻿
 Could be combined with WayShrine https://www.nexusmods.com/valheim/mods/1298 to create interesting maps.
 
-Does not require JVL as of 1.4.0
-
-The server will send the server config to overwrite client config on connect. The mod looks for changes in the .cfg and with ConfigurationManager
-You can change midgame as an admin in 1.3.0 now!  - 1.4.1 ServerSync does not update admin status in middle of game.
-
 It is better to set the starting quantity amount to 0 for Dedicated servers and let ServerCharacters mod handle the first time spawn in amounts.
 https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
@@ -47,6 +44,8 @@ No known conflicts.
 ChangeLog:
         
 
+        Version 2.0.0
+            Rewrite
         Version 1.6.0
             Added three New Configs: Portal Health, OnlyCreatorCanDeconstruct (  destroy possible), OnlyCreatorCanRename
         Version 1.5.1

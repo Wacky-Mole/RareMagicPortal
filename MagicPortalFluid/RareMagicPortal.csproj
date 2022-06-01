@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <EmbeddedResource Include="assetsEmbedded\portalcrystal" />
     <None Include="ILRepack.targets" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
