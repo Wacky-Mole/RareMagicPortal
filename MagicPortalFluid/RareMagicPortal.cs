@@ -48,6 +48,7 @@ namespace RareMagicPortal
 		private static string ConfigFileName = PluginGUID + ".cfg";
 		private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole.RareMagicPortal.cfg";
 		private static string YMLFULL = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole" + ".PortalNames.yml";
+		private static string YMLFULLServer = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole" + ".PortalServerNames.yml";
 
 		internal static string ConnectionError = "";
 
@@ -80,7 +81,9 @@ namespace RareMagicPortal
 		public static bool loadfilesonce = false;
 		public static Dictionary<string, int> Ind_Portal_Consumption;
 		public static int CurrentCrystalCount;
-		public static bool isAdmin = false;
+		public static bool isAdmin = true;
+		public static bool isLocal = true;
+		public static string Worldname = null;
 
 		public static int PortalMagicFluidSpawn = 3; // default
 		public static bool DisablePortalJuice = false; // don't disable
@@ -122,6 +125,8 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{
 				{
+					Worldname = ZNet.instance.GetWorldName();// for singleplayer  // won't be ready for multiplayer
+
 					RareMagicPortal.LogInfo("Setting MagicPortal Fluid Afterdelay");
 					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
 																					//LoadAllRecipeData(reload: true); // while loading on world screen
@@ -373,6 +378,7 @@ namespace RareMagicPortal
 			SetupWatcher();
 			setupWatcherYML();
 			ReadYMLValuesBoring();
+			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
 			RareMagicPortal.LogInfo("MagicPortalFluid has loaded start assets");
 
@@ -431,18 +437,50 @@ namespace RareMagicPortal
 			
 
 		}
+		private void CustomSyncEventDetected()
+        {
+			Worldname = ZNet.instance.GetWorldName();
+			RareMagicPortal.LogInfo("You are now connected to Server World " + Worldname);
+			isLocal = false;
+			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+			{
+				//isDedServer = true;
+			}
+			// else
+            {
+				string SyncedString = YMLPortalData.Value;
+				RareMagicPortal.LogInfo(SyncedString);
+				var deserializer = new DeserializerBuilder()
+					.Build();
+
+				PortalN.Portals.Clear();
+				PortalN = deserializer.Deserialize<PortalName>(SyncedString);
+				// reads string into ram // doesn't write to local file
 
 
-		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt
+			}
+
+		}
+
+		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
         {
 			if (!File.Exists(YMLFULL)) return;
-			var yml = File.ReadAllText(YMLFULL);
+			if (isAdmin) // if local admin or ServerSync admin
+			{
+				var yml = File.ReadAllText(YMLFULL);
 
-			var deserializer = new DeserializerBuilder()
-				.Build();
+				var deserializer = new DeserializerBuilder()
+					.Build();
 
-			PortalN.Portals.Clear();
-			PortalN = deserializer.Deserialize<PortalName>(yml);
+				PortalN.Portals.Clear();
+				PortalN = deserializer.Deserialize<PortalName>(yml);
+				YMLPortalData.Value = yml;
+			}
+            else
+            {
+				RareMagicPortal.LogInfo("Portal Cost Values Didn't change because you are not an admin");
+
+			}
 
 		}
 
@@ -457,7 +495,7 @@ namespace RareMagicPortal
 			watcher.EnableRaisingEvents = true;
 		}
 
-		private void ReadYMLValuesBoring() // T
+		private void ReadYMLValuesBoring() // Startup File 
 		{
 			if (!File.Exists(YMLFULL)) return;
 			var yml = File.ReadAllText(YMLFULL);
@@ -466,14 +504,22 @@ namespace RareMagicPortal
 				.Build();
 			PortalN.Portals.Clear();
 			PortalN = deserializer.Deserialize<PortalName>(yml);
+			YMLPortalData.Value = yml;
+
 		}
 
 		private void ReadConfigValues(object sender, FileSystemEventArgs e) // Thx Azumatt
         {
             if (!File.Exists(ConfigFileFullPath)) return;
+
+
 			//RareMagicPortal.LogInfo("ReadConfigValues called- checking admin status");
-			bool admin= !ConfigSync.IsLocked; // or locked?
-			if (admin)
+			//bool admin= !ConfigSync.IsLocked; // or locked?
+			bool admin = ConfigSync.IsAdmin;
+			bool locked = ConfigSync.IsLocked;
+			//RareMagicPortal.LogInfo("admin " + admin);
+			//RareMagicPortal.LogInfo("locked " + locked);
+			if (admin) // Server Sync Admin Only
 			{
 				isAdmin = admin; // need to check this
 				RareMagicPortal.LogInfo("ReadConfigValues loaded");
@@ -481,7 +527,7 @@ namespace RareMagicPortal
 				{
 					if (ConfigSync.IsSourceOfTruth)
 					{
-						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin-maybe");
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin - on a server");
 						Config.Reload();
 						ReadAndWriteConfigValues();
 						PortalChanger();
@@ -509,19 +555,18 @@ namespace RareMagicPortal
 				{
 					
 
-					if (ConfigSync.IsSourceOfTruth)
+					if (ConfigSync.IsSourceOfTruth && !locked)
 					{
-						RareMagicPortal.LogInfo("ReadConfigValues loaded- You are an local admin");
-						Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
-						ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- You are an local admin"); // Server hits this on dedicated
+						ReadAndWriteConfigValues(); 
 						PortalChanger();
+						isAdmin = true; // local admin as well
 					}
 					else
 					{
-						// false so remote config is being used
-						RareMagicPortal.LogInfo("You are not an admin - Server Sync Values loaded ");
-						//Config.Reload(); // I have no idea why, but both of these have to run to update from file properly // this one for configmanger
-						ReadAndWriteConfigValues(); // It could be a synchronizing issue. But it's not updating after I call it again. So weird // this one for local file edit
+
+						RareMagicPortal.LogInfo("You are not an Server admin - Server Sync Values loaded "); // regular non admin clients
+						ReadAndWriteConfigValues(); 
 						PortalChanger();
 						
 					}
@@ -537,6 +582,7 @@ namespace RareMagicPortal
 
 			}
 		}
+		
 
         // changing portals section
         private static void PortalChanger()
@@ -703,6 +749,8 @@ namespace RareMagicPortal
 
 		private static ConfigEntry<bool>? _serverConfigLocked;
 
+
+		private static readonly CustomSyncedValue<string> YMLPortalData = new(ConfigSync, "PortalYmlData", ""); // doesn't show up in config
 		private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
 			bool synchronizedSetting = true)
 		{
@@ -793,15 +841,18 @@ namespace RareMagicPortal
 
 	private static void WritetoYML(string PortalName, int CrystalsConsumable)
         {
-			PortalName.Portal paulgo = new PortalName.Portal
+			if (isAdmin)  // I am not sure why a non admin would need to write.
 			{
-				Crystal_Cost = CrystalsConsumable,
-			};
-			PortalN.Portals.Add(PortalName,paulgo);
-			var serializer = new SerializerBuilder()
-				.Build();
-			var yaml = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-			File.WriteAllText(YMLFULL, yaml);
+				PortalName.Portal paulgo = new PortalName.Portal
+				{
+					Crystal_Cost = CrystalsConsumable,
+				};
+				PortalN.Portals.Add(PortalName, paulgo);
+				var serializer = new SerializerBuilder()
+					.Build();
+				var yaml = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+				File.WriteAllText(YMLFULL, yaml);
+			}
 
 		}
 
