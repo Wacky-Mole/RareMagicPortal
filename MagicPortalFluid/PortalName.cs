@@ -12,8 +12,16 @@ namespace RareMagicPortal
 
         public class Portal
         {
-            public int Crystal_Cost { get; set; }
-            public bool Admin_only { get; set; } = false;
+
+
+            public string Crystal_Cost { get; set; } = "1,none,none";
+
+            public string Key_Requirments { get; set; } = "allow,none,none";
+
+            public int Crystal_Cost_Master { get; set; }
+
+            public bool Free_Passage { get; set; } = false;
+            public bool Admin_only_Access { get; set; } = false;
 
         }
 

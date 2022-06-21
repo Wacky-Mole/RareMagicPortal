@@ -47,8 +47,9 @@ namespace RareMagicPortal
 		private const string ModGUID = Author + "." + ModName;
 		private static string ConfigFileName = PluginGUID + ".cfg";
 		private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole.RareMagicPortal.cfg";
-		private static string YMLFULL = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole" + ".PortalNames.yml";
-		private static string YMLFULLServer = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole" + ".PortalServerNames.yml";
+		private static string YMLFULL = YMLFULLFOLDER + "World1.yml";
+		//private static string YMLFULLServer = Paths.ConfigPath + Path.DirectorySeparatorChar + "WackyMole" + ".PortalServerNames.yml";
+		private static string YMLFULLFOLDER = Path.Combine(Path.GetDirectoryName(Paths.ConfigPath + Path.DirectorySeparatorChar), "Portal_Names");
 
 		internal static string ConnectionError = "";
 
@@ -83,7 +84,8 @@ namespace RareMagicPortal
 		public static int CurrentCrystalCount;
 		public static bool isAdmin = true;
 		public static bool isLocal = true;
-		public static string Worldname = null;
+		public static string Worldname = "demo_world";
+		public static bool LoggingOntoServerFirst = true;
 
 		public static int PortalMagicFluidSpawn = 3; // default
 		public static bool DisablePortalJuice = false; // don't disable
@@ -96,8 +98,13 @@ namespace RareMagicPortal
 		public static int CraftingStationlvl = 1;
 		public static int MagicPortalFluidValue = 300;
 		public static bool EnableCrystals = false;
+		public static bool EnableKeys = false;
 		public static int CrystalsConsumable = 1;
 		public static bool AdminOnlyBuild = false;
+		public static string DefaultPortalColor = "blue";
+
+		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
+		private static bool JustWrote = false;
 
 
 		private static ConfigEntry<bool>? ConfigFluid;
@@ -109,14 +116,38 @@ namespace RareMagicPortal
 		private static ConfigEntry<bool>? ConfigCreatorLock;
 		private static ConfigEntry<int>? ConfigFluidValue;
 		private static ConfigEntry<bool>? ConfigEnableCrystals;
+		private static ConfigEntry<bool>? ConfigEnableKeys;
 		private static ConfigEntry<int>? ConfigCrystalsConsumable;
 		private static ConfigEntry<bool>? ConfigAdminOnly;
+		private static ConfigEntry<string>? CrystalKeyDefaultColor;
+
+		public static string crystalcolorre = ""; // need to reset everytime maybe?
+		public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
+		public string message_eng_MasterCost = $", Rainbow Crystals Required"; // 3, Master Crystals Required
+		public string message_eng_NotCreator = $""; 
+		public string message_eng_Grants_Acess = $"";
+		public string message_eng_Crystal_Consumed = $"";
+		public string message_eng_Odins_Kin = $"Only Odin's Kin are Allowed";
+		public string message_only_Owner_Can_Change = $"Only the Owner Can change Name";
+
+		public const string CrystalMaster = "$item_PortalCrystalMaster";  // RGB
+		public const string CrystalRed = "$item_PortalCrystalRed";
+		public const string CrystalGreen = "$item_PortalCrystalGreen";
+		public const string CrystalBlue = "$item_PortalCrystalBlue";
+
+		public const string PortalKeyGold = "$item_PortalKeyGold";
+		public const string PortalKeyRed = "$item_PortalKeyRed";
+		public const string PortalKeyGreen = "$item_PortalKeyGreen";
+		public const string PortalKeyBlue = "$item_PortalKeyBlue";
+
 
 
 		public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
 		private static PortalName PortalN;
 
 		public static ItemDrop.ItemData Crystal { get; private set; }
+
+
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
 		[HarmonyPriority(0)]
@@ -210,25 +241,41 @@ namespace RareMagicPortal
 			}
 		}
 
+		[HarmonyPatch(typeof(TeleportWorldTrigger), "OnTriggerEnter")]
+		[HarmonyPriority(1)]
+		private class OpenBeforeTargetPortal // need a blax solution to active below patch before hers. 
+		{
+			private static bool Prefix(TeleportWorldTrigger __instance, Collider collider)
+			{
+				return true;
+			}
+
+		}
+
 			[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Teleport))]  // for Crystals
 		static class TeleportWorld_Teleport_CheckforCrystal
 		{
 			[HarmonyPrefix]
 			private static bool Prefix(TeleportWorld __instance, ref Player player)
 			{
+				//finding portal name
 				string PortalName = __instance.GetHoverText();
 				var found = PortalName.IndexOf(":") + 2;
 				var end = PortalName.IndexOf("\" ");
 				var le = end - found;
 				PortalName = PortalName.Substring(found, le);
+				// end finding portal name
 
 				int CrystalForPortal = CrystalsConsumable;
 				bool OdinsKin = false;
+
+
+
 				RareMagicPortal.LogInfo($"Portal name  is {PortalName}");
 				if (PortalN.Portals.ContainsKey(PortalName))
                 {
-					CrystalForPortal = PortalN.Portals[PortalName].Crystal_Cost;
-					OdinsKin = PortalN.Portals[PortalName].Admin_only;
+					CrystalForPortal = PortalN.Portals[PortalName].Crystal_Cost_Master;
+					OdinsKin = PortalN.Portals[PortalName].Admin_only_Access;
 
 				} else
                 {
@@ -239,23 +286,27 @@ namespace RareMagicPortal
 					player.Message(MessageHud.MessageType.Center, "Only Odin's Kin are Allowed");
 					return false;
 				}
-				if (EnableCrystals)
+				if (EnableCrystals || EnableKeys)
 				{
+					
 					ItemDrop.ItemData Crystal = null;
 					//ItemDrop.ItemData Crystal = ObjectDB.instance.GetItemPrefab("PortalCrystal").GetComponent<ItemDrop>().m_itemData; // IDK this wasn't working
-					//CurrentCrystalCount = player.m_inventory.CountItems("$portalmagiccrystal"); 
+					CurrentCrystalCount = player.m_inventory.CountItems(CrystalMaster);
+					RareMagicPortal.LogInfo("Crystal Master Count before " + CurrentCrystalCount);
 
-					string nameC = "$portalmagiccrystal";
+					/*
 					List<ItemDrop.ItemData> GetItem = player.m_inventory.GetAllItems();
 					CurrentCrystalCount = 0;
 					foreach (ItemDrop.ItemData item in GetItem)
 					{
-						if (item.m_shared.m_name == nameC)
+						if (item.m_shared.m_name == CrystalMaster)
 						{
 							CurrentCrystalCount += item.m_stack;
 							Crystal = item;
 						}
 					}
+					*/
+
 					if (CurrentCrystalCount > 0 && __instance.m_hadTarget)
 					{
 						if (CrystalsConsumable > 0) // check if consume mode is active
@@ -376,11 +427,21 @@ namespace RareMagicPortal
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
 			SetupWatcher();
-			setupWatcherYML();
-			ReadYMLValuesBoring();
+			setupYMLFolderWatcher();
+			
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
 			RareMagicPortal.LogInfo("MagicPortalFluid has loaded start assets");
+
+		}
+
+
+		private static void LoadIN()
+        {
+			LoggingOntoServerFirst = true;
+			setupYMLFile();
+			ReadYMLValuesBoring();//
+			
 
 		}
 
@@ -393,9 +454,42 @@ namespace RareMagicPortal
 			portalmagicfluid.Name.English("Magical Portal Fluid");
 			portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
 			
-			Item PortalCrystal = new("portalcrystal", "PortalCrystal", "assetsEmbedded");
-			PortalCrystal.Name.English("Portal Essence Crystal");
-			PortalCrystal.Description.English("Unlock Traveling Odin's Crystals");
+			Item PortalCrystalMaster = new("portalcrystal", "PortalCrystalMaster", "assetsEmbedded");
+			PortalCrystalMaster.Name.English("Rainbow Portal Crystal");
+			PortalCrystalMaster.Description.English("Odin's Traveling Crystals allow for any Portal Traveling");
+
+
+			Item PortalCrystalRed = new("portalcrystal", "PortalCrystalRed", "assetsEmbedded");
+			PortalCrystalRed.Name.English("Red Portal Crystal");
+			PortalCrystalRed.Description.English("Odin's Traveling Crystals allow for Red Portal Traveling");
+
+
+			Item PortalCrystalGreen = new("portalcrystal", "PortalCrystalGreen", "assetsEmbedded");
+			PortalCrystalGreen.Name.English("Green Portal Crystal");
+			PortalCrystalGreen.Description.English("Odin's Traveling Crystals allow for Green Portal Traveling");
+
+
+			Item PortalCrystalBlue = new("portalcrystal", "PortalCrystalBlue", "assetsEmbedded");
+			PortalCrystalBlue.Name.English("Blue Portal Crystal");
+			PortalCrystalBlue.Description.English("Odin's Traveling Crystals allow for Blue Portal Traveling");
+
+
+			Item PortalKeyRed = new("portalcrystal", "PortalKeyRed", "assetsEmbedded");
+			PortalKeyRed.Name.English("Red Portal Key");
+			PortalKeyRed.Description.English("Unlock Portals Requiring The Red Key");
+
+			Item PortalKeyGold = new("portalcrystal", "PortalKeyGold", "assetsEmbedded");
+			PortalKeyGold.Name.English("Gold Admin Portal Key");
+			PortalKeyGold.Description.English("Unlock All Portals");
+
+			Item PortalKeyBlue = new("portalcrystal", "PortalKeyBlue", "assetsEmbedded");
+			PortalKeyBlue.Name.English("Blue Portal Key");
+			PortalKeyBlue.Description.English("Unlock Portals Requiring The Blue Key");
+
+			Item PortalKeyGreen = new("portalcrystal", "PortalKeyGreen", "assetsEmbedded");
+			PortalKeyGreen.Name.English("Green Portal Key");
+			PortalKeyGreen.Description.English("Unlock Portals Requiring The Green Key");
+
 
 
 		}
@@ -405,42 +499,59 @@ namespace RareMagicPortal
 			portalmagicfluid.Unload(false);
 		}
 
-		private void setupWatcherYML()
+		public void setupYMLFolderWatcher()
         {
-
-			PortalN = new PortalName()
+			if (!Directory.Exists(YMLFULLFOLDER))
 			{
+				Directory.CreateDirectory(YMLFULLFOLDER);
+				//File.WriteAllText(YMLFULL, WelcomeString + yaml); //overwrites
+			}
+
+			FileSystemWatcher watcherfolder = new(YMLFULLFOLDER);
+			watcherfolder.Changed += ReadYMLValues;
+			watcherfolder.Created += ReadYMLValues;
+			watcherfolder.Renamed += ReadYMLValues;
+			watcherfolder.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+			watcherfolder.IncludeSubdirectories = true;
+			watcherfolder.EnableRaisingEvents = true;
+
+		}
+
+		private static void setupYMLFile()
+        {
+			YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
+
+			if (!File.Exists(YMLCurrentFile))
+			{
+				PortalN = new PortalName()  // kind of iffy in inside this
+				{
 				Portals = new Dictionary<string, PortalName.Portal>
 					{
 						{"Demo_Portal_Name", new PortalName.Portal() {
-							Crystal_Cost = 3,
+							Crystal_Cost_Master = 3,
 						}},
 					}
-			};
-			var serializer = new SerializerBuilder()
-				.Build();
-			var yaml = serializer.Serialize(PortalN);
-			WelcomeString = WelcomeString + Environment.NewLine;
+				};
+				var serializer = new SerializerBuilder()
+					.Build();
+				var yaml = serializer.Serialize(PortalN);
+				WelcomeString = WelcomeString + Environment.NewLine;
 
-			if (!File.Exists(YMLFULL))
-            {
-				File.WriteAllText(YMLFULL, WelcomeString + yaml); //overwrites
+				File.WriteAllText(YMLCurrentFile, WelcomeString + yaml); //overwrites
+				RareMagicPortal.LogInfo("Creating Portal_Name file " + Worldname);
+				JustWrote = true;
 			}
-
-			FileSystemWatcher watcher2 = new(Paths.ConfigPath + Path.DirectorySeparatorChar, "WackyMole.PortalNames.yml");// sets for single file
-			watcher2.Changed += ReadYMLValues;
-			watcher2.Created += ReadYMLValues;
-			watcher2.Renamed += ReadYMLValues;
-			watcher2.SynchronizingObject = ThreadingHelper.SynchronizingObject;
-			watcher2.IncludeSubdirectories = false;
-			watcher2.EnableRaisingEvents = true;
-			
-
 		}
 		private void CustomSyncEventDetected()
         {
 			Worldname = ZNet.instance.GetWorldName();
-			RareMagicPortal.LogInfo("You are now connected to Server World " + Worldname);
+			YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
+			if (LoggingOntoServerFirst)
+			{
+				RareMagicPortal.LogInfo("You are now connected to Server World " + Worldname);
+				LoggingOntoServerFirst = false;
+			}
+
 			isLocal = false;
 			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 			{
@@ -449,13 +560,15 @@ namespace RareMagicPortal
 			// else
             {
 				string SyncedString = YMLPortalData.Value;
-				RareMagicPortal.LogInfo(SyncedString);
+				RareMagicPortal.LogInfo(SyncedString); // info SyncString might make debugmode for this
 				var deserializer = new DeserializerBuilder()
 					.Build();
 
 				PortalN.Portals.Clear();
 				PortalN = deserializer.Deserialize<PortalName>(SyncedString);
-				// reads string into ram // doesn't write to local file
+				JustWrote = true;
+				//File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString); //overwrites
+																		
 
 
 			}
@@ -464,10 +577,10 @@ namespace RareMagicPortal
 
 		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
         {
-			if (!File.Exists(YMLFULL)) return;
-			if (isAdmin) // if local admin or ServerSync admin
+			if (!File.Exists(YMLCurrentFile)) return;
+			if (isAdmin && !JustWrote) // if local admin or ServerSync admin
 			{
-				var yml = File.ReadAllText(YMLFULL);
+				var yml = File.ReadAllText(YMLCurrentFile);
 
 				var deserializer = new DeserializerBuilder()
 					.Build();
@@ -476,8 +589,10 @@ namespace RareMagicPortal
 				PortalN = deserializer.Deserialize<PortalName>(yml);
 				YMLPortalData.Value = yml;
 			}
-            else
-            {
+			if (JustWrote)
+					JustWrote = false;
+			else
+			{
 				RareMagicPortal.LogInfo("Portal Cost Values Didn't change because you are not an admin");
 
 			}
@@ -495,16 +610,17 @@ namespace RareMagicPortal
 			watcher.EnableRaisingEvents = true;
 		}
 
-		private void ReadYMLValuesBoring() // Startup File 
+		private static void ReadYMLValuesBoring() // Startup File 
 		{
-			if (!File.Exists(YMLFULL)) return;
-			var yml = File.ReadAllText(YMLFULL);
+			if (!File.Exists(YMLCurrentFile)) return;
+			var yml = File.ReadAllText(YMLCurrentFile);
 
 			var deserializer = new DeserializerBuilder()
 				.Build();
-			PortalN.Portals.Clear();
+			//PortalN.Portals.Clear();
+			PortalN = new PortalName(); // init
 			PortalN = deserializer.Deserialize<PortalName>(yml);
-			YMLPortalData.Value = yml;
+			//YMLPortalData.Value = yml; // should only be one time and for server
 
 		}
 
@@ -677,6 +793,8 @@ namespace RareMagicPortal
 			{
 
 				PortalChanger();
+				LoadIN();
+				
 			}
 		}
 
@@ -812,11 +930,14 @@ namespace RareMagicPortal
 
 			ConfigEnableCrystals = config("Portal Crystals", "Portal_Crystal_Enable", false, "Enable Portal Crystals");
 
-			ConfigCrystalsConsumable = config("Portal Crystals", "Crystal_Consume_Default", 1, "How many Crystals to Consume on Teleporting by Default, 0 is No Consumption");
+			ConfigEnableKeys = config("Portal Keys", "Portal_Keys_Enable", false, "Enable Portal Crystals");
+
+			ConfigCrystalsConsumable = config("Portal Crystals", "Crystal_Consume_Default", 1, "How many Master and Primary Crystals to Consume by Default for New Portals?");
 
 			ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
-	}
+			CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "blue", "Default Color for New Portals");
+		}
 
 	private void ReadAndWriteConfigValues()
 		{
@@ -830,6 +951,8 @@ namespace RareMagicPortal
 			CreatorLock = (bool)Config["Portal Config", "OnlyCreatorCanChange"].BoxedValue;
 			MagicPortalFluidValue = (int)Config["PortalJuice", "PortalJuiceValue"].BoxedValue;
 			EnableCrystals = (bool)Config["Portal Crystals", "Portal_Crystal_Enable"].BoxedValue;
+			EnableKeys = (bool)Config["Portal Keys", "Portal_Keys_Enable"].BoxedValue;
+			DefaultPortalColor = (string)Config["Portal Crystals", "Portal_Crystal_Color_Default"].BoxedValue;
 			CrystalsConsumable = (int)Config["Portal Crystals", "Crystal_Consume_Default"].BoxedValue;
 			AdminOnlyBuild = (bool)Config["Portal Config", "Only_Admin_Can_Build"].BoxedValue;
 
@@ -843,15 +966,20 @@ namespace RareMagicPortal
         {
 			if (isAdmin)  // I am not sure why a non admin would need to write.
 			{
+				// need to write soemthing for DefaultPortalColor and Key setup
+
 				PortalName.Portal paulgo = new PortalName.Portal
 				{
-					Crystal_Cost = CrystalsConsumable,
+					Crystal_Cost_Master = CrystalsConsumable, // If only using master crystals
 				};
 				PortalN.Portals.Add(PortalName, paulgo);
 				var serializer = new SerializerBuilder()
 					.Build();
 				var yaml = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-				File.WriteAllText(YMLFULL, yaml);
+
+				File.WriteAllText(YMLCurrentFile, yaml); //overwrite
+					
+
 			}
 
 		}

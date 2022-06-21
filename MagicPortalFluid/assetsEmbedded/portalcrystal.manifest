@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 798578495
+CRC: 1642653296
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1107c7c9493e1fdf861aab989def15a6
+    Hash: f8917d07161e7eab4e4dcedf7b2affd7
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 5ab225d056af7332cebf4400f9cf6a63
+    Hash: bbc48ad260a81d79a47a96b96b4140dc
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -29,10 +29,14 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 65
   Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: 11500000, guid: d8d531e381601b94c984221b5db7323d, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: beeab75582e689f4ebd2271089437b6d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1c2f8d58a6d59584391300be9718ce35, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: ce0660cf497ffea489c9c606137e6a86, type: 3}
 - Class: 115
@@ -41,9 +45,18 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 199
   Script: {instanceID: 0}
+- Class: 205
+  Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/CustomItems/PortalCrystal.prefab
+- Assets/CustomItems/PortalCrystalRed.prefab
+- Assets/CustomItems/PortalKeyBlue.prefab
+- Assets/CustomItems/PortalCrystalBlue.prefab
+- Assets/CustomItems/PortalKeyGreen.prefab
+- Assets/CustomItems/PortalKeyGold.prefab
+- Assets/CustomItems/PortalCrystalGreen.prefab
+- Assets/CustomItems/PortalKeyRed.prefab
+- Assets/CustomItems/PortalCrystalMaster.prefab
 Dependencies: []
