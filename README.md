@@ -1,27 +1,37 @@
 # RareMagicPortal
 
-Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth + Crystal Economy. 
+Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth + Crystal and Key Economy. 
 
 Includes pictures
 
-Allows you to limit the amount of portals per character. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
-Increase PVP and multiply cooperation by making portals a scarce resource. 
+Allows you to limit the amount of portals per character by giving every player a certain amount of PortalFluid. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
+Increase PVP and multiply cooperation by making portals a scarce resource. Allow only teammates or special access portals with Keys and Crystals.
+Make Crystal and Key trading a part of the valheim econmoy to get around the world. 
 
 Tired of Portals being the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
 to see more PVP or more cooperation between your buddies and their bases?
 Well, I've a mod for you!
 
-Set a starting amount of PortalMagicFluid per new character.  This mod changes the recipe for portals and requires a new unique item called PortalMagicFluid. One Magical Portal Fluid per Portal.
+2.0 adds 4 Crystals and Keys Each, RGB+G Red, Green, Blue and Gold/Master.
+4 Crystals, PortalCrystalMaster, PortalCrystalRed , PortalCrystalGreen, PortalCrystalBlue, 4 keys PortalKeyRed , PortalKeyGold, PortalKeyBlue , PortalKeyGreen PortalKeyGreen
 
-Has 7 (Seven) Server configurable values which are sync to client as of 1.6.0
+You can set the default color and default consumption per portal and change it once someone has gone through it. Make a portal admin only or free passage. 
 
-1)Turn on and off the new portal requirements (true, false)
+Odin makes a way. 
+
+Set a starting amount of PortalMagicFluid per new character.  This mod changes the recipe for portals and can require a new unique item called PortalMagicFluid. One Magical Portal Fluid per Portal.
+
+Has 12 Server configurable values which are sync to client as of 2.0
+
+0) Server Sync
+
+1)Turn on and off PortalJuice (true, false)
 
 2) Starting quantity of PortalMagicFluid (default 3)[ Only applies to brand new character on first spawn in]
 
 3) CraftingStation required nearby - Default is $piece_workbench for workbench.
 
-4) Level required for that craftingStation to be able to build this piece. - I think unique to this mod. - Default 1
+4) Level required for that craftingStation to be able to build this piece. - Default 1
 
 5) OnlyCreatorCanDeconstruct - Default is true; Can still be destoryed
 
@@ -29,10 +39,19 @@ Has 7 (Seven) Server configurable values which are sync to client as of 1.6.0
 
 7) Only the Creator can change the Portal Name : Default false;
 
+8) Portal_Crystal_Enable = false  - turn on/off Crystals and Keys
+
+9) Crystal_Consume_Default = 1. Default Crystal Consumption for new Portals
+
+10)  Portal_Crystal_Color_Default = Red - Default Color: Red,  Gold is automically enabled for all plus - Default
+
+11) PortalJuiceValue = 300 - Sets value of Portal Juice, a value of 0 keeps it from being sold at trader
+
+
 Admin can spawn in more items with name 'PortalMagicFluid'
 
 Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scarce resource.
-Other mods can allow it to be bought at the trader for high prices, gambled on or become rare drops from bosses.
+Other mods can allow the resources to be bought at the trader for high prices, gambled on or become rare drops from bosses.
 ﻿
 Could be combined with WayShrine https://www.nexusmods.com/valheim/mods/1298 to create interesting maps.
 
@@ -45,7 +64,8 @@ ChangeLog:
         
 
         Version 2.0.0
-            Rewrite
+            Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
+            Crystals are Consumable. Keys are not. TargetPortal compatibility. YML file for each world. ServerSynced admin control
         Version 1.6.0
             Added three New Configs: Portal Health, OnlyCreatorCanDeconstruct (  destroy possible), OnlyCreatorCanRename
         Version 1.5.1

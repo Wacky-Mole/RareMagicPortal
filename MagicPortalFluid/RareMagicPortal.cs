@@ -235,7 +235,7 @@ namespace RareMagicPortal
 
 			}
 		}
-
+		/*
 		[HarmonyPatch(typeof(TeleportWorldTrigger), "OnTriggerEnter")]
 		[HarmonyPriority(1)]
 		private class OpenBeforeTargetPortal // need a blax solution to active below patch before hers. 
@@ -246,15 +246,31 @@ namespace RareMagicPortal
 			}
 
 		}
+		*/
 
-		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Teleport))]  // for Crystals and Keys
-		static class TeleportWorld_Teleport_CheckforCrystal
-		{
-			[HarmonyPrefix]
-			private static bool Prefix(TeleportWorld __instance, ref Player player)
+		[HarmonyPatch(typeof(TeleportWorldTrigger), nameof(TeleportWorldTrigger.OnTriggerEnter))]  // for Crystals and Keys
+		//armonyPriority(600)]
+		//[HarmonyPriority(801)]
+		private class TeleportWorld_Teleport_CheckforCrystal
+		{ 
+			private class SkipPortalException : Exception
+			{
+			}
+			//throw new SkipPortalException(); This is used for return false instead/ keeps other mods from loading patches.
+			// only works for void?
+
+
+			[HarmonyPriority(Priority.First)]
+			private static bool Prefix(TeleportWorldTrigger __instance, Collider collider)
 			{
 				//finding portal name
-				string PortalName = __instance.GetHoverText();
+				if (collider.GetComponent<Player>() != Player.m_localPlayer)
+				{
+					throw new SkipPortalException();
+					return false;
+				}
+				Player player = collider.GetComponent<Player>();
+				string PortalName = __instance.m_tp.GetHoverText();
 				var found = PortalName.IndexOf(":") + 2;
 				var end = PortalName.IndexOf("\" ");
 				var le = end - found;
@@ -285,13 +301,15 @@ namespace RareMagicPortal
 				if (OdinsKin && !isAdmin) // If requires admin, but not admin
                 {
 					player.Message(MessageHud.MessageType.Center, "Only Odin's Kin are Allowed");
+					throw new SkipPortalException();
 					return false;
 				}
-				if (EnableCrystals && __instance.m_hadTarget)
+				if (EnableCrystals && __instance.m_tp.m_hadTarget)
 				{
 					if (!player.IsTeleportable())
 					{
 						player.Message(MessageHud.MessageType.Center, "$msg_noteleport");
+						throw new SkipPortalException();
 						return false;
 					}
 
@@ -443,29 +461,29 @@ namespace RareMagicPortal
                     {
 							case 1:
 							player.Message(MessageHud.MessageType.Center, "No Red Portal Crystals");
-							return false;
+							throw new SkipPortalException();
 							case 2:
 							player.Message(MessageHud.MessageType.Center, "No Green Portal Crystals");
-							return false;
+							throw new SkipPortalException();
 							case 3:
 							player.Message(MessageHud.MessageType.Center, "No Blue Portal Crystals");
-							return false;
+							throw new SkipPortalException();
 							case 4:
 							player.Message(MessageHud.MessageType.Center, "No Gold Portal Crystals");
-							return false;
+							throw new SkipPortalException();
 
 						case 5:
 							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Red"]} Red Crystals Require for Portal {PortalName}");
-							return false;
+							throw new SkipPortalException();
 						case 6:
 							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Green"]} Green Crystals Require for Portal {PortalName}");
-							return false;
+							throw new SkipPortalException();
 						case 7:
 							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Blue"]} Blue Crystals Require for Portal {PortalName}");
-							return false;
+							throw new SkipPortalException();
 						case 8:
 							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Gold"]} Gold Crystals Require for Portal {PortalName}");
-							return false;
+							throw new SkipPortalException();
 
 						case 11: 
 							player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
@@ -503,14 +521,14 @@ namespace RareMagicPortal
 
 							default:
 							player.Message(MessageHud.MessageType.Center, $"No Access");
-							return false;
+							throw new SkipPortalException();
 
 
 					}
 				}
 				else return true;
 			}
-
+			private static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException ? null : __exception;
 		}
 		[HarmonyPostfix]
 		private static void Postfix(ref Player player)
@@ -1177,7 +1195,7 @@ namespace RareMagicPortal
 
 			ConfigCrystalsConsumable = config("Portal Crystals", "Crystal_Consume_Default", 1, "What is the Default number of crystals to consume for each New Portal? - Depending on Default Color" + System.Environment.NewLine + " Gold/Master gets set to this regardless of Default Color");
 
-			ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
+			//ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
 			CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? - Options are Red,Green,Blue");
 		}
@@ -1197,7 +1215,7 @@ namespace RareMagicPortal
 			//EnableKeys = (bool)Config["Portal Keys", "Portal_Keys_Enable"].BoxedValue;
 			DefaultPortalColor = (string)Config["Portal Crystals", "Portal_Crystal_Color_Default"].BoxedValue;
 			CrystalsConsumable = (int)Config["Portal Crystals", "Crystal_Consume_Default"].BoxedValue;
-			AdminOnlyBuild = (bool)Config["Portal Config", "Only_Admin_Can_Build"].BoxedValue;
+			//AdminOnlyBuild = (bool)Config["Portal Config", "Only_Admin_Can_Build"].BoxedValue;
 
 
 			if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
