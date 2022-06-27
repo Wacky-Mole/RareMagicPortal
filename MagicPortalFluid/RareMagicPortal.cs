@@ -260,7 +260,7 @@ namespace RareMagicPortal
 			// only works for void?
 
 
-			[HarmonyPriority(Priority.First)]
+			[HarmonyPriority(Priority.HigherThanNormal)]
 			private static bool Prefix(TeleportWorldTrigger __instance, Collider collider)
 			{
 				//finding portal name
@@ -331,61 +331,6 @@ namespace RareMagicPortal
 				
 					int flagCarry = 0; // don't have any keys or crystals
 
-
-					//RareMagicPortal.LogInfo("Crystal Master Count before " + CrystalCountMaster);
-
-					/*  dynamic failure
-					List<string> colors = new List<string>();
-					colors.Add("Red");
-					colors.Add("Green");
-					colors.Add("Blue");
-					//colors.Add("Gold");
-					List<int> crystals = new List<int>();
-					crystals.Add(player.m_inventory.CountItems(CrystalRed));
-					crystals.Add(player.m_inventory.CountItems(CrystalGreen));
-					crystals.Add(player.m_inventory.CountItems(CrystalBlue));
-					crystals.Add(player.m_inventory.CountItems(CrystalMaster));
-					List<int> keys = new List<int>();
-					keys.Add(player.m_inventory.CountItems(PortalKeyRed));
-					keys.Add(player.m_inventory.CountItems(PortalKeyGreen));
-					keys.Add(player.m_inventory.CountItems(PortalKeyBlue));
-					keys.Add(player.m_inventory.CountItems(PortalKeyGold));
-
-					int i = 0;
-					var found2 = false;
-					var colorfound = "blue"
-					var iskey = false;	
-					foreach(string c in colors)
-                    {
-						if (Portal_Crystal_Cost[c] > 0 || Portal_Key[c])
-						{
-							if (crystals[i] == 0)
-							{ // has none of required
-								flagCarry = 1;								
-							}
-							else if (Portal_Crystal_Cost[c] > crystals[i])// has less than required
-                            {
-								flagCarry = 10;
-
-                            } 
-							else flagCarry = 11; // has more than required
-                            {
-
-                            }
-
-							if (Portal_Key[c] && keys[i] > 0)// check for keys
-                            {
-								flagCarry = 111;
-								player.Message(MessageHud.MessageType.TopLeft, $"Portal Key {c} Grants Passage");
-								return true;
-
-							} 
-								
-
-						}
-						i++;
-					}
-					*/
 					bool foundAccess = false;
 					int lowest = 0;
 

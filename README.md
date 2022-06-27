@@ -2,6 +2,8 @@
 
 Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth + Crystal and Key Economy. 
 
+<img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
+
 Includes pictures
 
 Allows you to limit the amount of portals per character by giving every player a certain amount of PortalFluid. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
