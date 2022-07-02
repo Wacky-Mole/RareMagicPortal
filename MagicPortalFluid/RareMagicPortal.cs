@@ -24,15 +24,17 @@ using RareMagicPortal;
 using ServerSync;
 using ItemManager;
 using BepInEx.Logging;
+using BepInEx.Bootstrap;
 using YamlDotNet;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+
 
 
 namespace RareMagicPortal
 {
 	//extra
 	[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+	[BepInDependency("org.bepinex.plugins.targetportal", BepInDependency.DependencyFlags.SoftDependency)]  // it loads before this mod// not really required, but whatever
 	internal class MagicPortalFluid : BaseUnityPlugin
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
@@ -100,6 +102,12 @@ namespace RareMagicPortal
 		private static bool JustWait = false;
 		private static bool JustRespawn = false;
 		private static bool NoMoreLoading = false;
+		private static bool Teleporting = false;
+		private static string checkiftagisPortal = null;
+
+		private static Player player = null; // need to keep it between patches
+		private static bool m_hadTarget = false;
+
 
 
 		private static ConfigEntry<bool>? ConfigFluid;
@@ -136,7 +144,7 @@ namespace RareMagicPortal
 		public const string PortalKeyBlue = "$item_PortalKeyBlue";
 
 
-
+		
 		public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
 		private static PortalName PortalN;
 
@@ -235,29 +243,67 @@ namespace RareMagicPortal
 
 			}
 		}
-		/*
-		[HarmonyPatch(typeof(TeleportWorldTrigger), "OnTriggerEnter")]
-		[HarmonyPriority(1)]
-		private class OpenBeforeTargetPortal // need a blax solution to active below patch before hers. 
+		[HarmonyPatch(typeof(Minimap), "SetMapMode")] // doesn't matter if targetportal is loaded or not
+		public class LeavePortalModeOnMapCloseMagicPortal
 		{
-			private static bool Prefix(TeleportWorldTrigger __instance, Collider collider)
+			private static void Postfix(Minimap.MapMode mode)
 			{
-				return true;
+				if (mode != Minimap.MapMode.Large)
+				{
+					Teleporting = false; 
+				}
+			}
+		}
+
+		[HarmonyPatch(typeof(Minimap), nameof(Minimap.OnMapLeftClick))]
+		private class MapLeftClickForRareMagic // for magic portal
+		{
+			private class SkipPortalException2 : Exception // skip all other mods if targetportal is installed and passes everything else
+			{
 			}
 
+			[HarmonyPriority(Priority.HigherThanNormal)]
+			private static bool Prefix()
+			{
+				if (!Teleporting)
+				{
+					return true;
+				}
+				if (!Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal")){ // check to see if targetportal is loaded
+					return true;
+				}
+				RareMagicPortal.LogInfo($"Made it to Map during Telecheck");
+				string PortalName;
+				try
+				{
+					 PortalName = HandlePortalClick(); //my handleportal click
+				} catch { PortalName = null; }
+				if (PortalName == null)
+                {
+					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
+
+				}
+				
+				if (CrystalandKeyLogic(PortalName))
+                {
+					return true; // allow TargetPortal to do it's checks
+                } else
+                {
+					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
+				}
+									 
+				
+			}
+			private static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException2 ? null : __exception;
 		}
-		*/
 
 		[HarmonyPatch(typeof(TeleportWorldTrigger), nameof(TeleportWorldTrigger.OnTriggerEnter))]  // for Crystals and Keys
-		//armonyPriority(600)]
-		//[HarmonyPriority(801)]
 		private class TeleportWorld_Teleport_CheckforCrystal
 		{ 
 			private class SkipPortalException : Exception
 			{
 			}
 			//throw new SkipPortalException(); This is used for return false instead/ keeps other mods from loading patches.
-			// only works for void?
 
 
 			[HarmonyPriority(Priority.HigherThanNormal)]
@@ -267,9 +313,10 @@ namespace RareMagicPortal
 				if (collider.GetComponent<Player>() != Player.m_localPlayer)
 				{
 					throw new SkipPortalException();
-					return false;
 				}
-				Player player = collider.GetComponent<Player>();
+				
+				player = collider.GetComponent<Player>();
+
 				string PortalName = __instance.m_tp.GetHoverText();
 				var found = PortalName.IndexOf(":") + 2;
 				var end = PortalName.IndexOf("\" ");
@@ -277,201 +324,28 @@ namespace RareMagicPortal
 				PortalName = PortalName.Substring(found, le);
 				// end finding portal name
 
-				int CrystalForPortal = CrystalsConsumable;
-				bool OdinsKin = false;
-				bool Free_Passage = false;
-				//Dictionary <string, int> Portal_Crystal_Cost = null; // rgbG
-				//Dictionary <string, bool> Portal_Key; //rgbG
+				m_hadTarget = __instance.m_tp.m_hadTarget;
+				// keep player and m_hadTarget for future patch for targetportal
 
-
-				RareMagicPortal.LogInfo($"Portal name  is {PortalName}");
-				if (!PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
-				{
-					WritetoYML(PortalName);
-				}
-
-				//CrystalForPortal = PortalN.Portals[PortalName].Crystal_Cost_Master;
-				OdinsKin = PortalN.Portals[PortalName].Admin_only_Access;
-				Free_Passage = PortalN.Portals[PortalName].Free_Passage;
-				var Portal_Crystal_Cost = PortalN.Portals[PortalName].Portal_Crystal_Cost; // rgbG  // 0 means it can't be used, (Keys only) anything greater means the cost. -1 means same as 0
-				var Portal_Key = PortalN.Portals[PortalName].Portal_Key; // rgbG
-				// the admin can customize crystal cost or key usage, but master crystal and golden key always are automatic unless set to admin
-
-
-				if (OdinsKin && !isAdmin) // If requires admin, but not admin
+				if (Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
                 {
-					player.Message(MessageHud.MessageType.Center, "Only Odin's Kin are Allowed");
-					throw new SkipPortalException();
-					return false;
-				}
-				if (EnableCrystals && __instance.m_tp.m_hadTarget)
+					Teleporting = true;
+					return true; // skip on checking because we don't know where this is going 
+					// we will catch in map for tele check
+                }
+
+				if (CrystalandKeyLogic(PortalName) && m_hadTarget) // true with m_hadTarget// not sure on m_hadTarget
 				{
-					if (!player.IsTeleportable())
-					{
-						player.Message(MessageHud.MessageType.Center, "$msg_noteleport");
-						throw new SkipPortalException();
-						return false;
-					}
+					Teleporting = true;
+					return true;
 
-					if (Free_Passage)
-                    {
-						player.Message(MessageHud.MessageType.TopLeft, $"The Gods Allow Free Passage");
-						return true;
-					}
-					
-					int CrystalCountMaster = player.m_inventory.CountItems(CrystalMaster);
-					int CrystalCountRed = player.m_inventory.CountItems(CrystalRed);
-					int CrystalCountGreen = player.m_inventory.CountItems(CrystalGreen);
-					int CrystalCountBlue = player.m_inventory.CountItems(CrystalBlue);
-
-					int KeyCountGold = player.m_inventory.CountItems(PortalKeyGold);
-					int KeyCountRed = player.m_inventory.CountItems(PortalKeyRed);
-					int KeyCountGreen = player.m_inventory.CountItems(PortalKeyGreen);
-					int KeyCountBlue = player.m_inventory.CountItems(PortalKeyBlue);
-				
-					int flagCarry = 0; // don't have any keys or crystals
-
-					bool foundAccess = false;
-					int lowest = 0;
-
-					if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
-					{
-						if (CrystalCountRed == 0) // has none of required
-							flagCarry = 1;
-						else if (Portal_Crystal_Cost["Red"] > CrystalCountRed) // has less than required
-							flagCarry = 5;
-						else flagCarry = 11; // has more than required
-
-						if (Portal_Key["Red"] && KeyCountRed > 0)
-							flagCarry = 111;
-					}
-					if (flagCarry > 10)
-						foundAccess = true;
-					if (flagCarry < 10 && lowest == 0)
-						lowest = flagCarry;
-
-
-					if (!foundAccess && (Portal_Crystal_Cost["Green"] > 0 || Portal_Key["Green"]))
-					{
-						if (CrystalCountGreen == 0) // has none of required
-							flagCarry = 2;
-						else if (Portal_Crystal_Cost["Green"] > CrystalCountGreen) // has less than required
-							flagCarry = 6;
-						else flagCarry = 22; // has more than required
-
-						if (Portal_Key["Green"] && KeyCountGreen > 0)
-							flagCarry = 222;
-					}
-					if (flagCarry > 20)
-						foundAccess = true;
-
-					if (flagCarry < 10 && lowest == 0)
-						lowest = flagCarry;
-
-					if (!foundAccess && (Portal_Crystal_Cost["Blue"] > 0 || Portal_Key["Blue"]))
-					{
-						if (CrystalCountBlue == 0) // has none of required
-							flagCarry = 3;
-						else if (Portal_Crystal_Cost["Blue"] > CrystalCountBlue) // has less than required
-							flagCarry = 7;
-						else flagCarry = 33; // has more than required
-
-						if (Portal_Key["Blue"] && KeyCountBlue > 0)
-							flagCarry = 333;
-					}
-					if (flagCarry > 30)
-						foundAccess = true;
-
-					if (flagCarry < 10 && lowest == 0)
-						lowest = flagCarry;
-
-					if (!foundAccess && (Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
-					{
-						if (CrystalCountMaster == 0) // has none of required
-							flagCarry = 4;
-						else if (Portal_Crystal_Cost["Gold"] > CrystalCountMaster) // has less than required
-							flagCarry = 8;
-						else flagCarry = 44; // has more than required
-
-						if (Portal_Key["Gold"] && KeyCountGold > 0)
-							flagCarry = 444;
-					}
-					if (flagCarry < 10 && lowest == 0)
-						lowest = flagCarry;
-
-					if (flagCarry < 10 && lowest != 0)
-						flagCarry = lowest;
-
-					switch (flagCarry)
-                    {
-							case 1:
-							player.Message(MessageHud.MessageType.Center, "No Red Portal Crystals");
-							throw new SkipPortalException();
-							case 2:
-							player.Message(MessageHud.MessageType.Center, "No Green Portal Crystals");
-							throw new SkipPortalException();
-							case 3:
-							player.Message(MessageHud.MessageType.Center, "No Blue Portal Crystals");
-							throw new SkipPortalException();
-							case 4:
-							player.Message(MessageHud.MessageType.Center, "No Gold Portal Crystals");
-							throw new SkipPortalException();
-
-						case 5:
-							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Red"]} Red Crystals Require for Portal {PortalName}");
-							throw new SkipPortalException();
-						case 6:
-							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Green"]} Green Crystals Require for Portal {PortalName}");
-							throw new SkipPortalException();
-						case 7:
-							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Blue"]} Blue Crystals Require for Portal {PortalName}");
-							throw new SkipPortalException();
-						case 8:
-							player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Gold"]} Gold Crystals Require for Portal {PortalName}");
-							throw new SkipPortalException();
-
-						case 11: 
-							player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
-							player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Red"]} Red Portal Crystals");
-							player.m_inventory.RemoveItem(CrystalRed, Portal_Crystal_Cost["Red"]);
-							return true;
-						case 22:
-							player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
-							player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Green"]} Green Portal Crystals");
-							player.m_inventory.RemoveItem(CrystalGreen, Portal_Crystal_Cost["Green"]);
-							return true;
-						case 33:
-							player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
-							player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Blue"]} Blue Portal Crystals");
-							player.m_inventory.RemoveItem(CrystalBlue, Portal_Crystal_Cost["Blue"]);
-							return true;
-						case 44:
-							player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
-							player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Gold"]} Gold Portal Crystals");
-							player.m_inventory.RemoveItem(CrystalMaster, Portal_Crystal_Cost["Gold"]);
-							return true;
-
-						case 111:
-							player.Message(MessageHud.MessageType.TopLeft, $"Red Portal Key Grants Access");
-							return true;
-						case 222:
-							player.Message(MessageHud.MessageType.TopLeft, $"Green Portal Key Grants Access");
-							return true;
-						case 333:
-							player.Message(MessageHud.MessageType.TopLeft, $"Blue Portal Key Grants Access");
-							return true;
-						case 444:
-							player.Message(MessageHud.MessageType.TopLeft, $"Gold Portal Key Grants Access");
-							return true;
-
-							default:
-							player.Message(MessageHud.MessageType.Center, $"No Access");
-							throw new SkipPortalException();
-
-
-					}
+                }else // false 
+                {
+					Teleporting = false;
+					throw new SkipPortalException();  // stops other mods from executing 
 				}
-				else return true;
+
+				//else return true;
 			}
 			private static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException ? null : __exception;
 		}
@@ -1205,15 +1079,243 @@ namespace RareMagicPortal
 
 				var serializer = new SerializerBuilder()
 					.Build();
-				var yaml = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-
-				File.WriteAllText(YMLCurrentFile, yaml); //overwrite
+				var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+				var yaml = Environment.NewLine + "\t" + PortalName +":"+Environment.NewLine + serializer.Serialize(PortalN.Portals[PortalName]); // just the single object
+				
+				File.AppendAllText(YMLCurrentFile, yaml);
+				//File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 				JustWrote = true;
-				YMLPortalData.Value = yaml;
+				YMLPortalData.Value = yamlfull;
 
 
 
 			}
+
+		}
+		private static string HandlePortalClick()
+        {
+			Minimap instance = Minimap.instance;
+			List<Minimap.PinData> paul = instance.m_pins;
+			Vector3 pos = instance.ScreenToWorldPoint(Input.mousePosition);
+			float radius = instance.m_removeRadius * (instance.m_largeZoom * 2f);
+
+			checkiftagisPortal = "";
+			Minimap.PinData  pinData = null;
+			float num = 999999f;
+			foreach (Minimap.PinData pin in paul)
+			{
+					pin.m_save = true;
+					float num2 = Utils.DistanceXZ(pos, pin.m_pos);
+				if (num2 < radius && (num2 < num || pinData == null))
+				{
+					pinData = pin;
+					num = num2;
+				}
+			}
+			if (!string.IsNullOrEmpty(pinData.m_name))
+				checkiftagisPortal = pinData.m_name;
+			if (checkiftagisPortal.Contains("$hud") || checkiftagisPortal.Contains("Day "))
+				checkiftagisPortal = null;
+
+			return checkiftagisPortal;
+		}
+
+		private static bool CrystalandKeyLogic(string PortalName)
+        {
+			int CrystalForPortal = CrystalsConsumable;
+			bool OdinsKin = false;
+			bool Free_Passage = false;
+			//Dictionary <string, int> Portal_Crystal_Cost = null; // rgbG
+			//Dictionary <string, bool> Portal_Key; //rgbG
+
+
+			RareMagicPortal.LogInfo($"Portal name  is {PortalName}");
+			if (!PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
+			{
+				WritetoYML(PortalName);
+			}
+
+			//CrystalForPortal = PortalN.Portals[PortalName].Crystal_Cost_Master;
+			OdinsKin = PortalN.Portals[PortalName].Admin_only_Access;
+			Free_Passage = PortalN.Portals[PortalName].Free_Passage;
+			var Portal_Crystal_Cost = PortalN.Portals[PortalName].Portal_Crystal_Cost; // rgbG  // 0 means it can't be used, (Keys only) anything greater means the cost. -1 means same as 0
+			var Portal_Key = PortalN.Portals[PortalName].Portal_Key; // rgbG
+																	 // the admin can customize crystal cost or key usage, but master crystal and golden key always are automatic unless set to admin
+
+
+			if (OdinsKin && !isAdmin) // If requires admin, but not admin
+			{
+				player.Message(MessageHud.MessageType.Center, "Only Odin's Kin are Allowed");
+				Teleporting = false;
+				return false;
+				
+			}
+			if (EnableCrystals)
+			{
+				if (!player.IsTeleportable())
+				{
+					player.Message(MessageHud.MessageType.Center, "$msg_noteleport");
+
+					return false;
+				}
+
+				if (Free_Passage)
+				{
+					player.Message(MessageHud.MessageType.TopLeft, $"The Gods Allow Free Passage");
+					return true;
+				}
+
+				int CrystalCountMaster = player.m_inventory.CountItems(CrystalMaster);
+				int CrystalCountRed = player.m_inventory.CountItems(CrystalRed);
+				int CrystalCountGreen = player.m_inventory.CountItems(CrystalGreen);
+				int CrystalCountBlue = player.m_inventory.CountItems(CrystalBlue);
+
+				int KeyCountGold = player.m_inventory.CountItems(PortalKeyGold);
+				int KeyCountRed = player.m_inventory.CountItems(PortalKeyRed);
+				int KeyCountGreen = player.m_inventory.CountItems(PortalKeyGreen);
+				int KeyCountBlue = player.m_inventory.CountItems(PortalKeyBlue);
+
+				int flagCarry = 0; // don't have any keys or crystals
+
+				bool foundAccess = false;
+				int lowest = 0;
+
+				if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
+				{
+					if (CrystalCountRed == 0) // has none of required
+						flagCarry = 1;
+					else if (Portal_Crystal_Cost["Red"] > CrystalCountRed) // has less than required
+						flagCarry = 5;
+					else flagCarry = 11; // has more than required
+
+					if (Portal_Key["Red"] && KeyCountRed > 0)
+						flagCarry = 111;
+				}
+				if (flagCarry > 10)
+					foundAccess = true;
+				if (flagCarry < 10 && lowest == 0)
+					lowest = flagCarry;
+
+
+				if (!foundAccess && (Portal_Crystal_Cost["Green"] > 0 || Portal_Key["Green"]))
+				{
+					if (CrystalCountGreen == 0) // has none of required
+						flagCarry = 2;
+					else if (Portal_Crystal_Cost["Green"] > CrystalCountGreen) // has less than required
+						flagCarry = 6;
+					else flagCarry = 22; // has more than required
+
+					if (Portal_Key["Green"] && KeyCountGreen > 0)
+						flagCarry = 222;
+				}
+				if (flagCarry > 20)
+					foundAccess = true;
+
+				if (flagCarry < 10 && lowest == 0)
+					lowest = flagCarry;
+
+				if (!foundAccess && (Portal_Crystal_Cost["Blue"] > 0 || Portal_Key["Blue"]))
+				{
+					if (CrystalCountBlue == 0) // has none of required
+						flagCarry = 3;
+					else if (Portal_Crystal_Cost["Blue"] > CrystalCountBlue) // has less than required
+						flagCarry = 7;
+					else flagCarry = 33; // has more than required
+
+					if (Portal_Key["Blue"] && KeyCountBlue > 0)
+						flagCarry = 333;
+				}
+				if (flagCarry > 30)
+					foundAccess = true;
+
+				if (flagCarry < 10 && lowest == 0)
+					lowest = flagCarry;
+
+				if (!foundAccess && (Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
+				{
+					if (CrystalCountMaster == 0) // has none of required
+						flagCarry = 4;
+					else if (Portal_Crystal_Cost["Gold"] > CrystalCountMaster) // has less than required
+						flagCarry = 8;
+					else flagCarry = 44; // has more than required
+
+					if (Portal_Key["Gold"] && KeyCountGold > 0)
+						flagCarry = 444;
+				}
+				if (flagCarry < 10 && lowest == 0)
+					lowest = flagCarry;
+
+				if (flagCarry < 10 && lowest != 0)
+					flagCarry = lowest;
+
+				switch (flagCarry)
+				{
+					case 1:
+						player.Message(MessageHud.MessageType.Center, "No Red Portal Crystals");
+						return false;
+					case 2:
+						player.Message(MessageHud.MessageType.Center, "No Green Portal Crystals");
+						return false;
+					case 3:
+						player.Message(MessageHud.MessageType.Center, "No Blue Portal Crystals");
+						return false;
+					case 4:
+						player.Message(MessageHud.MessageType.Center, "No Gold Portal Crystals");
+						return false;
+					case 5:
+						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Red"]} Red Crystals Require for Portal {PortalName}");
+						return false;
+					case 6:
+						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Green"]} Green Crystals Require for Portal {PortalName}");
+						return false;
+					case 7:
+						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Blue"]} Blue Crystals Require for Portal {PortalName}");
+						return false;
+					case 8:
+						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Gold"]} Gold Crystals Require for Portal {PortalName}");
+						return false;
+					case 11:
+						player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
+						player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Red"]} Red Portal Crystals");
+						player.m_inventory.RemoveItem(CrystalRed, Portal_Crystal_Cost["Red"]);
+						return true;
+					case 22:
+						player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
+						player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Green"]} Green Portal Crystals");
+						player.m_inventory.RemoveItem(CrystalGreen, Portal_Crystal_Cost["Green"]);
+						return true;
+					case 33:
+						player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
+						player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Blue"]} Blue Portal Crystals");
+						player.m_inventory.RemoveItem(CrystalBlue, Portal_Crystal_Cost["Blue"]);
+						return true;
+					case 44:
+						player.Message(MessageHud.MessageType.Center, $"Portal Crystal Grants Access");
+						player.Message(MessageHud.MessageType.TopLeft, $"Consumed {Portal_Crystal_Cost["Gold"]} Gold Portal Crystals");
+						player.m_inventory.RemoveItem(CrystalMaster, Portal_Crystal_Cost["Gold"]);
+						return true;
+
+					case 111:
+						player.Message(MessageHud.MessageType.TopLeft, $"Red Portal Key Grants Access");
+						return true;
+					case 222:
+						player.Message(MessageHud.MessageType.TopLeft, $"Green Portal Key Grants Access");
+						return true;
+					case 333:
+						player.Message(MessageHud.MessageType.TopLeft, $"Blue Portal Key Grants Access");
+						return true;
+					case 444:
+						player.Message(MessageHud.MessageType.TopLeft, $"Gold Portal Key Grants Access");
+						return true;
+
+					default:
+						player.Message(MessageHud.MessageType.Center, $"No Access");
+						return false;
+
+
+				}
+			}
+			return true;
 
 		}
 

@@ -29,6 +29,8 @@ namespace RareMagicPortal
             public bool Free_Passage { get; set; } = false;
             public bool Admin_only_Access { get; set; } = false;
 
+            public string space = "\n";
+
         }
 
     }

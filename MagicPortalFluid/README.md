@@ -4,8 +4,6 @@ Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + Porta
 
 <img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
 
-Includes pictures
-
 Allows you to limit the amount of portals per character by giving every player a certain amount of PortalFluid. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
 Increase PVP and multiply cooperation by making portals a scarce resource. Allow only teammates or special access portals with Keys and Crystals.
 Make Crystal and Key trading a part of the valheim econmoy to get around the world. 
@@ -27,7 +25,7 @@ Has 12 Server configurable values which are sync to client as of 2.0
 
 0) Server Sync
 
-1)Turn on and off PortalJuice (true, false)
+1) Turn on and off PortalJuice (true, false)
 
 2) Starting quantity of PortalMagicFluid (default 3)[ Only applies to brand new character on first spawn in]
 
