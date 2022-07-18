@@ -27,7 +27,7 @@ using BepInEx.Logging;
 using BepInEx.Bootstrap;
 using YamlDotNet;
 using YamlDotNet.Serialization;
-
+using LocalizationManager;
 
 
 namespace RareMagicPortal
@@ -107,6 +107,7 @@ namespace RareMagicPortal
 
 		private static Player player = null; // need to keep it between patches
 		private static bool m_hadTarget = false;
+		private static List<Minimap.PinData> HoldPins;
 
 
 
@@ -195,8 +196,13 @@ namespace RareMagicPortal
 		[HarmonyPrefix]
 		private static bool PortalCheckOutside(TeleportWorld __instance, Humanoid human, bool hold)
 		{
+			if (Chainloader.PluginInfos.ContainsKey("com.sweetgiorni.anyportal"))
+			{ // check to see if AnyPortal is loaded // don't touch when anyportal is loaded
+				return true;
+			}
 			if (hold)
 				return false;
+
 			if (__instance.m_nview.IsValid())
 			{
 				Player closestPlayer = Player.GetClosestPlayer(__instance.m_proximityRoot.position, 5f);
@@ -265,6 +271,8 @@ namespace RareMagicPortal
 			[HarmonyPriority(Priority.HigherThanNormal)]
 			private static bool Prefix()
 			{
+
+
 				if (!Teleporting)
 				{
 					return true;
@@ -314,14 +322,20 @@ namespace RareMagicPortal
 				{
 					throw new SkipPortalException();
 				}
+
 				
 				player = collider.GetComponent<Player>();
+				string PortalName = "";
+				if (!Chainloader.PluginInfos.ContainsKey("com.sweetgiorni.anyportal"))
+				{ // check to see if AnyPortal is loaded // don't touch when anyportal is loaded
 
-				string PortalName = __instance.m_tp.GetHoverText();
-				var found = PortalName.IndexOf(":") + 2;
-				var end = PortalName.IndexOf("\" ");
-				var le = end - found;
-				PortalName = PortalName.Substring(found, le);
+
+					PortalName = __instance.m_tp.GetHoverText();
+					var found = PortalName.IndexOf(":") + 2;
+					var end = PortalName.IndexOf("\" ");
+					var le = end - found;
+					PortalName = PortalName.Substring(found, le);
+				}
 				// end finding portal name
 
 				m_hadTarget = __instance.m_tp.m_hadTarget;
@@ -329,11 +343,13 @@ namespace RareMagicPortal
 
 				if (Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
                 {
+					Minimap instance = Minimap.instance;
+					HoldPins = instance.m_pins;
 					Teleporting = true;
 					return true; // skip on checking because we don't know where this is going 
 					// we will catch in map for tele check
                 }
-
+				
 				if (CrystalandKeyLogic(PortalName) && m_hadTarget) // true with m_hadTarget// not sure on m_hadTarget
 				{
 					Teleporting = true;
@@ -445,6 +461,7 @@ namespace RareMagicPortal
 		{
 			CreateConfigValues();
 			ReadAndWriteConfigValues();
+			Localizer.Load();
 			LoadAssets();
 
 			context = this;
@@ -455,9 +472,11 @@ namespace RareMagicPortal
 			SetupWatcher();
 			setupYMLFolderWatcher();
 			
+
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
 			RareMagicPortal.LogInfo("MagicPortalFluid has loaded start assets");
+			
 
 		}
 
@@ -1084,6 +1103,15 @@ namespace RareMagicPortal
 				
 				//File.AppendAllText(YMLCurrentFile, yaml);
 				File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
+				int counter = 0;
+				string lines = "";
+				foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+				{
+					lines += line + Environment.NewLine;
+					if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+					{ lines += Environment.NewLine; }
+				}
+				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 				JustWrote = true;
 				YMLPortalData.Value = yamlfull;
 
@@ -1099,12 +1127,16 @@ namespace RareMagicPortal
 			Vector3 pos = instance.ScreenToWorldPoint(Input.mousePosition);
 			float radius = instance.m_removeRadius * (instance.m_largeZoom * 2f);
 
+			//List<Minimap.PinData> result = MyExcept2(paul, HoldPins);
+			//var result = paul.Intersect( HoldPins).ToList();
+			//var result = paul.Where(f => !HoldPins.Any(t => t.FirmId == f.FirmId)).ToList(); // subtraction
+
 			checkiftagisPortal = "";
 			Minimap.PinData  pinData = null;
 			float num = 999999f;
 			foreach (Minimap.PinData pin in paul)
 			{
-					pin.m_save = true;
+				pin.m_save = true;
 					float num2 = Utils.DistanceXZ(pos, pin.m_pos);
 				if (num2 < radius && (num2 < num || pinData == null))
 				{
@@ -1113,7 +1145,13 @@ namespace RareMagicPortal
 				}
 			}
 			if (!string.IsNullOrEmpty(pinData.m_name))
-				checkiftagisPortal = pinData.m_name;
+				checkiftagisPortal = pinData.m_name; // icons name
+			if (pinData.m_icon.name == "" || pinData.m_icon.name == "TargetPortalIcon")
+			{ // TargetPortals Icons have no name therefore this stupid check weeds out regular icons  // pull request for icon.name  TargetPortalIcon
+			}
+			else 
+				checkiftagisPortal = null;
+
 			if (checkiftagisPortal.Contains("$hud") || checkiftagisPortal.Contains("Day "))
 				checkiftagisPortal = null;
 
@@ -1318,6 +1356,7 @@ namespace RareMagicPortal
 				if (crystalorkey == 2)
 					CorK = "Crystals or Keys";
 
+				//Localizer.AddPlaceholder("rmp_no_red_portal", "No Red Portal");
 				switch (flagCarry)
 				{
 					case 1:
@@ -1388,6 +1427,8 @@ namespace RareMagicPortal
 			return true;
 
 		}
+
+
 
 	}
 	// end of namespace class
