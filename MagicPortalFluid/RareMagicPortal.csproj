@@ -82,6 +82,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\ServerSync.dll</HintPath>
     </Reference>
+    <Reference Include="StatusEffectManager, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\StatusEffectManager.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -100,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="ColorfulLights.cs" />
     <Compile Include="PortalName.cs" />
     <Compile Include="VersionHandshake.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
@@ -136,10 +141,16 @@
     <Content Include="Libs\ServerSync.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Libs\StatusEffectManager.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Libs\YamlDotNet.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Package\icon.png" />
+    <EmbeddedResource Include="icons\portaldrink.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

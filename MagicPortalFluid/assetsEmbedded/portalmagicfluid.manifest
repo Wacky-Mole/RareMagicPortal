@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3758176251
+CRC: 2607414805
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 35faa5aa0a84c933f80c7fb62f740ad4
+    Hash: b8020941cd0faa409b5580cd69f94517
   TypeTreeHash:
     serializedVersion: 2
     Hash: 2c38fe503752489e75f1260d637aeba7
@@ -50,4 +50,5 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/CustomItems/PortalMagicFluid.prefab
+- Assets/CustomItems/PortalDrink.prefab
 Dependencies: []

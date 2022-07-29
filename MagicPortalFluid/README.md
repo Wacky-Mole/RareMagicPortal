@@ -106,7 +106,7 @@ Well, I've a mod for you!
 
         Version 2.0.0
             Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
-            Crystals are Consumable. Keys are not. TargetPortal compatibility. YML file for each world. ServerSynced admin control
+            Crystals are Consumable. Keys are not. TargetPortal, AnyPortal, TeleportAnything compatibility. YML file for each world. ServerSynced admin control
         Version 1.6.0
             Added three New Configs: Portal Health, OnlyCreatorCanDeconstruct (  destroy possible), OnlyCreatorCanRename
         Version 1.5.1

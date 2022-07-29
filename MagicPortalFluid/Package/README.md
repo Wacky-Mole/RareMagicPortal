@@ -1,71 +1,112 @@
 # RareMagicPortal
+`Server and client side required for Server Sync enforcement.`
 
-Magical Portal Fluid + ServerSync + CraftingStation + CraftingStationLVL + PortalHealth + Crystal and Key Economy. 
+Tired of portals being the end all, be all of Valheim?<br>
+You don't want to unnecessarily restrict which items can be teleported or not?<br>
+Do you want to see more PVP or more cooperation between your buddies and their bases?<br>
+Well, I've a mod for you!
+
+### Main Feature:
+* Magical Portal Fluid
+  * Added 1 extra required item to the Portal building recipe
+  * Controlling the distribution of fluid = Controlling the amount of portals can be built in the world
+  * Increasing portals' scarcity and value on a multiplayer server
+
+* Crystal and Key Economy
+  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue and Gold/Master.
+    * Crystals will be **consumed** upon entering the portal
+    * Keys to be **possessed** before entering the portal
+      * > *Simulate the economy progression from spending and upgrade to long-holding possession*
+  * Allows you to make special portal for:
+    * Special access portal by team members only
+    * Special toll charges for custom locations/bosses portal
+  * Helps your server build a more interactive economy in Valheim
 
 <img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
 
-Allows you to limit the amount of portals per character by giving every player a certain amount of PortalFluid. This is a good tool for restricting the amount of Portals on a server and increasing their scarcity and therefore their value.
-Increase PVP and multiply cooperation by making portals a scarce resource. Allow only teammates or special access portals with Keys and Crystals.
-Make Crystal and Key trading a part of the valheim econmoy to get around the world. 
+## Prefab IDs:
+  * PortalMagicFluid
+  * PortalCrystalMaster
+  * PortalCrystalRed
+  * PortalCrystalGreen
+  * PortalCrystalBlue
+  * PortalKeyGold
+  * PortalKeyRed
+  * PortalKeyGreen
+  * PortalKeyBlue
 
-Tired of Portals being the end all, be all of Valheim? You don't want to unnecessarily restrict which items can be teleported or not? Do you want
-to see more PVP or more cooperation between your buddies and their bases?
-Well, I've a mod for you!
+## Configuration Options:
+### RareMagicPortal.cfg
+  * [General]
+    * Force Server Config: 
+      * > Enable/Disable ServerSync enforcement
+    * CraftingStation_Requirement: 
+      * > Default required workbench
+    * Level_of_CraftingStation_Req: 
+      * > Default required lvl 1 of workbench
+    * OnlyCreatorCanDeconstruct: 
+      * > Allow/Disallow ONLY creator of the portal can demolish/destroy the portal
+    * Portal_Health: 
+      * > Configure the HP of portal
+    * OnlyCreatorCanChange: 
+      * > Allow/Disallow ONLY creator of the portal can rename the portal tag
 
-2.0 adds 4 Crystals and Keys Each, RGB+G Red, Green, Blue and Gold/Master.
-4 Crystals, PortalCrystalMaster, PortalCrystalRed , PortalCrystalGreen, PortalCrystalBlue, 4 keys PortalKeyRed , PortalKeyGold, PortalKeyBlue , PortalKeyGreen PortalKeyGreen
+  * [Portal Crystals]
+    * Portal_Crystal_Enable: 
+      * > Enable/Disable Crystals and Keys to be loaded and used in game
+    * Crystal_Consume_Default: 
+      * > Default required 1 crystal for each portal
+    * Portal_Crystal_Color_Default: 
+      * > Default required RED crystal for TP consumption
 
-You can set the default color and default consumption per portal and change it once someone has gone through it. Make a portal admin only or free passage. 
+  * [PortalJuice]
+    * EnablePortalJuice: 
+      * > Enable/Disable Portal Fluid to be loaded and used in game
+    * PortalMagicFluidSpawn: 
+      * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
+    * PortalJuiceValue: 
+      * > Default selling 300 coins at Haldor the trader
+        >> Set to value of 0 removed the sale at Haldor
 
-Odin makes a way. 
+### YML (config/Portal_Names/*.yml)
+  * > *The mod will auto generate default data into each yml named after your current world **upon your teleportation via ANY portal.***
+```
+  Demo_Portal_Name:
+    Portal_Crystal_Cost:
+      Red: 1
+      Green: 0
+      Blue: 0
+      Gold: 1
+    Portal_Key:
+      Red: true
+      Green: false
+      Blue: false
+      Gold: true
+    Free_Passage: false > set true makes the portal FOC from crys/keys
+    Admin_only_Access: false
+```
 
-Set a starting amount of PortalMagicFluid per new character.  This mod changes the recipe for portals and can require a new unique item called PortalMagicFluid. One Magical Portal Fluid per Portal.
+## Compatibility:
+* WayShrine by Azumatt
+  * https://www.nexusmods.com/valheim/mods/1298
+  * https://valheim.thunderstore.io/package/Azumatt/Wayshrine/
+* TargetPortal by Smoothbrain
+  * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
+* and most of the other mods.
 
-Has 12 Server configurable values which are sync to client as of 2.0
+## Author's Note:
+* Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scarce resource.
+* Other mods can allow the resources to be bought at the trader for high prices, gambled on or become rare drops from bosses.
+* If you are using *ServerCharacters*,
+  * It is suggested to set the starting quantity amount to 0 for dedicated server and let ServerCharacters mod handle the first time spawn in amounts.
+  * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
-0) Server Sync
-
-1) Turn on and off PortalJuice (true, false)
-
-2) Starting quantity of PortalMagicFluid (default 3)[ Only applies to brand new character on first spawn in]
-
-3) CraftingStation required nearby - Default is $piece_workbench for workbench.
-
-4) Level required for that craftingStation to be able to build this piece. - Default 1
-
-5) OnlyCreatorCanDeconstruct - Default is true; Can still be destoryed
-
-6) Portal Health: Default 400
-
-7) Only the Creator can change the Portal Name : Default false;
-
-8) Portal_Crystal_Enable = false  - turn on/off Crystals and Keys
-
-9) Crystal_Consume_Default = 1. Default Crystal Consumption for new Portals
-
-10)  Portal_Crystal_Color_Default = Red - Default Color: Red,  Gold is automically enabled for all plus - Default
-
-11) PortalJuiceValue = 300 - Sets value of Portal Juice, a value of 0 keeps it from being sold at trader
-
-
-Admin can spawn in more items with name 'PortalMagicFluid'
-
-Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scarce resource.
-Other mods can allow the resources to be bought at the trader for high prices, gambled on or become rare drops from bosses.
-﻿
-Could be combined with WayShrine https://www.nexusmods.com/valheim/mods/1298 to create interesting maps.
-
-It is better to set the starting quantity amount to 0 for Dedicated servers and let ServerCharacters mod handle the first time spawn in amounts.
-https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
-
-First Mod: Download and enjoy.
-No known conflicts.
-ChangeLog:
+## Change Log:
         
 
         Version 2.0.0
             Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
-            Crystals are Consumable. Keys are not. TargetPortal compatibility. YML file for each world. ServerSynced admin control
+            Crystals are Consumable. Keys are not. TargetPortal, AnyPortal, TeleportAnything compatibility. YML file for each world. ServerSynced admin control
         Version 1.6.0
             Added three New Configs: Portal Health, OnlyCreatorCanDeconstruct (  destroy possible), OnlyCreatorCanRename
         Version 1.5.1
@@ -84,5 +125,6 @@ ChangeLog:
             Mod Release
 
 
-
-Thank you to OdinPlus Team for some useful information.
+## Credits:
+* Thank you to OdinPlus Team for some useful information.
+* Zeall for readme update
