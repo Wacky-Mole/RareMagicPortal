@@ -44,6 +44,8 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         public String MaterialPortName { get; set; }
         public TeleportWorld TeleportW { get; }
 
+        public bool ColorSet { get; set; } = false;
+
 
         public TeleportWorldDataRMP(TeleportWorld teleportWorld)
         {
