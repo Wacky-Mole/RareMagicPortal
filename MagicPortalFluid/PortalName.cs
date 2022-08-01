@@ -27,6 +27,11 @@ namespace RareMagicPortal
                                   {"Gold", true } };
 
             public bool Free_Passage { get; set; } = false;
+
+            public bool TeleportAnything { get; set; } = false;
+
+            public List<string> AdditionalProhibitItems { get; set; } 
+
             public bool Admin_only_Access { get; set; } = false;
 
         }

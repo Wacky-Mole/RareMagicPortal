@@ -243,8 +243,8 @@ namespace RareMagicPortal
 			[HarmonyPatch(nameof(TeleportWorld.UpdatePortal))]
 			static void TeleportWorldUpdatePortalPostfixRMP(ref TeleportWorld __instance)
 			{
-				if (!ConfigEnableCrystals.Value
-					|| !__instance
+				if (//!ConfigEnableCrystals.Value
+					   !__instance
 					|| !__instance.m_nview
 					|| __instance.m_nview.m_zdo == null
 					|| __instance.m_nview.m_zdo.m_zdoMan == null
@@ -432,8 +432,6 @@ namespace RareMagicPortal
 				if (__instance.m_nview.IsValid())
 				{
 					//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact");
-
-					
 					Piece portal = null;
 					portal = __instance.GetComponent<Piece>();
 					string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
@@ -512,8 +510,6 @@ namespace RareMagicPortal
 
 							}
 
-							 
-
 							if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
 							{
 								teleportWorldData.ColorSet = false;
@@ -572,8 +568,46 @@ namespace RareMagicPortal
                 {
 					bo2 = true;
 				}
-				//Player.m_localPlayer.transform
-	
+
+
+				Piece portal = null;
+				String name = null;
+				Vector3 hi = Player.m_localPlayer.transform.position;
+				List<Piece> piecesfound = new List<Piece>();
+				Piece.GetAllPiecesInRadius(hi, 5f, piecesfound);
+				foreach (Piece piece in piecesfound)
+                {
+					if (piece.name == "portal_wood") // list of pieces that have teleport world
+                    {
+						portal = piece;
+						break;
+                    }
+                }
+				TeleportWorld maybe;
+
+				foreach (Piece piece in piecesfound)
+                {
+					if (piece.TryGetComponent<TeleportWorld>(out maybe))
+                    {
+						
+                    }
+                }
+
+				if (portal != null)
+				{
+					var portalW = portal.GetComponent<TeleportWorld>();
+					if (portalW != null)
+						name = portalW.GetHoverText();
+					if (name != null)
+                    {
+						var found = name.IndexOf(":") + 2;
+						var end = name.IndexOf("\" ");
+						var le = end - found;
+						name = name.Substring(found, le);
+
+					}
+				}
+
 
 				if (bo2) // if status effect is active 
                 {
@@ -1506,28 +1540,22 @@ namespace RareMagicPortal
 
 		private static int CrystalandKeyLogicColor(string PortalName)
 		{
-			// 0 is no tele
+			// 0 is black/admin only
 			// 1 is normal // free passage
 			// 2 red
 			// 3 green
 			// 4 blue
-			// 5 gold
+			// 5 gold or yellow?
 			// 6 white allow passage with base color
 
 			int CrystalForPortal = CrystalsConsumable;
 			bool OdinsKin = false;
 			bool Free_Passage = false;
-			//Dictionary <string, int> Portal_Crystal_Cost = null; // rgbG
-			//Dictionary <string, bool> Portal_Key; //rgbG
 
-
-			//RareMagicPortal.LogInfo($"Portal name is {PortalName}");
 			if (!PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
 			{
 				WritetoYML(PortalName);
 			}
-
-			//CrystalForPortal = PortalN.Portals[PortalName].Crystal_Cost_Master;
 			OdinsKin = PortalN.Portals[PortalName].Admin_only_Access;
 			Free_Passage = PortalN.Portals[PortalName].Free_Passage;
 			var Portal_Crystal_Cost = PortalN.Portals[PortalName].Portal_Crystal_Cost; // rgbG  // 0 means it can't be used, (Keys only) anything greater means the cost. -1 means same as 0
@@ -1543,24 +1571,21 @@ namespace RareMagicPortal
 				return 1;
 
 
-			if (EnableCrystals)
-			{
+			if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
+				return 2;
 
+			if ((Portal_Crystal_Cost["Green"] > 0 || Portal_Key["Green"]))
+				return 3;
 
-				if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
-					return 2;
+			if ((Portal_Crystal_Cost["Blue"] > 0 || Portal_Key["Blue"]))
+				return 4;
 
-				if ((Portal_Crystal_Cost["Green"] > 0 || Portal_Key["Green"]))
-					return 3;
+			if ((Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
+				return 5;
+			if (PortalN.Portals[PortalName].TeleportAnything)
+				return 6;
 
-				if ((Portal_Crystal_Cost["Blue"] > 0 || Portal_Key["Blue"]))
-					return 4;
-
-				if ((Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
-					return 5;
-
-			}
-			return 1;
+			return 0;
 
 
 		}
@@ -1580,12 +1605,14 @@ namespace RareMagicPortal
 				case 0:
 					currentcolor = "Black";
 					PortalN.Portals[PortalName].Admin_only_Access = true;
+					PortalN.Portals[PortalName].TeleportAnything = true; // I guess
 
 					break;
 				case 1:
 					currentcolor = "Yellow";
 					PortalN.Portals[PortalName].Free_Passage = true;
 					PortalN.Portals[PortalName].Admin_only_Access = false;
+					PortalN.Portals[PortalName].TeleportAnything = false;
 
 					break;
 				case 2:
@@ -1651,9 +1678,7 @@ namespace RareMagicPortal
 					break;
 				case 6:
 					currentcolor = "White"; // only use for freee trans
-					//PortalN.Portals[PortalName].Free_Passage = false;
-					//PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 0;
-					//PortalN.Portals[PortalName].Portal_Key["Gold"] = false;
+					PortalN.Portals[PortalName].TeleportAnything = true;
 					// don't change underling base requirements but cast white vfx 
 
 
@@ -1662,6 +1687,7 @@ namespace RareMagicPortal
 					currentcolor = "Yellow";
 					PortalN.Portals[PortalName].Free_Passage = true;
 					PortalN.Portals[PortalName].Admin_only_Access = false;
+					PortalN.Portals[PortalName].TeleportAnything = false;
 					break;
 
 			}
@@ -1672,7 +1698,6 @@ namespace RareMagicPortal
 			var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
 			File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
-			int counter = 0;
 			string lines = "";
 			foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
 			{
