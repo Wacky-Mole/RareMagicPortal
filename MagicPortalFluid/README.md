@@ -1,6 +1,6 @@
 # RareMagicPortal
 
-<img src="https://wackymole.com/hosts/FireandIce.png" width="400"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="400"/>
+<img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
 `Server and client side required for Server Sync enforcement.`
 
@@ -35,14 +35,14 @@ Well, I've a mod for you!
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
- <img src="https://wackymole.com/hosts/WhitePortal.png" width="800"/>
+ <img src="https://wackymole.com/hosts/WhiteOdin.png" width="800"/>
 
 * Portal Drink
  * Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
 
 YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or changing Portal color. 
 
-<img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
+<img src="https://wackymole.com/hosts/typesofcrystals.png" width="300"/> <img src="https://wackymole.com/hosts/nored.png" width="300"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="300"/>
 
 ## Prefab IDs:
   * PortalMagicFluid
