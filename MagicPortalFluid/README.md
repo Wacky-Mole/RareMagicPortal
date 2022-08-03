@@ -23,14 +23,14 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
-*Portal Colors
- *Black Portal -With EnableCrystals- Admin Only Portal
- *Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
- *Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
- *Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
- *Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
- *Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
- *White Portal -With EnableCrystals-  Teleport Anything
+* Portal Colors
+ * Black Portal -With EnableCrystals- Admin Only Portal
+ * Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
+ * Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
+ * Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
+ * Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
+ * Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
+ * White Portal -With EnableCrystals-  Teleport Anything
 
 *Portal Drink
  *Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
@@ -85,7 +85,7 @@ Well, I've a mod for you!
         >> Set to value of 1 or more to sale at Haldor
 
   * [Portal Drink]
-    Portal_drink_timer = 120 : Seconds that PortalDrink lasts
+    * Portal_drink_timer = 120 : Seconds that PortalDrink lasts
 
 
 ### YML (config/Portal_Names/*.yml)

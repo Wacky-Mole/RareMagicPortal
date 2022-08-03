@@ -4,6 +4,7 @@
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
 Do you want to see more PVP or more cooperation between your buddies and their bases?<br>
+Do you want more colors on your portals or more freedom or restrictions?<br>
 Well, I've a mod for you!
 
 ### Main Feature:
@@ -22,6 +23,18 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
+* Portal Colors
+ * Black Portal -With EnableCrystals- Admin Only Portal
+ * Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
+ * Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
+ * Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
+ * Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
+ * Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
+ * White Portal -With EnableCrystals-  Teleport Anything
+
+*Portal Drink
+ *Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
+
 <img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
 
 ## Prefab IDs:
@@ -34,12 +47,15 @@ Well, I've a mod for you!
   * PortalKeyRed
   * PortalKeyGreen
   * PortalKeyBlue
+  * PortalDrink
 
 ## Configuration Options:
 ### RareMagicPortal.cfg
   * [General]
     * Force Server Config: 
       * > Enable/Disable ServerSync enforcement
+    *YML Logs
+      * > Useful for seeing what a Portal Requirements are: Default: True
     * CraftingStation_Requirement: 
       * > Default required workbench
     * Level_of_CraftingStation_Req: 
@@ -61,16 +77,21 @@ Well, I've a mod for you!
 
   * [PortalJuice]
     * EnablePortalJuice: 
-      * > Enable/Disable Portal Fluid to be loaded and used in game
+      * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1 Disabled by default
     * PortalMagicFluidSpawn: 
       * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
     * PortalJuiceValue: 
-      * > Default selling 300 coins at Haldor the trader
-        >> Set to value of 0 removed the sale at Haldor
+      * > Default 0 coins 
+        >> Set to value of 1 or more to sale at Haldor
+
+  * [Portal Drink]
+    * Portal_drink_timer = 120 : Seconds that PortalDrink lasts
+
 
 ### YML (config/Portal_Names/*.yml)
   * > *The mod will auto generate default data into each yml named after your current world **upon your teleportation via ANY portal.***
 ```
+  Demo_Portal_Name:
   Demo_Portal_Name:
     Portal_Crystal_Cost:
       Red: 1
@@ -82,8 +103,13 @@ Well, I've a mod for you!
       Green: false
       Blue: false
       Gold: true
-    Free_Passage: false > set true makes the portal FOC from crys/keys
-    Admin_only_Access: false
+    Free_Passage: false  - No Crystal or Key requirement
+    TeleportAnything: false  - Portal allows you to Teleport Anything
+    AdditionalProhibitItems: -- Additional items restricted at this portal
+    - Stone
+    - Wood
+    Admin_only_Access: false -- Only admins
+
 ```
 
 ## Compatibility:
