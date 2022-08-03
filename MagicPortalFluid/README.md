@@ -24,8 +24,8 @@ Well, I've a mod for you!
   * Helps your server build a more interactive economy in Valheim
 
 * Portal Colors
- * Black Portal -With EnableCrystals- Admin Only Portal
- * Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
+ * > Black Portal -With EnableCrystals- Admin Only Portal
+ * > Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
  * Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
  * Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
  * Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
