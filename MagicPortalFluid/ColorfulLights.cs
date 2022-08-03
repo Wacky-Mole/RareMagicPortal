@@ -40,11 +40,11 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         public List<ParticleSystem> Systems { get; } = new List<ParticleSystem>();
         public List<Material> Materials { get; } = new List<Material>();
         public Color TargetColor = Color.clear;
+        public Color OldColor = Color.clear;
         public List<Renderer> MeshRend { get; } = new List<Renderer>();
         public String MaterialPortName { get; set; }
         public TeleportWorld TeleportW { get; }
 
-        public bool ColorSet { get; set; } = false;
 
 
         public TeleportWorldDataRMP(TeleportWorld teleportWorld)

@@ -30,7 +30,7 @@ namespace RareMagicPortal
 
             public bool TeleportAnything { get; set; } = false;
 
-            public List<string> AdditionalProhibitItems { get; set; } 
+            public List<string> AdditionalProhibitItems { get; set; } = new List<string>();// { "Blackmetal", "Iron" };
 
             public bool Admin_only_Access { get; set; } = false;
 
