@@ -1,6 +1,7 @@
 # RareMagicPortal
 
-<img src="https://wackymole.com/hosts/FireandIce.png" width="300"/> <img src="https://wackymole.com/hosts/White.png" width="300"/> <img src="https://wackymole.com/hosts/GoldPortal.png" width="300"/>
+<img src="https://wackymole.com/hosts/FireandIce.png" width="400"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="400"/>
+
 `Server and client side required for Server Sync enforcement.`
 
 Tired of portals being the end all, be all of Valheim?<br>
@@ -33,6 +34,8 @@ Well, I've a mod for you!
  * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
+
+ <img src="https://wackymole.com/hosts/WhitePortal.png" width="800"/>
 
 * Portal Drink
  * Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
