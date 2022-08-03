@@ -1451,7 +1451,7 @@ namespace RareMagicPortal
 		// Add server config which gets pushed to all clients connecting and can only be edited by admins
 		// In local/single player games the player is always considered the admin
 
-			ConfigFluid = config("PortalJuice", "EnablePortalJuice", false,
+			ConfigFluid = config("PortalJuice", "EnablePortalJuice", true,
 							"Enable PortalFluid requirement?");
 
 			ConfigSpawn = config("PortalJuice", "PortalMagicFluidSpawn", 3,

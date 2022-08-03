@@ -1,4 +1,6 @@
 # RareMagicPortal
+
+img src="https://wackymole.com/hosts/FireandIce.png" width="248"/> <img src="https://wackymole.com/hosts/White.png" width="230"/> <img src="https://wackymole.com/hosts/GoldPortal.png" width="215"/>
 `Server and client side required for Server Sync enforcement.`
 
 Tired of portals being the end all, be all of Valheim?<br>
@@ -32,10 +34,10 @@ Well, I've a mod for you!
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
-*Portal Drink
- *Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
+* Portal Drink
+ * Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
 
-YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or Changing Portal Color. 
+YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or changing Portal color. 
 
 <img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
 
@@ -79,7 +81,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
   * [PortalJuice]
     * EnablePortalJuice: 
-      * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1 Disabled by default
+      * > Enable/Disable Portal Fluid to be loaded and used in game:
     * PortalMagicFluidSpawn: 
       * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
     * PortalJuiceValue: 
@@ -136,9 +138,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
             Added PortalColor Changing feature, can be used exclusively or with Crystals and Keys
             Added AdditionalProhibitItems, If you restrict additional items on specific portals
             Added TeleportAnything for individual Portals- White Portals allows anything thorugh
-            Defaults changed on EnablePortalJuice and PortalJuiceValue
+            Defaults changed on PortalJuiceValue
             Bug fixes for TargetPortal mod
-            Fixed WackysDatabase comptability with Portals- Keep EnablePortalJuice = false if you want to change Default Portal reqs to something unqiue. Add PortalJuice with Wackysdb instead.
+            Fixed WackysDatabase comptability with Portals- Keep EnablePortalJuice = false and add PortalJuice with Wackysdb instead if you want unique reqs
         Version 2.0.0
             Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
             Crystals are Consumable. Keys are not. TargetPortal, AnyPortal, TeleportAnything compatibility. YML file for each world. ServerSynced admin control
@@ -163,3 +165,6 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Credits:
 * Thank you to OdinPlus Team for some useful information.
 * Zeall for readme update
+* Some code from https://github.com/redseiko/ComfyMods/tree/main/ColorfulPortals
+* Assets from https://assetstore.unity.com/packages/3d/props/interior/free-alchemy-and-magic-pack-142991
+* crystal assets from https://assetstore.unity.com/packages/3d/environments/fantasy/translucent-crystals-106274
