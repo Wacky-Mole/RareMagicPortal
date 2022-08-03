@@ -467,7 +467,7 @@ namespace RareMagicPortal
 						if (portal.m_creator == closestPlayer.GetPlayerID())
 							sameperson = true;
 
-						//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact Past portal check");
+						//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact Past portal check and is admin {isAdmin}");
 						if (_changePortalReq.IsDown() && isAdmin || _changePortalReq.IsDown() && sameperson && !EnableCrystals) // creator can change it if enable crystals is off
 						{
 
@@ -1238,6 +1238,7 @@ namespace RareMagicPortal
 			}
 			else
 			{
+				isAdmin = false;
 				RareMagicPortal.LogInfo("You are not ServerSync admin"); 
 				try
 				{

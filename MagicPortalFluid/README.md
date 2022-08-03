@@ -61,7 +61,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * [General]
     * Force Server Config: 
       * > Enable/Disable ServerSync enforcement
-    *YML Logs
+    * YML Logs
       * > Useful for seeing what a Portal Requirements are: Default: True
     * CraftingStation_Requirement: 
       * > Default required workbench
@@ -98,7 +98,6 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ### YML (config/Portal_Names/*.yml)
   * > *The mod will auto generate default data into each yml named after your current world **upon your teleportation via ANY portal.***
 ```
-  Demo_Portal_Name:
   Demo_Portal_Name:
     Portal_Crystal_Cost:
       Red: 1
