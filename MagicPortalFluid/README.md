@@ -23,17 +23,19 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
-* Portal Colors
+* Portal Colors - You can manually edit or cyle through colors with "LeftControl-E" as Admin or Owner with EnableCrystal off
  * > Black Portal -With EnableCrystals- Admin Only Portal
  * > Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
- * Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
- * Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
- * Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
- * Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
- * White Portal -With EnableCrystals-  Teleport Anything
+ * > Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
+ * > Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
+ * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
+ * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
+ * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
 *Portal Drink
  *Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
+
+YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or Changing Portal Color. 
 
 <img src="https://wackymole.com/hosts/typesofcrystals.png" width="248"/> <img src="https://wackymole.com/hosts/nored.png" width="230"/> <img src="https://wackymole.com/hosts/goldPortal.png" width="215"/>
 
@@ -129,7 +131,14 @@ Well, I've a mod for you!
 
 ## Change Log:
         
-
+        Version 2.1.0
+            Added PortalDrink - Configurable Time that allows a player to Teleport anything.
+            Added PortalColor Changing feature, can be used exclusively or with Crystals and Keys
+            Added AdditionalProhibitItems, If you restrict additional items on specific portals
+            Added TeleportAnything for individual Portals- White Portals allows anything thorugh
+            Defaults changed on EnablePortalJuice and PortalJuiceValue
+            Bug fixes for TargetPortal mod
+            Fixed WackysDatabase comptability with Portals- Keep EnablePortalJuice = false if you want to change Default Portal reqs to something unqiue. Add PortalJuice with Wackysdb instead.
         Version 2.0.0
             Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
             Crystals are Consumable. Keys are not. TargetPortal, AnyPortal, TeleportAnything compatibility. YML file for each world. ServerSynced admin control
