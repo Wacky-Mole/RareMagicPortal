@@ -1,6 +1,6 @@
 # RareMagicPortal
 
-img src="https://wackymole.com/hosts/FireandIce.png" width="248"/> <img src="https://wackymole.com/hosts/White.png" width="230"/> <img src="https://wackymole.com/hosts/GoldPortal.png" width="215"/>
+<img src="https://wackymole.com/hosts/FireandIce.png" width="300"/> <img src="https://wackymole.com/hosts/White.png" width="300"/> <img src="https://wackymole.com/hosts/GoldPortal.png" width="300"/>
 `Server and client side required for Server Sync enforcement.`
 
 Tired of portals being the end all, be all of Valheim?<br>
