@@ -35,7 +35,7 @@ Well, I've a mod for you!
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
- <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="700"/>
+ <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="300"/>
 
 * Portal Drink
  * Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
