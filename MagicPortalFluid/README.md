@@ -135,6 +135,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
 ## Change Log:
         
+        Version 2.1.1
+            Changed Default for EnablePortalJuice to false for everyone that just wants PortalColors.
+            Fixed Spelling errors. 
         Version 2.1.0
             Added PortalDrink - Configurable Time that allows a player to Teleport anything.
             Added PortalColor Changing feature, can be used exclusively or with Crystals and Keys
