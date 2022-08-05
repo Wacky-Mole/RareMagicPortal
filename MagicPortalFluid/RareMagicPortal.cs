@@ -43,7 +43,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.1.0";
+		public const string PluginVersion = "2.1.1";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -63,7 +63,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.0.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.1.0" };
 
 		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
@@ -1452,7 +1452,7 @@ namespace RareMagicPortal
 		// Add server config which gets pushed to all clients connecting and can only be edited by admins
 		// In local/single player games the player is always considered the admin
 
-			ConfigFluid = config("PortalJuice", "EnablePortalJuice", true,
+			ConfigFluid = config("PortalJuice", "EnablePortalJuice", false,
 							"Enable PortalFluid requirement?");
 
 			ConfigSpawn = config("PortalJuice", "PortalMagicFluidSpawn", 3,
@@ -1484,7 +1484,7 @@ namespace RareMagicPortal
 
             PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
 
-			ConfigEnableYMLLogs = config("General", "YMLPortalLogs", true, "Show YML Portal Logs after Every update");
+			ConfigEnableYMLLogs = config("General", "YMLPortalLogs", true, "Show YML Portal Logs after Every update", false);
 
 		}
 

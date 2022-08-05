@@ -2,7 +2,7 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.`
+`Server and client side required for Server Sync enforcement.` V2.1.1
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -38,7 +38,7 @@ Well, I've a mod for you!
 <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="200"/>
 
 * Portal Drink
- * Allows you do drink and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
+ * Allows you do drink a potion and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
 
 YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or changing Portal color. 
 
@@ -84,7 +84,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
   * [PortalJuice]
     * EnablePortalJuice: 
-      * > Enable/Disable Portal Fluid to be loaded and used in game:
+      * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
     * PortalMagicFluidSpawn: 
       * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
     * PortalJuiceValue: 
@@ -96,7 +96,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
 
 ### YML (config/Portal_Names/*.yml)
-  * > *The mod will auto generate default data into each yml named after your current world **upon your teleportation via ANY portal.***
+  * > *The mod will auto generate default data into each yml named after your current world **upon getting close to ANY portal.***
 ```
   Demo_Portal_Name:
     Portal_Crystal_Cost:
@@ -111,7 +111,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
       Gold: true
     Free_Passage: false  - No Crystal or Key requirement
     TeleportAnything: false  - Portal allows you to Teleport Anything
-    AdditionalProhibitItems: -- Additional items restricted at this portal
+    AdditionalProhibitItems: -- Additional items restricted at this portal or [Stone, Wood]
     - Stone
     - Wood
     Admin_only_Access: false -- Only admins
@@ -137,6 +137,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
         
         Version 2.1.1
             Changed Default for EnablePortalJuice to false for everyone that just wants PortalColors.
+            Changed ConfigEnableYMLLogs to allow for indivudal log settings. 
             Fixed Spelling errors. 
         Version 2.1.0
             Added PortalDrink - Configurable Time that allows a player to Teleport anything.
