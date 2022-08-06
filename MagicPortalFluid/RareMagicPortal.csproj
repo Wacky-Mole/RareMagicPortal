@@ -106,6 +106,7 @@
     <Compile Include="Class1.cs" />
     <Compile Include="ColorfulLights.cs" />
     <Compile Include="PortalName.cs" />
+    <Compile Include="SpriteTools.cs" />
     <Compile Include="VersionHandshake.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="RareMagicPortal.cs" />
@@ -129,6 +130,12 @@
     <None Include="Package\manifest.json" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="portaliconTarget.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="portalicon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="Libs\ItemManager.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
