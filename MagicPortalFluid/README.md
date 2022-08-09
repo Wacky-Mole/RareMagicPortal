@@ -26,6 +26,18 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
+## How to Get Crystals/Keys/Fluid in your World
+The Crystals/Keys/Fluid is mostly meant for Multiplayer Worlds<br>
+The Admins can add them to the world in several different ways. <br>
+Drop That mod : https://valheim.thunderstore.io/package/ASharpPen/Drop_That/ <br>
+Sell That mod : https://valheim.thunderstore.io/package/ASharpPen/Sell_That/ <br>
+Better Trader: https://valheim.thunderstore.io/package/OdinPlus/Better_Trader_Remake/ <br>
+CLLC: https://valheim.thunderstore.io/package/Smoothbrain/CreatureLevelAndLootControl/ <br>
+KG's Marketplace https://valheim.thunderstore.io/package/KGvalheim/Marketplace_And_Server_NPCs_Revamped/ <br>
+KnarrTheTrader https://valheim.thunderstore.io/package/OdinPlus/KnarrTheTrader/  <br>
+Or Just Server rewards for compeleting Objects, like in KG marketplace mod for bounties, <br>
+https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards, but I don't recommend
+
 * Portal Colors - You can manually edit or cyle through colors with "LeftControl-E" as Admin or Owner with EnableCrystal off
  * > Black Portal -With EnableCrystals- Admin Only Portal
  * > Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
