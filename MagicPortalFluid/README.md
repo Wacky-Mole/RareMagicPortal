@@ -27,7 +27,7 @@ Well, I've a mod for you!
   * Helps your server build a more interactive economy in Valheim
 
 #### How to Get Crystals/Keys/Fluid in your World
-The Crystals/Keys/Fluid is mostly meant for Multiplayer Worlds<br>
+The Crystals/Keys/Fluid are mostly meant for Multiplayer Worlds<br>
 The Admins can add them to the world in several different ways. <br>
 Drop That mod : https://valheim.thunderstore.io/package/ASharpPen/Drop_That/ <br>
 Sell That mod : https://valheim.thunderstore.io/package/ASharpPen/Sell_That/ <br>
