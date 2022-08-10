@@ -2,7 +2,7 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.1.1
+`Server and client side required for Server Sync enforcement.` V2.1.2
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -25,6 +25,18 @@ Well, I've a mod for you!
     * Special access portal by team members only
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
+
+## How to Get Crystals/Keys/Fluid in your World
+The Crystals/Keys/Fluid is mostly meant for Multiplayer Worlds<br>
+The Admins can add them to the world in several different ways. <br>
+Drop That mod : https://valheim.thunderstore.io/package/ASharpPen/Drop_That/ <br>
+Sell That mod : https://valheim.thunderstore.io/package/ASharpPen/Sell_That/ <br>
+Better Trader: https://valheim.thunderstore.io/package/OdinPlus/Better_Trader_Remake/ <br>
+CLLC: https://valheim.thunderstore.io/package/Smoothbrain/CreatureLevelAndLootControl/ <br>
+KG's Marketplace https://valheim.thunderstore.io/package/KGvalheim/Marketplace_And_Server_NPCs_Revamped/ <br>
+KnarrTheTrader https://valheim.thunderstore.io/package/OdinPlus/KnarrTheTrader/  <br>
+Server rewards for completing objectives, like in KG marketplace mod for bounties,  <br>
+https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards, but I don't recommend
 
 * Portal Colors - You can manually edit or cyle through colors with "LeftControl-E" as Admin or Owner with EnableCrystal off
  * > Black Portal -With EnableCrystals- Admin Only Portal
@@ -124,6 +136,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * https://valheim.thunderstore.io/package/Azumatt/Wayshrine/
 * TargetPortal by Smoothbrain
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
+  * This a recommended mod, has good Compatibility 
 * and most of the other mods.
 
 ## Author's Note:
@@ -134,7 +147,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
-        
+        Version 2.1.2
+            Extra Compatibility with TargetPortal
+            Now shows TargetPortal Icon colors based on color of Portal
+            bug fixes
         Version 2.1.1
             Changed Default for EnablePortalJuice to false for everyone that just wants PortalColors.
             Changed ConfigEnableYMLLogs to allow for indivudal log settings. 

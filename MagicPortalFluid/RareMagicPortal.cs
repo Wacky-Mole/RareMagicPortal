@@ -740,8 +740,11 @@ namespace RareMagicPortal
 				if (!Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal")){ // check to see if targetportal is loaded
 					return true;
 				}
-				RareMagicPortal.LogInfo($"Made it to Map during Telecheck");
+				//RareMagicPortal.LogInfo($"Made it to Map during Telecheck");
 				string PortalName;
+				HoldPins = Minimap.instance.m_pins;
+				//return true;
+				
 				try
 				{
 					 PortalName = HandlePortalClick(); //my handleportal click
@@ -750,8 +753,7 @@ namespace RareMagicPortal
                 {
 					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
 
-				}
-				
+				}			
 				if (CrystalandKeyLogic(PortalName))
                 {
 					return true; // allow TargetPortal to do it's checks
@@ -759,15 +761,23 @@ namespace RareMagicPortal
                 {
 					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
 				}
+				
 									 
 				
 			}
 			private static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException2 ? null : __exception;
 		}
 
+		[HarmonyPatch(typeof(Minimap), nameof(Minimap.Start))]
+		[HarmonyPriority(Priority.Low)]
+		public class AddMinimapPortalIconRMP
+		{
 
-
-
+			private static void Postfix(Minimap __instance)
+			{
+				HoldPins = Minimap.instance.m_pins;
+			}
+		}
 
 		[HarmonyPatch(typeof(TeleportWorldTrigger), nameof(TeleportWorldTrigger.OnTriggerEnter))]  // for Crystals and Keys
 		private class TeleportWorld_Teleport_CheckforCrystal
@@ -814,8 +824,6 @@ namespace RareMagicPortal
 
 				if (Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
                 {
-					Minimap instance = Minimap.instance;
-					HoldPins = instance.m_pins;
 					Teleporting = true;
 					return true; // skip on checking because we don't know where this is going 
 					// we will catch in map for tele check
@@ -842,15 +850,23 @@ namespace RareMagicPortal
 		
 		[HarmonyPostfix]
 			[HarmonyPriority(Priority.Low)]
-			private static void Postfix()
+			private static void Postfix(TeleportWorldTrigger __instance)
 			{
 			 if (Teleporting && Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
 				{
-					RareMagicPortal.LogInfo($"Made it to Portal Trigger");
+					//RareMagicPortal.LogInfo($"Made it to Portal Trigger");
+					Minimap.instance.ShowPointOnMap(__instance.transform.position);
 					int colorint;
 					String PName;
+					String PortalName;
 					Minimap instance = Minimap.instance;
+					try
+					{
+						PortalName = HandlePortalClick(); //This is making minimap instance correctly
+					}
+					catch { }
 					List<Minimap.PinData> paul = instance.m_pins;
+					//List<Minimap.PinData> paul = HoldPins;
 					foreach (Minimap.PinData pin in paul)
 					{
 						PName = null;
@@ -1929,19 +1945,21 @@ namespace RareMagicPortal
 			var Portal_Key = PortalN.Portals[PortalName].Portal_Key; // rgbG
 																	 // the admin can customize crystal cost or key usage, but master crystal and golden key always are automatic unless set to admin
 
+			//RareMagicPortal.LogInfo($"Portal IS ADMIN {OdinsKin} and is player admin? {isAdmin}");
+			if (OdinsKin && isAdmin)
+			{
+				player.Message(MessageHud.MessageType.TopLeft, "$rmp_kin_welcome"); // forgot this one
+				return true;
+			}
 
-			if (OdinsKin && !isAdmin) // If requires admin, but not admin
+			else if (OdinsKin && !isAdmin) // If requires admin, but not admin
 			{
 				player.Message(MessageHud.MessageType.Center, "$rmp_kin_only");
 				Teleporting = false;
 				return false;
 				
 			} 
-			if (OdinsKin && isAdmin)
-            {
-				player.Message(MessageHud.MessageType.TopLeft, "$rmp_kin_welcome"); // forgot this one
-				return true;
-			}
+
 			if (EnableCrystals)
 			{
 				if (!player.IsTeleportable())
