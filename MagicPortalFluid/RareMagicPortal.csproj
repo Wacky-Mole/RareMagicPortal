@@ -107,7 +107,6 @@
     <Compile Include="ColorfulLights.cs" />
     <Compile Include="PortalName.cs" />
     <Compile Include="SpriteTools.cs" />
-    <Compile Include="VersionHandshake.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="RareMagicPortal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

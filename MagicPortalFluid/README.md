@@ -2,7 +2,8 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.1.2
+`Server and client side required for Server Sync enforcement.` V2.1.3
+MinimumRequiredVersion = "2.1.3"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -136,10 +137,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * https://www.nexusmods.com/valheim/mods/1298
   * https://valheim.thunderstore.io/package/Azumatt/Wayshrine/
 * TargetPortal by Smoothbrain
-<img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
-
+* <img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
-  * This a recommended mod, it has good compatibility 
+  * This a recommended mod, it has good compatibility with RMP
 * and most of the other mods.
 
 ## Author's Note:
@@ -150,6 +150,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.1.3
+            Bug fix for Admin status: I swear there are little gremlins messing up Serversync and admin permissions.
         Version 2.1.2
             Extra Compatibility with TargetPortal
             Now shows TargetPortal Icon colors based on color of Portal

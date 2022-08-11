@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.1.2";
+		public const string PluginVersion = "2.1.3";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.1.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.1.3" };
 
 		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
@@ -1319,19 +1319,36 @@ namespace RareMagicPortal
             if (!File.Exists(ConfigFileFullPath)) return;
 
 
-			//RareMagicPortal.LogInfo("ReadConfigValues called- checking admin status");
-			//bool admin= !ConfigSync.IsLocked; // or locked?
 			bool admin = ConfigSync.IsAdmin;
 			bool locked = ConfigSync.IsLocked;
-			//RareMagicPortal.LogInfo("admin " + admin);
-			//RareMagicPortal.LogInfo("locked " + locked);
-			if (admin) // Server Sync Admin Only
+			bool islocaladmin = false;
+			bool isdedServer = false;
+			if (ZNet.instance.IsServer() && !ZNet.instance.IsDedicated())
+				islocaladmin = true;
+			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+				isdedServer = true;
+
+
+			if (admin || islocaladmin || isdedServer) // Server Sync Admin Only
 			{
 				isAdmin = admin; // need to check this
-				RareMagicPortal.LogInfo("ReadConfigValues loaded");
 				try
 				{
-					if (ConfigSync.IsSourceOfTruth)
+					if (islocaladmin)
+                    {
+						isAdmin = true;
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are a local admin");
+						Config.Reload();
+						ReadAndWriteConfigValues();
+						PortalChanger();
+					} else if (isdedServer)
+                    {
+						RareMagicPortal.LogInfo("ReadConfigValues loaded- you the dedicated Server");
+						Config.Reload();
+						ReadAndWriteConfigValues();
+						PortalChanger();
+					}
+					else if (ConfigSync.IsSourceOfTruth)
 					{
 						RareMagicPortal.LogInfo("ReadConfigValues loaded- you are an admin - on a server");
 						Config.Reload();
