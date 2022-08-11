@@ -137,7 +137,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * https://www.nexusmods.com/valheim/mods/1298
   * https://valheim.thunderstore.io/package/Azumatt/Wayshrine/
 * TargetPortal by Smoothbrain
-* <img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
+<img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
+
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
   * This a recommended mod, it has good compatibility with RMP
 * and most of the other mods.
