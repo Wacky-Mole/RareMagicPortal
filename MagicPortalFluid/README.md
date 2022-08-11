@@ -3,6 +3,7 @@
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
 `Server and client side required for Server Sync enforcement.` V2.1.3
+
 MinimumRequiredVersion = "2.1.3"
 
 Tired of portals being the end all, be all of Valheim?<br>
@@ -140,7 +141,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 <img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
 
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
-  * This a recommended mod, it has good compatibility with RMP
+  * This a recommended mod, it has good compatibility with RMP.  Shows Icon Color in 2.1.2
 * and most of the other mods.
 
 ## Author's Note:
