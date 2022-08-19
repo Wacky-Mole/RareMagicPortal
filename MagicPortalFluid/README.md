@@ -208,6 +208,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Credits:
 * Thank you to OdinPlus Team for some useful information.
 * Zeall for readme update
+* GraveBear for Icon Update
 * Some code from https://github.com/redseiko/ComfyMods/tree/main/ColorfulPortals
 * Assets from https://assetstore.unity.com/packages/3d/props/interior/free-alchemy-and-magic-pack-142991
 * crystal assets from https://assetstore.unity.com/packages/3d/environments/fantasy/translucent-crystals-106274
