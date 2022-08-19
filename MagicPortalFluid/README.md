@@ -97,7 +97,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * OnlyCreatorCanChange: 
       * > Allow/Disallow ONLY creator of the portal can rename the portal tag
     * Portal_D_Restrict:
-      * > Additional Items to Restrict by Default - Wood,Stone
+      * > Additional Items to Restrict by Default. 
+      * > For Example you can add - Wood,Stone - And those items restricted
 
   * [Portal Crystals]
     * Portal_Crystal_Enable: 

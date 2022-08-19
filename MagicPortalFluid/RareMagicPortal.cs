@@ -1073,7 +1073,6 @@ namespace RareMagicPortal
 			IconColor.setTint(Color.yellow);
 			IconYellow = IconColor.CreateSprite(tex, true);
 			IconColor.setTint(Color.red);
-			IconColor.setRatio(50);
 			IconRed = IconColor.CreateSprite(tex, true);
 			IconColor.setTint(Color.green);
 			IconGreen = IconColor.CreateSprite(tex, true);
