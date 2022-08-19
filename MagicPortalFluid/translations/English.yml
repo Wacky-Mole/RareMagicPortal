@@ -54,6 +54,7 @@ rmp_key: "Key"
 rmp_crystalorkey: "Crystals or Keys"
 rmp_freepassage: "The Gods Allow Free Passage"
 
+
 rmp_tooltip_drink: "<color=green>You can Teleport Everything through the Portals</color>"
 rmp_startmessage: "Odin Blesses you with Teleporting Power"
 rmp_stopmessage: "Odin's Portal blessing fades"

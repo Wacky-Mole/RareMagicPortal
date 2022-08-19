@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.1.3
+`Server and client side required for Server Sync enforcement.` V2.2.0
 
-MinimumRequiredVersion = "2.1.3"
+MinimumRequiredVersion = "2.2.0"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -88,6 +88,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Configure the HP of portal
     * OnlyCreatorCanChange: 
       * > Allow/Disallow ONLY creator of the portal can rename the portal tag
+    * Portal_D_Restrict:
+      * > Additional Items to Restrict by Default - Wood,Stone
 
   * [Portal Crystals]
     * Portal_Crystal_Enable: 
@@ -96,6 +98,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Default required 1 crystal for each portal
     * Portal_Crystal_Color_Default: 
       * > Default required RED crystal for TP consumption
+      * > Options include Red, Green, Blue or None - None makes portals free passage by default
 
   * [PortalJuice]
     * EnablePortalJuice: 
@@ -152,6 +155,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.2.0
+            Changed Icons, Added a default Prohibited Items List, Add "None" to default color option for free passage ( yellow default).
+            Now Syncs with portal color by just hoverring over name. 
         Version 2.1.3
             Bug fix for Admin status: I swear there are little gremlins messing up Serversync and admin permissions.
         Version 2.1.2
