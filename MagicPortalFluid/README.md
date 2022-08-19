@@ -28,6 +28,13 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
+* Restrict Additional Items
+  * You can Restrict Wood or Stone or any other item
+  * Editing IsTeleportable with wackysDatabase is better, but you can do it here
+
+* Portal Colors
+  * If you just want to see different Portal Colors, this mod is great for that.
+
 #### How to Get Crystals/Keys/Fluid in your World
 The Crystals/Keys/Fluid are mostly meant for Multiplayer Worlds<br>
 The Admins can add them to the world in several different ways. <br>
@@ -37,6 +44,7 @@ Better Trader: https://valheim.thunderstore.io/package/OdinPlus/Better_Trader_Re
 CLLC: https://valheim.thunderstore.io/package/Smoothbrain/CreatureLevelAndLootControl/ <br>
 KG's Marketplace https://valheim.thunderstore.io/package/KGvalheim/Marketplace_And_Server_NPCs_Revamped/ <br>
 KnarrTheTrader https://valheim.thunderstore.io/package/OdinPlus/KnarrTheTrader/  <br>
+Make it a Bounty Reward in EpicLoot <br>
 Server rewards for completing objectives, like in KG marketplace mod for bounties,  <br>
 https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards, but I don't recommend
 
