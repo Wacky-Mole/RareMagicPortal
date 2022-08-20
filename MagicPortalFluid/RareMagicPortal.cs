@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.2.0";
+		public const string PluginVersion = "2.2.1";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.1" };
 
 		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
@@ -117,6 +117,7 @@ namespace RareMagicPortal
 		private static Player player = null; // need to keep it between patches
 		private static bool m_hadTarget = false;
 		private static List<Minimap.PinData> HoldPins;
+		private static bool Globaliscreator = false;
 
 
 		private static ConfigEntry<bool>? ConfigFluid;
@@ -179,7 +180,7 @@ namespace RareMagicPortal
 
 		public static ItemDrop.ItemData Crystal { get; private set; }
 
-		static readonly int _teleportWorldColorHashCode = "TeleportWorldColor".GetStableHashCode();
+		static readonly int _teleportWorldColorHashCode = "TeleportWorldColor".GetStableHashCode(); // I should probably change this
 		static readonly int _teleportWorldColorAlphaHashCode = "TeleportWorldColorAlpha".GetStableHashCode();
 		static readonly int _portalLastColoredByHashCode = "PortalLastColoredBy".GetStableHashCode();
 
@@ -287,6 +288,8 @@ namespace RareMagicPortal
 					{
 						string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
 						int colorint = CrystalandKeyLogicColor(PortalName); // this should sync up portal colors
+						//Color Colorcurrenctly = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
+
 						Color color;
 						Color Gold = new Color(1f, 215f / 255f, 0, 1f);
 						switch (colorint)
@@ -322,7 +325,6 @@ namespace RareMagicPortal
 
 						if (color != teleportWorldData.OldColor)
 						{  // don't waste resources
-
 							teleportWorldData.TargetColor = color;
 							SetTeleportWorldColors(teleportWorldData, true);
 						}
@@ -528,7 +530,7 @@ namespace RareMagicPortal
 						//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact Past portal check and is admin {isAdmin}");
 						if (_changePortalReq.IsDown() && isAdmin || _changePortalReq.IsDown() && sameperson && !EnableCrystals) // creator can change it if enable crystals is off
 						{
-
+							Globaliscreator = sameperson; // set this for yml permissions
 						//	RareMagicPortal.LogInfo($"Made it to Map during teleworldcache");
 
 							int colorint = CrystalandKeyLogicColor(PortalName);
@@ -1241,26 +1243,24 @@ namespace RareMagicPortal
 				}
 
 				isLocal = false;
+
+				string SyncedString = YMLPortalData.Value;
+
+				if (EnableExtraYMLLog)
+					RareMagicPortal.LogInfo(SyncedString);
+
+				var deserializer = new DeserializerBuilder()
+					.Build();
+
+				PortalN.Portals.Clear();
+				PortalN = deserializer.Deserialize<PortalName>(SyncedString);
 				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
-					//isDedServer = true;
+					RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved" + Worldname);
+					File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString);
 				}
-				// else
-				{
-					string SyncedString = YMLPortalData.Value;
+				JustWrote = true;
 
-					if (EnableExtraYMLLog)
-						RareMagicPortal.LogInfo(SyncedString);
-
-					var deserializer = new DeserializerBuilder()
-						.Build();
-
-					PortalN.Portals.Clear();
-					PortalN = deserializer.Deserialize<PortalName>(SyncedString);
-					JustWrote = true;
-					//File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString); //overwrites
-
-				}
 			}
 
 		}
@@ -1284,7 +1284,7 @@ namespace RareMagicPortal
 
 			if (!isAdmin)
 			{
-				RareMagicPortal.LogInfo("Portal Cost Values Didn't change because you are not an admin");
+				//RareMagicPortal.LogInfo("Portal Values Didn't change because you are not an admin");
 
 			}			
 		}
@@ -1729,7 +1729,8 @@ namespace RareMagicPortal
 				{
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = CrystalsConsumable; // by default always unless true
 				}
-				PortalN.Portals[PortalName].AdditionalProhibitItems = DefaultRestrictString.Split(',').ToList(); // one time
+				if (DefaultRestrictString != "")
+					PortalN.Portals[PortalName].AdditionalProhibitItems = DefaultRestrictString.Split(',').ToList(); // one time
 
 
 				var serializer = new SerializerBuilder()
@@ -1749,9 +1750,6 @@ namespace RareMagicPortal
 				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 				JustWrote = true;
 				YMLPortalData.Value = yamlfull;
-
-
-
 			}
 
 		}

@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.2.0
+`Server and client side required for Server Sync enforcement.` V2.2.1
 
-MinimumRequiredVersion = "2.2.0"
+MinimumRequiredVersion = "2.2.1"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -28,6 +28,13 @@ Well, I've a mod for you!
     * Special toll charges for custom locations/bosses portal
   * Helps your server build a more interactive economy in Valheim
 
+* Restrict Additional Items
+  * You can Restrict Wood or Stone or any other item
+  * Editing IsTeleportable with wackysDatabase is better, but you can do it here
+
+* Portal Colors
+  * If you just want to see different Portal Colors, this mod is great for that.
+
 #### How to Get Crystals/Keys/Fluid in your World
 The Crystals/Keys/Fluid are mostly meant for Multiplayer Worlds<br>
 The Admins can add them to the world in several different ways. <br>
@@ -37,6 +44,7 @@ Better Trader: https://valheim.thunderstore.io/package/OdinPlus/Better_Trader_Re
 CLLC: https://valheim.thunderstore.io/package/Smoothbrain/CreatureLevelAndLootControl/ <br>
 KG's Marketplace https://valheim.thunderstore.io/package/KGvalheim/Marketplace_And_Server_NPCs_Revamped/ <br>
 KnarrTheTrader https://valheim.thunderstore.io/package/OdinPlus/KnarrTheTrader/  <br>
+Make it a Bounty Reward in EpicLoot <br>
 Server rewards for completing objectives, like in KG marketplace mod for bounties,  <br>
 https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards, but I don't recommend
 
@@ -89,7 +97,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * OnlyCreatorCanChange: 
       * > Allow/Disallow ONLY creator of the portal can rename the portal tag
     * Portal_D_Restrict:
-      * > Additional Items to Restrict by Default - Wood,Stone
+      * > Additional Items to Restrict by Default. 
+      * > For Example you can add - Wood,Stone - And those items will restricted
 
   * [Portal Crystals]
     * Portal_Crystal_Enable: 
@@ -141,7 +150,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * https://www.nexusmods.com/valheim/mods/1298
   * https://valheim.thunderstore.io/package/Azumatt/Wayshrine/
 * TargetPortal by Smoothbrain
-<img src="https://wackymole.com/hosts/TargetPortalIcon.png" width="600"/> 
+<img src="https://wackymole.com/hosts/TargetPortalRMP2.png" width="600"/> 
 
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
   * This a recommended mod, it has good compatibility with RMP.  Shows Icon Color in 2.1.2
@@ -155,6 +164,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Versuib 2.2.1
+            Bug fixes for Server not saving admin changes.
+            Known bug for nonAdmin Portal Creator trying to change Color, but not syncing with Portal_Crystal_Enable = false
         Version 2.2.0
             Changed Icons, Added a default Prohibited Items List, Add "None" to default color option for free passage ( yellow default).
             Now Syncs with portal color by just hoverring over name. 
@@ -200,6 +212,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Credits:
 * Thank you to OdinPlus Team for some useful information.
 * Zeall for readme update
+* GraveBear for Icon Update
 * Some code from https://github.com/redseiko/ComfyMods/tree/main/ColorfulPortals
 * Assets from https://assetstore.unity.com/packages/3d/props/interior/free-alchemy-and-magic-pack-142991
 * crystal assets from https://assetstore.unity.com/packages/3d/environments/fantasy/translucent-crystals-106274
