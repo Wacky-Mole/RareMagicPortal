@@ -164,7 +164,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
-        Versuib 2.2.1
+        Version 2.2.2
+            Rewrote the way YML client updates are performed. Server now is the sole distributor for YAML changes.
+            This should allow nonadmins to update portal colors and set names that everyone can see. 
+        Version 2.2.1
             Bug fixes for Server not saving admin changes.
             Known bug for nonAdmin Portal Creator trying to change Color, but not syncing with Portal_Crystal_Enable = false
         Version 2.2.0

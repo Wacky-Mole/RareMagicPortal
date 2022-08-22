@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.2.1";
+		public const string PluginVersion = "2.2.2";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.1" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.2" };
 
 		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
@@ -192,6 +192,7 @@ namespace RareMagicPortal
 		//Material PortalDefMaterial = originalMaterials["portal_small"];
 		static Color flamesstart = new Color(1f, 194f/255f, 34f/255f, 1f);
 		static Color flamesend = new Color(1f, 0, 0, 1f);
+		static Color Gold = new Color(1f, 215f / 255f, 0, 1f);
 
 
 		static IEnumerator RemovedDestroyedTeleportWorldsCoroutine()
@@ -269,8 +270,8 @@ namespace RareMagicPortal
 					|| !__instance.m_nview
 					|| __instance.m_nview.m_zdo == null
 					|| __instance.m_nview.m_zdo.m_zdoMan == null
-					|| __instance.m_nview.m_zdo.m_vec3 == null )
-					//|| !__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode)
+					|| __instance.m_nview.m_zdo.m_vec3 == null 
+					|| !__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode)) // going to ask for it below, so no reason to get a null
 					//|| !_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData)) // I don't think this will break anything
 				{
 					return;
@@ -288,10 +289,11 @@ namespace RareMagicPortal
 					{
 						string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
 						int colorint = CrystalandKeyLogicColor(PortalName); // this should sync up portal colors
-						//Color Colorcurrenctly = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
+					
+						//Color CurrentZDOColor = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
 
 						Color color;
-						Color Gold = new Color(1f, 215f / 255f, 0, 1f);
+						
 						switch (colorint)
 						{
 							case 0:
@@ -320,8 +322,21 @@ namespace RareMagicPortal
 								break;
 
 						}
-						if (!__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode))
-							__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
+						//if (!__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode))
+						//	__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
+
+						//if (CurrentZDOColor != color) // why would this be the case? 2 options
+							// 1) color has not propgated through yml yet. 
+							// 2) color will not be propgated thorugh yml because PortalCreator was not admin
+							// both cases it is okay to update the color without the yml
+							// 2) both sides of the portal will not be synced in this case because the yml will not update. Unless this is the server. Kinda sad
+							// So we could ask if this is the server and if it is change yml file to reflect current color? - Does server process this ZDO?
+							// 3rd option RPC all yml changes and let server push
+                        
+							//color = CurrentZDOColor;
+							//if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+							//	ServerZDOymlUpdate(CurrentZDOColor, PortalName);
+						
 
 						if (color != teleportWorldData.OldColor)
 						{  // don't waste resources
@@ -1015,6 +1030,17 @@ namespace RareMagicPortal
 					
         }
 
+		[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
+		private static class ZrouteMethodsClientRMP
+
+		{
+			private static void Prefix()
+			{
+				ZRoutedRpc.instance.Register("RequestServerAnnouncementRMP", new Action<long, ZPackage>(RPC_RequestServerAnnouncementRMP)); // Our Server Handler
+				//ZRoutedRpc.instance.Register("EventServerAnnouncementRMP", new Action<long, ZPackage>(RPC_EventServerAnnouncementRMP)); // event handler
+			}
+		}
+
 		[HarmonyPatch(typeof(ZNet), "Shutdown")]
 		private class PatchZNetDisconnect
 		{
@@ -1256,7 +1282,7 @@ namespace RareMagicPortal
 				PortalN = deserializer.Deserialize<PortalName>(SyncedString);
 				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
-					RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved" + Worldname);
+					RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved " + Worldname);
 					File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString);
 				}
 				JustWrote = true;
@@ -1342,6 +1368,9 @@ namespace RareMagicPortal
 				//PortalN.Portals.Clear();
 				PortalN = new PortalName(); // init
 				PortalN = deserializer.Deserialize<PortalName>(yml);
+				if (EnableExtraYMLLog)
+					RareMagicPortal.LogInfo(yml);
+
 				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
 					YMLPortalData.Value = yml; // should only be one time and for server
@@ -1699,11 +1728,13 @@ namespace RareMagicPortal
 					//Crystal_Cost_Master = CrystalsConsumable, // If only using master crystals
 				};
 				PortalN.Portals.Add(PortalName, paulgo); // adds
+				int colorint = 1; // freepassage yellow = 1
 
 				if (DefaultPortalColor == "Red")
                 {
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Red"] = CrystalsConsumable;
 					PortalN.Portals[PortalName].Portal_Key["Red"] = true;
+					colorint = 2;
 
 				} else
                 {
@@ -1714,42 +1745,77 @@ namespace RareMagicPortal
 				{
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Green"] = CrystalsConsumable;
 					PortalN.Portals[PortalName].Portal_Key["Green"] = true;
+					colorint = 3;
 				}
 				if (DefaultPortalColor == "Blue")
 				{
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Blue"] = CrystalsConsumable;
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = true;
+					colorint = 4;
 				}
 
 				if (DefaultPortalColor == "None")
 				{
 					PortalN.Portals[PortalName].Free_Passage = true;
+					colorint = 1;
 				}
 				else
 				{
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = CrystalsConsumable; // by default always unless true
 				}
+
 				if (DefaultRestrictString != "")
 					PortalN.Portals[PortalName].AdditionalProhibitItems = DefaultRestrictString.Split(',').ToList(); // one time
 
 
-				var serializer = new SerializerBuilder()
-					.Build();
-				var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-				//var yaml = Environment.NewLine + "\t" + PortalName +":"+Environment.NewLine + serializer.Serialize(PortalN.Portals[PortalName]); // just the single object idk on spacing
-				
-				//File.AppendAllText(YMLCurrentFile, yaml);
-				File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
-				string lines = "";
-				foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
 				{
-					lines += line + Environment.NewLine;
-					if (line.Contains("Admin_only_Access")) // three spaces for non main objects
-					{ lines += Environment.NewLine; }
+					var serializer = new SerializerBuilder()
+					.Build();
+					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+
+					//File.AppendAllText(YMLCurrentFile, yaml);
+					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
+					string lines = "";
+					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+					{
+						lines += line + Environment.NewLine;
+						if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+						{ lines += Environment.NewLine; }
+					}
+					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
+					JustWrote = true;
+					YMLPortalData.Value = yamlfull; // send out to clients from server only
 				}
-				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-				JustWrote = true;
-				YMLPortalData.Value = yamlfull;
+				else
+				{
+					if (!ZNet.instance.IsServer())
+					{
+						RareMagicPortal.LogInfo("You are connect to a Server");
+						ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
+					}
+					else // single client only or Server but not dedicated
+					{
+						var serializer = new SerializerBuilder()
+						.Build();
+						var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+						File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
+						string lines = "";
+						foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+						{
+							lines += line + Environment.NewLine;
+							if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+							{ lines += Environment.NewLine; }
+						}
+						File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
+						if (EnableExtraYMLLog)
+							RareMagicPortal.LogInfo(yamlfull);
+						JustWrote = true;
+					}
+				}
+
 			}
 
 		}
@@ -1967,22 +2033,54 @@ namespace RareMagicPortal
 
 			}
 
-			// write 
-			var serializer = new SerializerBuilder()
-					.Build();
-			var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-			File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
-			string lines = "";
-			foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
 			{
-				lines += line + Environment.NewLine;
-				if (line.Contains("Admin_only_Access")) // three spaces for non main objects
-				{ lines += Environment.NewLine; }
+				var serializer = new SerializerBuilder()
+				.Build();
+				var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+
+				//File.AppendAllText(YMLCurrentFile, yaml);
+				File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
+				string lines = "";
+				foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+				{
+					lines += line + Environment.NewLine;
+					if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+					{ lines += Environment.NewLine; }
+				}
+				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
+				JustWrote = true;
+				YMLPortalData.Value = yamlfull; // send out to clients from server only
 			}
-			File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-			JustWrote = true;
-			YMLPortalData.Value = yamlfull;
+			else
+			{
+				if (!ZNet.instance.IsServer())
+				{
+					RareMagicPortal.LogInfo("You are connect to a Server");
+					ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
+				}
+				else // single client only or Server but not dedicated
+				{
+					var serializer = new SerializerBuilder()
+					.Build();
+					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
+					string lines = "";
+					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+					{
+						lines += line + Environment.NewLine;
+						if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+						{ lines += Environment.NewLine; }
+					}
+					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
+					if (EnableExtraYMLLog)
+						RareMagicPortal.LogInfo(yamlfull);
+					JustWrote = true;
+				}
+			}
 
 		}
 
@@ -2444,6 +2542,62 @@ namespace RareMagicPortal
 			}
 		}
 		*/
+
+
+		private static void ServerZDOymlUpdate(int Colorint, string Portalname) // MESSAGE SENDER
+        {
+			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+				return;
+
+			ZPackage pkg = new ZPackage(); // Create ZPackage
+			string textSplit = Portalname + "," + Colorint;
+			string msg ="";
+			for (int i = 1; i < textSplit.Length; i++)
+			{
+				msg += textSplit[i] + " ";
+			}
+			pkg.Write(Portalname + "," + Colorint);
+			ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestServerAnnouncementRMP", new object[] { pkg });
+		}
+
+		public static void RPC_RequestServerAnnouncementRMP(long sender, ZPackage pkg) // MESSAGE RECIEVER
+		{
+			if (ZNet.instance.IsDedicated() && ZNet.instance.IsServer())
+			{
+				if (pkg != null && pkg.Size() > 0)
+				{ // Check that our Package is not null, and if it isn't check that it isn't empty.
+					ZNetPeer peer = ZNet.instance.GetPeer(sender);
+					if (peer != null)
+					{ // Confirm the peer exists
+						string peerSteamID = ((ZSteamSocket)peer.m_socket).GetPeerID().m_SteamID.ToString();
+						string msg = pkg.ReadString();
+						string[] msgArray = msg.Split(',');
+						string PortalName = msgArray[0];
+						int Colorint = Convert.ToInt32(msgArray[1]);
+						RareMagicPortal.LogInfo($"Server has recieved a YML update from {peerSteamID} for {PortalName} with Color {Colorint}");
+
+						if (!PortalN.Portals.ContainsKey(PortalName)) // first time portal name
+						{
+							WritetoYML(PortalName);
+						} else // and update of existing name
+                        {
+							updateYmltoColorChange(PortalName, Colorint);
+						}
+						//YMLPortalData.Value has been updated
+						return;
+
+						//ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "EventServerAnnouncementRMP", new object[] { pkg }); // send to clients which is not needed will yml
+					}
+				}
+			}
+		}
+		/*
+		public static void RPC_EventServerAnnouncementRMP(long sender, ZPackage pkg)
+
+			return;
+		}
+		*/
+
 
 		static string GetColorHtmlString(Color color)
 		{
