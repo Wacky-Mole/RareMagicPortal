@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.2.1
+`Server and client side required for Server Sync enforcement.` V2.2.2
 
-MinimumRequiredVersion = "2.2.1"
+MinimumRequiredVersion = "2.2.2"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
