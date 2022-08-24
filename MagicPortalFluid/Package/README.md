@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.2.2
+`Server and client side required for Server Sync enforcement.` V2.2.4
 
-MinimumRequiredVersion = "2.2.2"
+MinimumRequiredVersion = "2.2.4"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -164,9 +164,13 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.2.4
+            Fix for Server YML continous writing loop. Change Crystal Stack size to 25.
+            Rewrote how Ctrl-E is displayed.  Added some more log info. 
         Version 2.2.2
             Rewrote the way YML client updates are performed. Server now is the sole distributor for YAML changes.
             This should allow nonadmins to update portal colors and set names that everyone can see. 
+            Version 2.2.1 Has a continous writing loop problem for servers, not sure if 2.2.2 fixed it. 
         Version 2.2.1
             Bug fixes for Server not saving admin changes.
             Known bug for nonAdmin Portal Creator trying to change Color, but not syncing with Portal_Crystal_Enable = false

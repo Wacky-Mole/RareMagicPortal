@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.2.2";
+		public const string PluginVersion = "2.2.4";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.2" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.2.4" };
 
 		private AssetBundle portalmagicfluid;
 		private static MagicPortalFluid context;
@@ -482,31 +482,32 @@ namespace RareMagicPortal
 
 					if (isAdmin || sameperson && !EnableCrystals)
 					{
-
-						if (EnableCrystals)
+					// L-ctrl + E instead of _
+					string Shortcut = "LeftCtrl + E ";
+					if (EnableCrystals)
 						{
 							__result =
 								string.Format(
-									"{0}\n<size={4}>[<color={1}>{1}</color>] Change Portal Crystal to: [<color={3}>{3}</color>] <color={5}>{2}</color></size>\n<size={4}>{6}</size>",
+									"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Crystal to: [<color={3}>{3}</color>]</size>\n<size={4}>{6}</size>",
 									__result,
 									currentcolor,
-									_changePortalReq,
+									Shortcut,//_changePortalReq,
 									nextcolor,
 									15,
-									"Green",
+									"Yellow",
 									text);
 						}
 						else
 						{
 							__result =
 								string.Format(
-									"{0}\n<size={4}>[<color={1}>{1}</color>] Change Portal Color to: [<color={3}>{3}</color>] <color={5}>{2}</color></size>",
+									"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Color to: [<color={3}>{3}</color>] </size>",
 									__result,
 									currentcolor,
-									_changePortalReq,
+									Shortcut, //_changePortalReq,
 									nextcolor,
 									15,
-									"Green"
+									"Yellow"
 									);
 						}
 					}
@@ -1282,8 +1283,8 @@ namespace RareMagicPortal
 				PortalN = deserializer.Deserialize<PortalName>(SyncedString);
 				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
-					RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved " + Worldname);
-					File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString);
+					//RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved " + Worldname);
+					//File.WriteAllText(YMLCurrentFile, SyncedString);
 				}
 				JustWrote = true;
 
@@ -1303,7 +1304,17 @@ namespace RareMagicPortal
 
 				PortalN.Portals.Clear();
 				PortalN = deserializer.Deserialize<PortalName>(yml);
-				YMLPortalData.Value = yml;
+				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+				{
+					RareMagicPortal.LogInfo("Server Portal YML Manual UPdate " + Worldname);
+					YMLPortalData.Value = yml; 
+				} else
+                {
+					RareMagicPortal.LogInfo("Client Admin Manual YML UPdate " + Worldname);
+					if (EnableExtraYMLLog)
+						RareMagicPortal.LogInfo(yml);
+				}
+
 			}
 			if (JustWrote)
 				JustWrote = false;
@@ -1770,12 +1781,12 @@ namespace RareMagicPortal
 
 				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
 				{
+					RareMagicPortal.LogInfo("You are a dedicated Server");
 					var serializer = new SerializerBuilder()
 					.Build();
 					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-
-					//File.AppendAllText(YMLCurrentFile, yaml);
+					JustWrote = true;
 					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 					string lines = "";
 					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -1785,7 +1796,7 @@ namespace RareMagicPortal
 						{ lines += Environment.NewLine; }
 					}
 					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-					JustWrote = true;
+															  //JustWrote = true;
 					YMLPortalData.Value = yamlfull; // send out to clients from server only
 				}
 				else
@@ -1797,10 +1808,12 @@ namespace RareMagicPortal
 					}
 					else // single client only or Server but not dedicated
 					{
+						RareMagicPortal.LogInfo("Single client only or Server but not dedicated");
 						var serializer = new SerializerBuilder()
 						.Build();
 						var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
+						JustWrote = true;
 						File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 						string lines = "";
 						foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -1812,7 +1825,7 @@ namespace RareMagicPortal
 						File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 						if (EnableExtraYMLLog)
 							RareMagicPortal.LogInfo(yamlfull);
-						JustWrote = true;
+						//JustWrote = true;
 					}
 				}
 
@@ -2036,12 +2049,12 @@ namespace RareMagicPortal
 
 			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
 			{
+				RareMagicPortal.LogInfo("You are a dedicated Server");
 				var serializer = new SerializerBuilder()
 				.Build();
 				var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-
-				//File.AppendAllText(YMLCurrentFile, yaml);
+				JustWrote = true;
 				File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 				string lines = "";
 				foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -2051,7 +2064,7 @@ namespace RareMagicPortal
 					{ lines += Environment.NewLine; }
 				}
 				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-				JustWrote = true;
+				//JustWrote = true;
 				YMLPortalData.Value = yamlfull; // send out to clients from server only
 			}
 			else
@@ -2063,10 +2076,12 @@ namespace RareMagicPortal
 				}
 				else // single client only or Server but not dedicated
 				{
+					RareMagicPortal.LogInfo("Single client only or Server but not dedicated");
 					var serializer = new SerializerBuilder()
 					.Build();
 					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
+					JustWrote = true;
 					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 					string lines = "";
 					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -2078,7 +2093,7 @@ namespace RareMagicPortal
 					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 					if (EnableExtraYMLLog)
 						RareMagicPortal.LogInfo(yamlfull);
-					JustWrote = true;
+					//JustWrote = true;
 				}
 			}
 
@@ -2576,13 +2591,8 @@ namespace RareMagicPortal
 						int Colorint = Convert.ToInt32(msgArray[1]);
 						RareMagicPortal.LogInfo($"Server has recieved a YML update from {peerSteamID} for {PortalName} with Color {Colorint}");
 
-						if (!PortalN.Portals.ContainsKey(PortalName)) // first time portal name
-						{
-							WritetoYML(PortalName);
-						} else // and update of existing name
-                        {
-							updateYmltoColorChange(PortalName, Colorint);
-						}
+						updateYmltoColorChange(PortalName, Colorint);
+
 						//YMLPortalData.Value has been updated
 						return;
 
