@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.2.4";
+		public const string PluginVersion = "2.2.5";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -107,7 +107,7 @@ namespace RareMagicPortal
 		public static string DefaultRestrictString = "";
 
 		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
-		private static bool JustWrote = false;
+		private static int JustWrote = 0;
 		private static bool JustWait = false;
 		private static bool JustRespawn = false;
 		private static bool NoMoreLoading = false;
@@ -1250,7 +1250,7 @@ namespace RareMagicPortal
 
 				File.WriteAllText(YMLCurrentFile, WelcomeString + yaml); //overwrites
 				RareMagicPortal.LogInfo("Creating Portal_Name file " + Worldname);
-				JustWrote = true;
+				JustWrote = 2;
 			}
 		}
 		private void CustomSyncEventDetected()
@@ -1286,7 +1286,7 @@ namespace RareMagicPortal
 					//RareMagicPortal.LogInfo("Server Portal UPdates Are being Saved " + Worldname);
 					//File.WriteAllText(YMLCurrentFile, SyncedString);
 				}
-				JustWrote = true;
+				JustWrote = 2;
 
 			}
 
@@ -1295,7 +1295,7 @@ namespace RareMagicPortal
 		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
         {
 			if (!File.Exists(YMLCurrentFile)) return;
-			if (isAdmin && !JustWrote) // if local admin or ServerSync admin
+			if (isAdmin && JustWrote == 0) // if local admin or ServerSync admin
 			{
 				var yml = File.ReadAllText(YMLCurrentFile);
 
@@ -1316,8 +1316,13 @@ namespace RareMagicPortal
 				}
 
 			}
-			if (JustWrote)
-				JustWrote = false;
+			if (JustWrote == 2)
+				JustWrote = 0;
+
+			if (JustWrote == 1)
+				JustWrote = 2;
+
+			
 
 			if (!isAdmin)
 			{
@@ -1365,7 +1370,7 @@ namespace RareMagicPortal
 
 				//PortalN.Portals.Clear();
 				PortalN = deserializer2.Deserialize<PortalName>(SyncedString);
-				JustWrote = true;
+				JustWrote = 2;
 				File.WriteAllText(YMLCurrentFile, WelcomeString + SyncedString); //overwrites
 
 			}
@@ -1786,7 +1791,7 @@ namespace RareMagicPortal
 					.Build();
 					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-					JustWrote = true;
+					JustWrote = 1;
 					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 					string lines = "";
 					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -1796,7 +1801,7 @@ namespace RareMagicPortal
 						{ lines += Environment.NewLine; }
 					}
 					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-															  //JustWrote = true;
+					JustWrote = 2;                                     
 					YMLPortalData.Value = yamlfull; // send out to clients from server only
 				}
 				else
@@ -1813,7 +1818,7 @@ namespace RareMagicPortal
 						.Build();
 						var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-						JustWrote = true;
+						JustWrote = 1;
 						File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 						string lines = "";
 						foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -1825,7 +1830,7 @@ namespace RareMagicPortal
 						File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 						if (EnableExtraYMLLog)
 							RareMagicPortal.LogInfo(yamlfull);
-						//JustWrote = true;
+						JustWrote = 2;
 					}
 				}
 
@@ -2054,7 +2059,7 @@ namespace RareMagicPortal
 				.Build();
 				var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-				JustWrote = true;
+				JustWrote = 1;
 				File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 				string lines = "";
 				foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -2064,7 +2069,7 @@ namespace RareMagicPortal
 					{ lines += Environment.NewLine; }
 				}
 				File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
-				//JustWrote = true;
+				JustWrote = 2;
 				YMLPortalData.Value = yamlfull; // send out to clients from server only
 			}
 			else
@@ -2081,7 +2086,7 @@ namespace RareMagicPortal
 					.Build();
 					var yamlfull = WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-					JustWrote = true;
+					JustWrote = 1;
 					File.WriteAllText(YMLCurrentFile, yamlfull); //overwrite
 					string lines = "";
 					foreach (string line in System.IO.File.ReadLines(YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
@@ -2093,7 +2098,7 @@ namespace RareMagicPortal
 					File.WriteAllText(YMLCurrentFile, lines); //overwrite with extra goodies
 					if (EnableExtraYMLLog)
 						RareMagicPortal.LogInfo(yamlfull);
-					//JustWrote = true;
+					JustWrote = 2;
 				}
 			}
 
