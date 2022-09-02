@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3921735829
+CRC: 129441060
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0f3151d039fc6cb6851043240d0870cf
+    Hash: 8aca90dcff13bf3e7c6e323b84c49d39
   TypeTreeHash:
     serializedVersion: 2
     Hash: bbc48ad260a81d79a47a96b96b4140dc
@@ -55,8 +55,10 @@ Assets:
 - Assets/CustomItems/PortalKeyBlue.prefab
 - Assets/CustomItems/PortalCrystalBlue.prefab
 - Assets/CustomItems/PortalKeyGreen.prefab
+- Assets/CustomItems/PortalCrystalPurple.prefab
 - Assets/CustomItems/PortalKeyGold.prefab
 - Assets/CustomItems/PortalCrystalGreen.prefab
 - Assets/CustomItems/PortalKeyRed.prefab
+- Assets/CustomItems/PortalKeyPurple.prefab
 - Assets/CustomItems/PortalCrystalMaster.prefab
 Dependencies: []

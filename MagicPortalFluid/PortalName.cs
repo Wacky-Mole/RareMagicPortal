@@ -17,6 +17,7 @@ namespace RareMagicPortal
                                   {"Red", 1},
                                   {"Green", 0},
                                   {"Blue", 0 },
+                                  {"Purple", 0 },
                                   {"Gold", 1 }};
 
             public Dictionary<string, bool> Portal_Key =
@@ -24,6 +25,7 @@ namespace RareMagicPortal
                                   {"Red", true},
                                   {"Green", false },
                                   {"Blue", false },
+                                  {"Purple", false },
                                   {"Gold", true } };
 
             public bool Free_Passage { get; set; } = false;
