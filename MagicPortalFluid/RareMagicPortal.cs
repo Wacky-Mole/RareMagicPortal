@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.3.0";
+		public const string PluginVersion = "2.4.0";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,10 +64,12 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.3.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.0" };
+
+		private static MagicPortalFluid? plugin;
+		private static MagicPortalFluid context;
 
 		private AssetBundle portalmagicfluid;
-		private static MagicPortalFluid context;
 		public static ConfigEntry<bool> modEnabled;
 		public static ConfigEntry<bool> isDebug;
 		public static bool firstTime = false;
@@ -156,12 +158,14 @@ namespace RareMagicPortal
 		public const string CrystalGreen = "$item_PortalCrystalGreen";
 		public const string CrystalBlue = "$item_PortalCrystalBlue";
 		public const string CrystalPurple = "$item_PortalCrystalPurple";
+		public const string CrystalTan = "$item_PortalCrystalTan";
 
 		public const string PortalKeyGold = "$item_PortalKeyGold";
 		public const string PortalKeyRed = "$item_PortalKeyRed";
 		public const string PortalKeyGreen = "$item_PortalKeyGreen";
 		public const string PortalKeyBlue = "$item_PortalKeyBlue";
 		public const string PortalKeyPurple = "$item_PortalKeyPurple";
+		public const string PortalKeyTan = "$item_PortalKeyTan";
 
 		SpriteTools IconColor = new SpriteTools();
 
@@ -174,6 +178,7 @@ namespace RareMagicPortal
 		public static Sprite IconWhite = null!;
 		public static Sprite IconDefault = null!;
 		public static Sprite IconPurple = null!;
+		public static Sprite IconTan = null!;
 
 		internal static Localization english = null!;
 
@@ -186,6 +191,7 @@ namespace RareMagicPortal
 		public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
 		private static PortalName PortalN;
 
+		static Coroutine myCoroutineRMP;
 		public static ItemDrop.ItemData Crystal { get; private set; }
 
 		static readonly int _teleportWorldColorHashCode = "TeleportWorldColor".GetStableHashCode(); // I should probably change this
@@ -203,13 +209,16 @@ namespace RareMagicPortal
 		static Color flamesend = new Color(1f, 0, 0, 1f);
 		static Color Gold = new Color(1f, 215f / 255f, 0, 1f);
 		static Color Purple = new Color(107f / 255f, 63f / 255f, 160 / 255f, 1f);
+		static Color Tan = new Color(210f / 255f, 180f / 255f, 140f / 255f, 1f);
+		static Color Brown = new Color(193f/255f, 69f/255f, 19f/255f, 1f);
 
 		static private Dictionary<string, bool> enaColor = new Dictionary<string, bool>(){
 				{"Red", false },
 				{"Blue", false },
 				{"Green", false },
 				{"Gold", false },
-				{"Purple",false }
+				{"Purple",false },
+				{"Tan",false }
 			};
 
 
@@ -333,9 +342,12 @@ namespace RareMagicPortal
 								color = Purple;
 								break;
 							case 6:
-								color = Gold; // go with material change small_portal
+								color = Tan;
 								break;
 							case 7:
+								color = Gold; // go with material change small_portal
+								break;
+							case 8:
 								color = Color.white;
 								break;
 							default:
@@ -467,17 +479,23 @@ namespace RareMagicPortal
 							break;
 						case 5:
 							currentcolor = "Purple";
-							nextcolor = "Gold";
+							nextcolor = "Tan";
 							text = "Purple Crystal Portal";
 							color = Purple;
 							break;
 						case 6:
+							currentcolor = "Tan";
+							nextcolor = "Gold";
+							text = "Tan Crystal Portal";
+							color = Tan;
+							break;
+						case 7:
 							currentcolor = "Gold";
 							nextcolor = "White";
 							text = "Gold Crystal Portal";
 							color = Gold;
 							break;
-						case 7:
+						case 8:
 							currentcolor = "White";
 							nextcolor = "Black";
 							text = "Any Teleportation Portal with No Crystal Cost";
@@ -651,17 +669,23 @@ namespace RareMagicPortal
 									break;
 								case 5:
 									currentcolor = "Purple";
-									nextcolor = "Gold";
+									nextcolor = "Tan";
 									text = "Purple Crystal Portal";
-									color = Gold;
+									color = Tan;
 									break;
 								case 6:
+									currentcolor = "Tan";
+									nextcolor = "Gold";
+									text = "Tan Crystal Portal";
+									color = Gold;
+									break;
+								case 7:
 									currentcolor = "Gold";
 									nextcolor = "White";
 									text = "Gold Crystal Portal";
 									color = Color.white; // go with material change small_portal
 									break;
-								case 7:
+								case 8:
 									currentcolor = "White";
 									nextcolor = "Black";
 									text = "Any Teleportation Portal No Cost";
@@ -686,7 +710,7 @@ namespace RareMagicPortal
 							__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
 
 							// now need to set the yml file to update with these changes on interact
-							if (colorint == 7) // interate one up
+							if (colorint == 8) // interate one up
 								colorint = 0;
 							else colorint++;
 					
@@ -993,7 +1017,7 @@ namespace RareMagicPortal
 						PName = null;
 						try
 						{	
-							if (pin.m_icon.name == "" || pin.m_icon.name == "TargetPortalIcon")
+							if ( pin.m_icon.name == "TargetPortalIcon") // only selects correct icon now
 							{
 								if (checkiftagisPortal.Contains("$hud") || checkiftagisPortal.Contains("Day "))
 									continue;
@@ -1021,9 +1045,12 @@ namespace RareMagicPortal
 										pin.m_icon = IconPurple;
 										break;
 									case 6:
-										pin.m_icon = IconGold;
+										pin.m_icon = IconTan;
 										break;
 									case 7:
+										pin.m_icon = IconGold;
+										break;
+									case 8:
 										pin.m_icon = IconWhite;
 										break;
 									default:
@@ -1119,11 +1146,14 @@ namespace RareMagicPortal
 			private static bool Prefix()
 			{
 				RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
+				((MonoBehaviour)(object)context).StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
+
 
 				NoMoreLoading = true;
 				return true;
 			}
 		}
+
 
 		[HarmonyPatch(typeof(ZNet), "OnDestroy")]
 		private class PatchZNetDestory
@@ -1155,8 +1185,9 @@ namespace RareMagicPortal
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
 			StartCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
+			
 			IconColors();
-		
+
 
 			RareMagicPortal.LogInfo($"MagicPortalFluid has loaded start assets");
 			
@@ -1184,6 +1215,8 @@ namespace RareMagicPortal
 			IconWhite = IconColor.CreateSprite(tex, true);
 			IconColor.setTint(Purple);
 			IconPurple = IconColor.CreateSprite(tex, true);
+			IconColor.setTint(Brown);
+			IconTan = IconColor.CreateSprite(tex, true);
 
 		}
 
@@ -1250,6 +1283,10 @@ namespace RareMagicPortal
 			PortalCrystalPurple.Name.English("Purple Portal Crystal");
 			PortalCrystalPurple.Description.English("Odin's Traveling Crystals allow for Purple Portal Traveling");
 
+			Item PortalCrystalTan = new("portalcrystal", "PortalCrystalTan", "assetsEmbedded");
+			PortalCrystalTan.Name.English("Tan Portal Crystal");
+			PortalCrystalTan.Description.English("Odin's Traveling Crystals allow for Tan Portal Traveling");
+
 			Item PortalKeyRed = new("portalcrystal", "PortalKeyRed", "assetsEmbedded");
 			PortalKeyRed.Name.English("Red Portal Key");
 			PortalKeyRed.Description.English("Unlock Portals Requiring The Red Key");
@@ -1269,6 +1306,10 @@ namespace RareMagicPortal
 			Item PortalKeyPurple = new("portalcrystal", "PortalKeyPurple", "assetsEmbedded");
 			PortalKeyPurple.Name.English("Purple Portal Key");
 			PortalKeyPurple.Description.English("Unlock Portals Requiring The Purple Key");
+
+			Item PortalKeyTan = new("portalcrystal", "PortalKeyTan", "assetsEmbedded");
+			PortalKeyTan.Name.English("Tan Portal Key");
+			PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
 
 
 
@@ -1369,6 +1410,13 @@ namespace RareMagicPortal
 			}
 
 		}
+		IEnumerator WaitforReadWrote()
+        {
+			yield return new WaitForSeconds(10f);
+
+			JustWrote = 0; // lets manual update happen no problem
+			//StopCoroutine(WaitforReadWrote()); not needed
+		}
 
 		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
         {
@@ -1398,7 +1446,10 @@ namespace RareMagicPortal
 				JustWrote = 0;
 
 			if (JustWrote == 1)
+			{
 				JustWrote = 2;
+				StartCoroutine(WaitforReadWrote());
+			}
 
 			
 
@@ -1756,7 +1807,7 @@ namespace RareMagicPortal
 			ConfigSpawn = config("PortalFluid", "PortalMagicFluidSpawn", 3,
 				"How much PortalMagicFluid to start with on a new character?");
 
-			ConfigFluidValue = config("PortalFluid", "PortalFluidValue", 0, "What is the value of MagicPortalJuice? " + System.Environment.NewLine + "A Value of 1 or more, makes the item saleable to trader");
+			ConfigFluidValue = config("PortalFluid", "PortalFluidValue", 0, "What is the value of MagicPortalFluid? " + System.Environment.NewLine + "A Value of 1 or more, makes the item saleable to trader");
 
 			ConfigTable = config("Portal Config", "CraftingStation_Requirement", DefaultTable,
 				"Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation "  + System.Environment.NewLine + "Pick a valid table otherwise default is workbench"); // $piece_workbench , $piece_forge , $piece_artisanstation
@@ -1774,7 +1825,7 @@ namespace RareMagicPortal
 
 			ConfigEnableCrystals = config("Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
 
-			ConfigEnableGoldAsMaster = config("Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Gold)");
+			ConfigEnableGoldAsMaster = config("Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
 
 			//ConfigEnableColorEnable = config("Portal Crystals", "ColorsEnabled", "Red,Green,Blue,Purple,Gold", "Whether anyone can use these Colored Portals, even if they have the requirements-  Red,Green,Blue,Purple,Gold");
 
@@ -1784,7 +1835,7 @@ namespace RareMagicPortal
 
 			//ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
-			CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
+			CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,Tan,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
 
             PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
 
@@ -1857,11 +1908,17 @@ namespace RareMagicPortal
 					colorint = 1;
 					RareMagicPortal.LogWarning($"Your PortalName world has Portals that don't Contain Purple, this portal {PortalName} is being updated to default");
 				}
+				if (updateP == "Tan")
+				{
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
+					colorint = 1;
+					RareMagicPortal.LogWarning($"Your PortalName world has Portals that don't Contain Tan, this portal {PortalName} is being updated to default");
+				}
 				else
 				{
 					return;
 				}
-
 			}
 
 			if (DefaultPortalColor == "Red")
@@ -1894,6 +1951,13 @@ namespace RareMagicPortal
 				PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = CrystalsConsumable;
 				PortalN.Portals[PortalName].Portal_Key["Purple"] = true;
 				colorint = 5;
+			}
+
+			if (DefaultPortalColor == "Tan")
+			{
+				PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = CrystalsConsumable;
+				PortalN.Portals[PortalName].Portal_Key["Tan"] = true;
+				colorint = 6;
 			}
 
 			if (DefaultPortalColor == "None")
@@ -1988,7 +2052,7 @@ namespace RareMagicPortal
 			}
 			if (!string.IsNullOrEmpty(pinData.m_name))
 				checkiftagisPortal = pinData.m_name; // icons name
-			if (pinData.m_icon.name == "" || pinData.m_icon.name == "TargetPortalIcon")
+			if (pinData.m_icon.name == "" || pinData.m_icon.name == "TargetPortalIcon") // only targetPortalIcon now
 			{ // TargetPortals Icons have no name therefore this stupid check weeds out regular icons  // pull request for icon.name  TargetPortalIcon
 			}
 			else 
@@ -2035,7 +2099,7 @@ namespace RareMagicPortal
 			if (PortalN.Portals[PortalName].TeleportAnything ) 
 			{
 				//CycleWhite = false;
-				return 7;
+				return 8;
 			}
 
 			if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
@@ -2054,14 +2118,25 @@ namespace RareMagicPortal
 				RareMagicPortal.LogInfo("No Purple in File for Portal, adding one");
 				WritetoYML(PortalName, "Purple");
 			}
+			try
+			{
+				if ((Portal_Crystal_Cost["Tan"] > 0 || Portal_Key["Tan"]))
+					return 6;
+			}
+			catch
+			{
+				RareMagicPortal.LogInfo("No Tan in File for Portal, adding one");
+				WritetoYML(PortalName, "Tan");
+			}
+
 			//if ((Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]) && !PortalN.Portals[PortalName].TeleportAnything && EnableCrystals || (Portal_Crystal_Cost["Gold"] > 0 && Portal_Key["Gold"]) && !PortalN.Portals[PortalName].TeleportAnything)
 			if ((Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
 			{
-				return 6;
+				return 7;
 			}
 			//if ((Portal_Crystal_Cost["Gold"] == 0 && Portal_Key["Gold"]) && !EnableCrystals)
 			if (PortalN.Portals[PortalName].TeleportAnything)
-				return 7;
+				return 8;
 
 			return 0;
 
@@ -2101,6 +2176,8 @@ namespace RareMagicPortal
 
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0; // making sure defautls are set
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 
 					break;
 				case 2:
@@ -2116,6 +2193,8 @@ namespace RareMagicPortal
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = false;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0;
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 					if (UseGoldASMaster)
 					{
 						PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
@@ -2136,6 +2215,8 @@ namespace RareMagicPortal
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = false;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0;
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 					if (UseGoldASMaster)
 					{
 						PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
@@ -2156,6 +2237,8 @@ namespace RareMagicPortal
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = true;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0;
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 					if (UseGoldASMaster)
 					{
 						PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
@@ -2177,6 +2260,8 @@ namespace RareMagicPortal
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = false;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 1;
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = true;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 					if (UseGoldASMaster)
 					{
 						PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
@@ -2184,7 +2269,30 @@ namespace RareMagicPortal
 					}
 
 					break;
+
 				case 6:
+					currentcolor = "Tan";
+					PortalN.Portals[PortalName].Free_Passage = false;
+					PortalN.Portals[PortalName].Admin_only_Access = false;
+
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Red"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Red"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Green"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Green"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Blue"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Blue"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 1;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = true;
+					if (UseGoldASMaster)
+					{
+						PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
+						PortalN.Portals[PortalName].Portal_Key["Gold"] = true;
+					}
+
+					break;
+				case 7:
 					currentcolor = "Gold";
 					PortalN.Portals[PortalName].Free_Passage = false;
 					PortalN.Portals[PortalName].Admin_only_Access = false;
@@ -2197,12 +2305,14 @@ namespace RareMagicPortal
 					PortalN.Portals[PortalName].Portal_Key["Blue"] = false;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Purple"] = 0;
 					PortalN.Portals[PortalName].Portal_Key["Purple"] = false;
+					PortalN.Portals[PortalName].Portal_Crystal_Cost["Tan"] = 0;
+					PortalN.Portals[PortalName].Portal_Key["Tan"] = false;
 					PortalN.Portals[PortalName].Portal_Crystal_Cost["Gold"] = 1;
 					PortalN.Portals[PortalName].Portal_Key["Gold"] = true;
 
 
 					break;
-				case 7:
+				case 8:
 					currentcolor = "White"; // only use for freee trans
 					{ 
 						PortalN.Portals[PortalName].TeleportAnything = true;
@@ -2298,15 +2408,25 @@ namespace RareMagicPortal
 			var TeleportEvery = PortalN.Portals[PortalName].TeleportAnything;
 			// the admin can customize crystal cost or key usage, but master crystal and golden key always are automatic unless set to admin
 
-			try
+			try// keep this for a while for people upgrading
 			{
-				if ((Portal_Crystal_Cost["Purple"] > 0 || Portal_Key["Purple"])) { }
-					
+				if ((Portal_Crystal_Cost["Purple"] > 0 || Portal_Key["Purple"])) { } 
+	
 			}
 			catch
 			{
 				RareMagicPortal.LogInfo("No Purple in File for Portal, adding one in CrystalKeyLogic");
 				WritetoYML(PortalName, "Purple");
+			}
+			try// keep this for a while for people upgrading
+			{
+				if ((Portal_Crystal_Cost["Tan"] > 0 || Portal_Key["Tan"])) { }
+
+			}
+			catch
+			{
+				RareMagicPortal.LogInfo("No Tan in File for Portal, adding one in CrystalKeyLogic");
+				WritetoYML(PortalName, "Tan");
 			}
 
 			//RareMagicPortal.LogInfo($"Portal IS ADMIN {OdinsKin} and is player admin? {isAdmin}");
@@ -2316,7 +2436,7 @@ namespace RareMagicPortal
 				return true;
 			}
 
-			else if (OdinsKin && !isAdmin) // If requires admin, but not admin
+			else if (OdinsKin && !isAdmin && EnableCrystals) // If requires admin, but not admin, but only with enable crystals otherwise just a normal portal
 			{
 				player.Message(MessageHud.MessageType.Center, "$rmp_kin_only");
 				//Teleporting = false;
@@ -2355,12 +2475,14 @@ namespace RareMagicPortal
 				int CrystalCountGreen = player.m_inventory.CountItems(CrystalGreen);
 				int CrystalCountBlue = player.m_inventory.CountItems(CrystalBlue);
 				int CrystalCountPurple = player.m_inventory.CountItems(CrystalPurple);
+				int CrystalCountTan = player.m_inventory.CountItems(CrystalTan);
 
 				int KeyCountGold = player.m_inventory.CountItems(PortalKeyGold);
 				int KeyCountRed = player.m_inventory.CountItems(PortalKeyRed);
 				int KeyCountGreen = player.m_inventory.CountItems(PortalKeyGreen);
 				int KeyCountBlue = player.m_inventory.CountItems(PortalKeyBlue);
 				int KeyCountPurple = player.m_inventory.CountItems(PortalKeyPurple);
+				int KeyCountTan = player.m_inventory.CountItems(PortalKeyTan);
 
 				int flagCarry = 0; // don't have any keys or crystals
 				int crystalorkey = 0;// 0 is crystal, 1 is key, 2 is both
@@ -2427,7 +2549,7 @@ namespace RareMagicPortal
 						}
 					}
 				}
-				if (flagCarry > 30)
+				if (flagCarry > 20)
 					foundAccess = true;
 
 				if (flagCarry < 20 && lowest == 0)
@@ -2460,14 +2582,16 @@ namespace RareMagicPortal
 						}
 					}
 				}
-				if (flagCarry > 40)
+				if (flagCarry > 30)
 					foundAccess = true;
 
 				if (flagCarry < 20 && lowest == 0)
 					lowest = flagCarry;
 
+
 				if (!foundAccess && (Portal_Crystal_Cost["Purple"] > 0 || Portal_Key["Purple"]))
 				{
+
 					if (CrystalCountPurple == 0) // has none of required
 						flagCarry = 4;
 					else if (Portal_Crystal_Cost["Purple"] > CrystalCountPurple) // has less than required
@@ -2493,6 +2617,41 @@ namespace RareMagicPortal
 						}
 					}
 				}
+
+				if (flagCarry > 40)
+					foundAccess = true;
+
+				if (flagCarry < 20 && lowest == 0)
+					lowest = flagCarry;
+
+
+				if (!foundAccess && (Portal_Crystal_Cost["Tan"] > 0 || Portal_Key["Tan"]))
+				{
+					if (CrystalCountTan == 0) // has none of required
+						flagCarry = 5;
+					else if (Portal_Crystal_Cost["Tan"] > CrystalCountTan) // has less than required
+						flagCarry = 15;
+					else flagCarry = 55; // has more than required
+
+					if (Portal_Key["Tan"])
+					{
+						if (Portal_Crystal_Cost["Tan"] == 0)
+						{
+							crystalorkey = 1;
+							if (KeyCountTan > 0)
+								flagCarry = 555;
+							else
+								flagCarry = 5; // no crystal cost, but key cost with no key
+						}
+						else
+						{
+							if (KeyCountTan > 0 && flagCarry < 20)
+								flagCarry = 555;
+							else
+								crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
+						}
+					}
+				}
 				if (flagCarry > 50)
 					foundAccess = true;
 
@@ -2503,10 +2662,10 @@ namespace RareMagicPortal
 				if (!foundAccess && (Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
 				{
 					if (CrystalCountMaster == 0) // has none of required
-						flagCarry = 5;
+						flagCarry = 9;
 					else if (Portal_Crystal_Cost["Gold"] > CrystalCountMaster) // has less than required
-						flagCarry = 15;
-					else flagCarry = 55; // has more than required
+						flagCarry = 19;
+					else flagCarry = 99; // has more than required
 
 					if (Portal_Key["Gold"])
 					{
@@ -2514,14 +2673,14 @@ namespace RareMagicPortal
 						{
 							crystalorkey = 1;
 							if (KeyCountGold > 0)
-								flagCarry = 555;
+								flagCarry = 999;
 							else
-								flagCarry = 5; // no crystal cost, but key cost with no key
+								flagCarry = 9; // no crystal cost, but key cost with no key
 						}
 						else
 						{
 							if (KeyCountGold > 0 && flagCarry < 20)
-								flagCarry = 555;
+								flagCarry = 999;
 							else
 								crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
 						}
@@ -2539,6 +2698,7 @@ namespace RareMagicPortal
 				if (crystalorkey == 2)
 					CorK = "$rmp_crystalorkey";
 
+
 				//Localizer.AddPlaceholder("rmp_no_red_portal", "No Red Portal");
 				switch (flagCarry)
 				{
@@ -2555,6 +2715,9 @@ namespace RareMagicPortal
 						player.Message(MessageHud.MessageType.Center, $"$rmp_no_purple_portal {CorK}");
 						return false;
 					case 5:
+						player.Message(MessageHud.MessageType.Center, $"$rmp_no_tan_portal {CorK}");
+						return false;
+					case 9:
 						player.Message(MessageHud.MessageType.Center, $"$rmp_no_gold_portal {CorK}");
 						return false;
 					case 11:
@@ -2570,6 +2733,9 @@ namespace RareMagicPortal
 						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Purple"]} $rmp_required_purple {PortalName}");
 						return false;
 					case 15:
+						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Tan"]} $rmp_required_tan {PortalName}");
+						return false;
+					case 19:
 						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Gold"]} $rmp_required_gold {PortalName}");
 						return false;
 					case 21:
@@ -2594,6 +2760,11 @@ namespace RareMagicPortal
 						return true;
 					case 55:
 						player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
+						player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Tan"]} $rmp_consumed_tan");
+						player.m_inventory.RemoveItem(CrystalTan, Portal_Crystal_Cost["Tan"]);
+						return true;
+					case 99:
+						player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
 						player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Gold"]} $rmp_consumed_gold");
 						player.m_inventory.RemoveItem(CrystalMaster, Portal_Crystal_Cost["Gold"]);
 						return true;
@@ -2611,6 +2782,9 @@ namespace RareMagicPortal
 						player.Message(MessageHud.MessageType.TopLeft, $"$rmp_purpleKey_access");
 						return true;
 					case 555:
+						player.Message(MessageHud.MessageType.TopLeft, $"$rmp_tanKey_access");
+						return true;
+					case 999:
 						player.Message(MessageHud.MessageType.TopLeft, $"$rmp_goldKey_access");
 						return true;
 
@@ -2706,6 +2880,19 @@ namespace RareMagicPortal
 				}
 				catch { }
 			}
+			/*
+			else if (teleportWorldData.TargetColor == Tan)
+			{
+				try
+				{
+					Material mat = originalMaterials["ball2"];
+					foreach (Renderer red in teleportWorldData.MeshRend)
+					{
+						red.material = mat;
+					}
+				}
+				catch { }
+			}*/
 			else
             {
 				Material mat = originalMaterials["portal_small"];
@@ -2770,6 +2957,10 @@ namespace RareMagicPortal
 				{
 					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor;
 				}
+				else if (teleportWorldData.TargetColor == Tan)
+				{
+					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor *3;
+				}
 				else if (teleportWorldData.TargetColor == Color.cyan) // cyan now
 				{
 					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor*4;
@@ -2822,6 +3013,7 @@ namespace RareMagicPortal
 				msg += textSplit[i] + " ";
 			}
 			pkg.Write(Portalname + "," + Colorint);
+			RareMagicPortal.LogInfo($"Sending the Server a update for {Portalname} with Color {Colorint}");
 			ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestServerAnnouncementRMP", new object[] { pkg });
 		}
 

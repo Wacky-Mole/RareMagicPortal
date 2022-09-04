@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.2.4
+`Server and client side required for Server Sync enforcement.` V2.3.0
 
-MinimumRequiredVersion = "2.2.4"
+MinimumRequiredVersion = "2.3.0"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -19,7 +19,7 @@ Well, I've a mod for you!
   * Increasing portals' scarcity and value on a multiplayer server
 
 * Crystal and Key Economy
-  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue and Gold/Master.
+  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue, Purple and Gold/Master.
     * Crystals will be **consumed** upon entering the portal
     * Keys to be **possessed** before entering the portal
       * > *Simulate the economy progression from spending and upgrade to long-holding possession*
@@ -55,6 +55,7 @@ https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards,
  * > Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
  * > Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
  * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
+  * > Purple Portal  -With EnableCrystals- Purple Crystal, Purple Key, Gold Crystal, Gold Key
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
@@ -73,10 +74,12 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * PortalCrystalRed
   * PortalCrystalGreen
   * PortalCrystalBlue
+  * PortalCrystalPurple
   * PortalKeyGold
   * PortalKeyRed
   * PortalKeyGreen
   * PortalKeyBlue
+  * PortalKeyPurple
   * PortalDrink
 
 ## Configuration Options:
@@ -86,31 +89,38 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Enable/Disable ServerSync enforcement
     * YML Logs
       * > Useful for seeing what a Portal Requirements are: Default: True
-    * CraftingStation_Requirement: 
+    * CraftingStation_Requirement = $piece_workbench
       * > Default required workbench
     * Level_of_CraftingStation_Req: 
       * > Default required lvl 1 of workbench
     * OnlyCreatorCanDeconstruct: 
       * > Allow/Disallow ONLY creator of the portal can demolish/destroy the portal
     * Portal_Health: 
-      * > Configure the HP of portal
+      * > Configure the HP of portal = 400
     * OnlyCreatorCanChange: 
       * > Allow/Disallow ONLY creator of the portal can rename the portal tag
     * Portal_D_Restrict:
       * > Additional Items to Restrict by Default. 
       * > For Example you can add - Wood,Stone - And those items will restricted
+    * Modifier key for toggle = LeftControl 
+      * > Default Shortcut for admin and !EnabledCrystal && owner color cycling
+      * > If Crystals and Keys is disabled than the owner can change coloring. 
+      * > Shortcut is LeftControl + E on hovering
 
   * [Portal Crystals]
-    * Portal_Crystal_Enable: 
+    * Enable Portal Crystals and Keys = false
       * > Enable/Disable Crystals and Keys to be loaded and used in game
     * Crystal_Consume_Default: 
       * > Default required 1 crystal for each portal
     * Portal_Crystal_Color_Default: 
       * > Default required RED crystal for TP consumption
-      * > Options include Red, Green, Blue or None - None makes portals free passage by default
+      * > Options include Red, Green, Blue, Purple or None - None makes portals free passage by default
+    * USE_GOLD_AS_PORTAL_MASTER = true
+      * > Will Set Gold to always be true on regular colors - Making Gold Key the Master Key
+      * > If you turn this off, you have to cycle through ALL Portals to get rid of Gold setting
 
   * [PortalJuice]
-    * EnablePortalJuice: 
+    * EnablePortalFluid: 
       * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
     * PortalMagicFluidSpawn: 
       * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
@@ -130,11 +140,13 @@ YML files are synced on creation to the rest of the clients. Server always overr
       Red: 1
       Green: 0
       Blue: 0
+      Purple: 0
       Gold: 1
     Portal_Key:
       Red: true
       Green: false
       Blue: false
+      Purple: false
       Gold: true
     Free_Passage: false  - No Crystal or Key requirement
     TeleportAnything: false  - Portal allows you to Teleport Anything
@@ -164,6 +176,14 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.3.0
+            Added the color Purple to the Mix, After Blue
+            Fix for Fluid not changing value setting
+            Fix for color Syncing(mostly)
+            Changed config .cfg names- SERVER ADMINS - CHECK CONFIGS - some will go to defaults
+            Will work with old PortalName Files, but recommend to del
+            Fix for admin Portal
+            Added config and fix For Shortcut for admin cycling
         Version 2.2.4
             Fix for Server YML continous writing loop. Change Crystal Stack size to 25.
             Rewrote how Ctrl-E is displayed.  Added some more log info. 
