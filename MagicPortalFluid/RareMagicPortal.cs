@@ -198,6 +198,7 @@ namespace RareMagicPortal
 		static readonly int _teleportWorldColorAlphaHashCode = "TeleportWorldColorAlpha".GetStableHashCode();
 		static readonly int _portalLastColoredByHashCode = "PortalLastColoredBy".GetStableHashCode();
 		private static string PortalFluidname;
+		private static bool TargetPortalLoaded = false;
 
 		static readonly Dictionary<TeleportWorld, TeleportWorldDataRMP> _teleportWorldDataCache = new();
 		static readonly KeyboardShortcut _changePortalReq= new(KeyCode.E, KeyCode.LeftControl);
@@ -271,9 +272,9 @@ namespace RareMagicPortal
 				{
 					__instance.m_proximityRoot = __instance.transform;
 				}
-
+				
 				// Stone 'portal' prefab does not set this property.
-				if (!__instance.m_target_found)
+				if (!__instance.m_target_found ) 
 				{
 					// The prefab does not have '_target_found_red' but instead '_target_found'.
 					GameObject targetFoundObject = __instance.gameObject.transform.Find("_target_found").gameObject;
@@ -289,6 +290,7 @@ namespace RareMagicPortal
 			}
 
 			[HarmonyPostfix]
+			[HarmonyPriority(Priority.Low)]
 			[HarmonyPatch(nameof(TeleportWorld.UpdatePortal))]
 			static void TeleportWorldUpdatePortalPostfixRMP(ref TeleportWorld __instance)
 			{
@@ -358,19 +360,6 @@ namespace RareMagicPortal
 						//if (!__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode))
 						//	__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
 
-						//if (CurrentZDOColor != color) // why would this be the case? 2 options
-							// 1) color has not propgated through yml yet. 
-							// 2) color will not be propgated thorugh yml because PortalCreator was not admin
-							// both cases it is okay to update the color without the yml
-							// 2) both sides of the portal will not be synced in this case because the yml will not update. Unless this is the server. Kinda sad
-							// So we could ask if this is the server and if it is change yml file to reflect current color? - Does server process this ZDO?
-							// 3rd option RPC all yml changes and let server push
-                        
-							//color = CurrentZDOColor;
-							//if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
-							//	ServerZDOymlUpdate(CurrentZDOColor, PortalName);
-						
-
 						if (color != teleportWorldData.OldColor)
 						{  // don't waste resources
 							teleportWorldData.TargetColor = color;
@@ -379,9 +368,14 @@ namespace RareMagicPortal
 
 						
 					}
+					//if (TargetPortalLoaded)
+					//__instance.gameObject.transform.Find("_target_found").gameObject.SetActive(false);
+
 					
 				}
 				catch { } // catches beginning errors
+
+				
 			}
 		}
 
@@ -393,6 +387,7 @@ namespace RareMagicPortal
 			{
 				{
 					Worldname = ZNet.instance.GetWorldName();// for singleplayer  // won't be ready for multiplayer
+					TargetPortalLoaded = Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal");
 
 					RareMagicPortal.LogInfo("Setting MagicPortal Fluid Afterdelay");
 					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
@@ -439,158 +434,195 @@ namespace RareMagicPortal
 				if (portal.m_creator == closestPlayer.GetPlayerID())
 					sameperson = true;
 
-					string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
-					int colorint = CrystalandKeyLogicColor(PortalName);
-					string currentcolor = "Default";
-					string nextcolor;
-					string text;
-					Color color;
-					switch (colorint)
+				string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+			
+				
+				int colorint = CrystalandKeyLogicColor(PortalName);
+				string currentcolor = "Default";
+				string nextcolor;
+				string text;
+				Color color;
+				switch (colorint)
+				{
+					case 0:
+						currentcolor = "Black";
+						nextcolor = "Yellow";
+						text = "Admin Only";
+						color = Color.black;
+						break;
+					case 1:
+						currentcolor = "Yellow";
+						nextcolor = "Red";
+						text = "Normal Portal";
+						color = Color.yellow;
+						break;
+					case 2:
+						currentcolor = "Red";
+						nextcolor = "Green";
+						text = "Red Crystal Portal";
+						color = Color.red;
+						break;
+					case 3:
+						currentcolor = "Green";
+						nextcolor = "Blue";
+						text = "Green Crystal Portal";
+						color = Color.green;
+						break;
+					case 4:
+						currentcolor = "Blue";
+						nextcolor = "Gold";
+						text = "Blue Crystal Portal";
+						color = Color.cyan;
+						break;
+					case 5:
+						currentcolor = "Purple";
+						nextcolor = "Tan";
+						text = "Purple Crystal Portal";
+						color = Purple;
+						break;
+					case 6:
+						currentcolor = "Tan";
+						nextcolor = "Gold";
+						text = "Tan Crystal Portal";
+						color = Tan;
+						break;
+					case 7:
+						currentcolor = "Gold";
+						nextcolor = "White";
+						text = "Gold Crystal Portal";
+						color = Gold;
+						break;
+					case 8:
+						currentcolor = "White";
+						nextcolor = "Black";
+						text = "Any Teleportation Portal with No Crystal Cost";
+						color = Color.white;
+						break;
+					default:
+						currentcolor = "Yellow";
+						text = "";
+						nextcolor = currentcolor;
+						color = Color.yellow;
+						break;
+
+				}
+				if (
+				!__instance.m_nview
+				|| __instance.m_nview.m_zdo == null
+				|| __instance.m_nview.m_zdo.m_zdoMan == null
+				|| __instance.m_nview.m_zdo.m_vec3 == null)
+				{
+					RareMagicPortal.LogInfo("Setting Portal Color For First Time");
+					if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
 					{
-						case 0:
-							currentcolor = "Black";
-							nextcolor = "Yellow";
-							text = "Admin Only";
-							color = Color.black;
-							break;
-						case 1:
-							currentcolor = "Yellow";
-							nextcolor = "Red";
-							text = "Normal Portal";
-							color = Color.yellow;
-							break;
-						case 2:
-							currentcolor = "Red";
-							nextcolor = "Green";
-							text = "Red Crystal Portal";
-							color = Color.red;
-							break;
-						case 3:
-							currentcolor = "Green";
-							nextcolor = "Blue";
-							text = "Green Crystal Portal";
-							color = Color.green;
-							break;
-						case 4:
-							currentcolor = "Blue";
-							nextcolor = "Gold";
-							text = "Blue Crystal Portal";
-							color = Color.cyan;
-							break;
-						case 5:
-							currentcolor = "Purple";
-							nextcolor = "Tan";
-							text = "Purple Crystal Portal";
-							color = Purple;
-							break;
-						case 6:
-							currentcolor = "Tan";
-							nextcolor = "Gold";
-							text = "Tan Crystal Portal";
-							color = Tan;
-							break;
-						case 7:
-							currentcolor = "Gold";
-							nextcolor = "White";
-							text = "Gold Crystal Portal";
-							color = Gold;
-							break;
-						case 8:
-							currentcolor = "White";
-							nextcolor = "Black";
-							text = "Any Teleportation Portal with No Crystal Cost";
-							color = Color.white;
-							break;
-						default:
-							currentcolor = "Yellow";
-							text = "";
-							nextcolor = currentcolor;
-							color = Color.yellow;
-							break;
-
+						teleportWorldData.TargetColor = color;
+						SetTeleportWorldColors(teleportWorldData, true);
+						__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
+						__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
 					}
-					if (
-					!__instance.m_nview
-					|| __instance.m_nview.m_zdo == null
-					|| __instance.m_nview.m_zdo.m_zdoMan == null
-					|| __instance.m_nview.m_zdo.m_vec3 == null)
-                    {
-						RareMagicPortal.LogInfo("Setting Portal Color For First Time");
-						if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
+				}
+				if (PortalName != "" && PortalName != "Empty tag")
+				{ 
+						if (isAdmin || sameperson && !EnableCrystals)
 						{
-							teleportWorldData.TargetColor = color;
-							SetTeleportWorldColors(teleportWorldData, true);
-							__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
-							__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
-						}
-					} 
+							//string Shortcut
 
-					if (isAdmin || sameperson && !EnableCrystals)
-					{
-					//string Shortcut
+							if (portalRMPKEY.Value.MainKey is KeyCode.None)
+							{
+								//Shortcut = portalRMPKEY.Value;
+								return; // because it would error out otherwise
 
-					if (portalRMPKEY.Value.MainKey is KeyCode.None)
-                    {
-						//Shortcut = portalRMPKEY.Value;
-						return; // because it would error out otherwise
+							}
+							// L-ctrl + E instead of _
 
-					}
-					// L-ctrl + E instead of _
-					
-					if (EnableCrystals)
-						{
-							__result =
-								string.Format(
-									"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Crystal to: [<color={3}>{3}</color>]</size>\n<size={4}>{6}</size>",
-									__result,
-									currentcolor,
-									portalRMPKEY.Value + " + " + "E",//_changePortalReq,
-									nextcolor,
-									15,
-									"Yellow",
-									text);
+							if (EnableCrystals)
+							{
+								__result =
+									string.Format(
+										"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Crystal to: [<color={3}>{3}</color>]</size>\n<size={4}>{6}</size>",
+										__result,
+										currentcolor,
+										portalRMPKEY.Value + " + " + "E",//_changePortalReq,
+										nextcolor,
+										15,
+										"Yellow",
+										text);
+							}
+							else
+							{
+								__result =
+									string.Format(
+										"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Color to: [<color={3}>{3}</color>] </size>",
+										__result,
+										currentcolor,
+										portalRMPKEY.Value + " + " + "E", //_changePortalReq,
+										nextcolor,
+										15,
+										"Yellow"
+										);
+							}
 						}
 						else
 						{
-							__result =
+							if (EnableCrystals)
+							{
+								__result =
+									string.Format(
+										"{0}\n<size={2}><color={1}>{1} Portal</color></size>\n<size={2}>{4}</size>",
+										__result,
+										currentcolor,
+										15,
+										"Yellow",
+										text
+										);
+							}
+							else
+							{
+								__result =
+									string.Format(
+										"{0}\n<size={2}><color={1}>{1} Portal</color></size>",
+										__result,
+										currentcolor,
+										15,
+										"Yellow"
+										);
+							}
+
+						}
+				}else// name = ""
+                {
+					string jo = "Please name Portal to change from Default";
+					__result =
 								string.Format(
-									"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Color to: [<color={3}>{3}</color>] </size>",
+									"{0}\n<size={1}><color={3}>{2}</color></size>",
 									__result,
-									currentcolor,
-									portalRMPKEY.Value + " + " + "E", //_changePortalReq,
-									nextcolor,
 									15,
+									jo,
 									"Yellow"
 									);
-						}
-					} else
-						{
-					if (EnableCrystals)
-					{
-						__result =
-							string.Format(
-								"{0}\n<size={2}><color={1}>{1} Portal</color></size>\n<size={2}>{4}</size>",
-								__result,
-								currentcolor,
-								15,
-								"Yellow",
-								text
-								);
-					} else
-                    {
-						__result =
-							string.Format(
-								"{0}\n<size={2}><color={1}>{1} Portal</color></size>",
-								__result,
-								currentcolor,
-								15,
-								"Yellow"
-								);
-					}
 
-				}
+				} 
 			}
 		}
+		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.TargetFound))]
+		public static class DisabldHaveTarget
+		{
+			private static bool Prefix(ref bool __result)
+            {
+               if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+                {
+					__result = true;
+					return false;
+				}
+                if (TargetPortalLoaded ) // I should make a config for this instead
+				{
+					__result = false;
+					return false;
+				}
+				return true;
+			}
+		}
+
 
 		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Interact))]
 		public static class PortalCheckOutside
@@ -614,7 +646,7 @@ namespace RareMagicPortal
 					string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
 					
 
-					if (portal != null)
+					if (portal != null && PortalName !="" && PortalName != "Empty tag")
 					{
 						Player closestPlayer = Player.m_localPlayer; //Player.GetClosestPlayer(__instance.m_proximityRoot.position, 5f);
 						bool sameperson = false;
@@ -1022,7 +1054,8 @@ namespace RareMagicPortal
 								if (checkiftagisPortal.Contains("$hud") || checkiftagisPortal.Contains("Day "))
 									continue;
 
-								PName = pin.m_name; // icons name
+								PName = pin.m_name; // icons name - Portalname
+
 								colorint = CrystalandKeyLogicColor(PName); // kindof expensive task to do this cpu wize for all portals
 								switch (colorint)
 								{
@@ -1057,6 +1090,7 @@ namespace RareMagicPortal
 										pin.m_icon = IconDefault;
 										break;
 								}
+								pin.m_icon.name = "TargetPortalIcon"; // test after 2.4
 							}
 						} catch { }
 					}// foreach
@@ -2052,7 +2086,7 @@ namespace RareMagicPortal
 			}
 			if (!string.IsNullOrEmpty(pinData.m_name))
 				checkiftagisPortal = pinData.m_name; // icons name
-			if (pinData.m_icon.name == "" || pinData.m_icon.name == "TargetPortalIcon") // only targetPortalIcon now
+			if (pinData.m_icon.name == "" || pinData.m_icon.name == "TargetPortalIcon") // only targetPortalIcon now, or not maybe new icons being set don't have name after messing with them
 			{ // TargetPortals Icons have no name therefore this stupid check weeds out regular icons  // pull request for icon.name  TargetPortalIcon
 			}
 			else 
@@ -2912,6 +2946,7 @@ namespace RareMagicPortal
 					light.color = teleportWorldData.TargetColor;
 			}
 
+			Color FlamePurple = new Color(191f / 255f, 0f, 191f / 255f, 1);
 			foreach (ParticleSystem system in teleportWorldData.Systems)
 			{
 				ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
@@ -2919,8 +2954,6 @@ namespace RareMagicPortal
 				{
 					colorOverLifetime.color = new ParticleSystem.MinMaxGradient(flamesstart, flamesend);
 				}
-				else
-					colorOverLifetime.color = new ParticleSystem.MinMaxGradient(teleportWorldData.TargetColor);
 
 				ParticleSystem.MainModule main = system.main;
 				if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default

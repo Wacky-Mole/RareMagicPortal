@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.3.0
+`Server and client side required for Server Sync enforcement.` V2.4.0
 
-MinimumRequiredVersion = "2.3.0"
+MinimumRequiredVersion = "2.4.0"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -19,7 +19,7 @@ Well, I've a mod for you!
   * Increasing portals' scarcity and value on a multiplayer server
 
 * Crystal and Key Economy
-  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue, Purple and Gold/Master.
+  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue, Purple, Tan and Gold/Master.
     * Crystals will be **consumed** upon entering the portal
     * Keys to be **possessed** before entering the portal
       * > *Simulate the economy progression from spending and upgrade to long-holding possession*
@@ -55,7 +55,8 @@ https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards,
  * > Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
  * > Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
  * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
-  * > Purple Portal  -With EnableCrystals- Purple Crystal, Purple Key, Gold Crystal, Gold Key
+ * > Purple Portal  -With EnableCrystals- Purple Crystal, Purple Key, Gold Crystal, Gold Key
+ * > Tan Portal  -With EnableCrystals- Tan Crystal, Tan Key, Gold Crystal, Gold Key
  * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
  * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
 
@@ -75,11 +76,13 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * PortalCrystalGreen
   * PortalCrystalBlue
   * PortalCrystalPurple
+  * PortalCrystalTan
   * PortalKeyGold
   * PortalKeyRed
   * PortalKeyGreen
   * PortalKeyBlue
   * PortalKeyPurple
+  * PortalKeyTan
   * PortalDrink
 
 ## Configuration Options:
@@ -114,17 +117,17 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Default required 1 crystal for each portal
     * Portal_Crystal_Color_Default: 
       * > Default required RED crystal for TP consumption
-      * > Options include Red, Green, Blue, Purple or None - None makes portals free passage by default
+      * > Options include Red, Green, Blue, Purple, Tan or None - None makes portals free passage by default
     * USE_GOLD_AS_PORTAL_MASTER = true
       * > Will Set Gold to always be true on regular colors - Making Gold Key the Master Key
       * > If you turn this off, you have to cycle through ALL Portals to get rid of Gold setting
 
-  * [PortalJuice]
+  * [PortalFluyid]
     * EnablePortalFluid: 
       * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
     * PortalMagicFluidSpawn: 
       * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
-    * PortalJuiceValue: 
+    * PortalFluidValue: 
       * > Default 0 coins 
         >> Set to value of 1 or more to sale at Haldor
 
@@ -141,12 +144,14 @@ YML files are synced on creation to the rest of the clients. Server always overr
       Green: 0
       Blue: 0
       Purple: 0
+      Tan: 0
       Gold: 1
     Portal_Key:
       Red: true
       Green: false
       Blue: false
       Purple: false
+      Tan: false
       Gold: true
     Free_Passage: false  - No Crystal or Key requirement
     TeleportAnything: false  - Portal allows you to Teleport Anything
@@ -176,6 +181,15 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.4.0
+            Added the color Tan to the mix, after Purple
+            Will work with old PortalName Files, but recommend to del - Portals go to Defaults
+            Fix Portal Animation to OFF with TargetPortal(except during PortalDrink usage)
+            Added a check for empty portal name, so that it remains default portal type ("" and Empty Tag)
+            (Please delete or manually change "" and Empty Tag in yml)
+            TanKey and CrystalTan, Fixed Purple Logic.
+            Needs Updated TargetPortal update for icons. Now only TargetPortalIcons should be displayed
+            Fix error for RMP on logout    
         Version 2.3.0
             Added the color Purple to the Mix, After Blue
             Fix for Fluid not changing value setting
