@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.4.0
+`Server and client side required for Server Sync enforcement.` V2.4.1
 
-MinimumRequiredVersion = "2.4.0"
+MinimumRequiredVersion = "2.4.1"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -19,7 +19,7 @@ Well, I've a mod for you!
   * Increasing portals' scarcity and value on a multiplayer server
 
 * Crystal and Key Economy
-  * v2.0 adds 4 Crystals and 4 Keys, color-tiered:Red, Green, Blue, Purple, Tan and Gold/Master.
+  * v2.0 adds 6 Crystals and 6 Keys, color-tiered:Red, Green, Blue, Purple, Tan and Gold/Master.
     * Crystals will be **consumed** upon entering the portal
     * Keys to be **possessed** before entering the portal
       * > *Simulate the economy progression from spending and upgrade to long-holding possession*
@@ -121,8 +121,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * USE_GOLD_AS_PORTAL_MASTER = true
       * > Will Set Gold to always be true on regular colors - Making Gold Key the Master Key
       * > If you turn this off, you have to cycle through ALL Portals to get rid of Gold setting
+    * UseTopLeftMessage
+       *>  false, In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.
 
-  * [PortalFluyid]
+  * [PortalFluid]
     * EnablePortalFluid: 
       * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
     * PortalMagicFluidSpawn: 
@@ -181,6 +183,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.4.1
+            Fixed TargetPortal Default Icons loading when they arn't suppose to.
+            Added ConfigOption for UseTopLeftMessage - Mostly for OdinsQOL or other announcting center mods
         Version 2.4.0
             Added the color Tan to the mix, after Purple
             Will work with old PortalName Files, but recommend to del - Portals go to Defaults

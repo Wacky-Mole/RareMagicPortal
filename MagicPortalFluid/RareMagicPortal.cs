@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.0";
+		public const string PluginVersion = "2.4.1";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.0" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.1" };
 
 		private static MagicPortalFluid? plugin;
 		private static MagicPortalFluid context;
@@ -109,6 +109,7 @@ namespace RareMagicPortal
 		public static string DefaultRestrictString = "";
 		public static bool UseGoldASMaster = true;
 		public static string ColorsEnabled = "";
+		public static bool msgLeft = false;
 
 		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
 		private static int JustWrote = 0;
@@ -143,6 +144,7 @@ namespace RareMagicPortal
 		private static ConfigEntry<bool>? ConfigEnableGoldAsMaster;
 		private static ConfigEntry<string>? ConfigEnableColorEnable;
 		private static ConfigEntry<KeyboardShortcut>? portalRMPKEY = null!;
+		private static ConfigEntry<bool>? ConfigMessageLeft;
 
 		public static string crystalcolorre = ""; // need to reset everytime maybe?
 		public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -919,24 +921,36 @@ namespace RareMagicPortal
 				}
 				//RareMagicPortal.LogInfo($"Made it to Map during Telecheck");
 				string PortalName;
-				HoldPins = Minimap.instance.m_pins;
+				Minimap Instancpass = Minimap.instance;
+				HoldPins = Instancpass.m_pins;
 				//return true;
 				
 				try
 				{
 					 PortalName = HandlePortalClick(); //my handleportal click
 				} catch { PortalName = null; }
-				if (PortalName == null)
+					if (PortalName == null)
                 {
 					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
 
-				}			
+				}
+				if (!Player.m_localPlayer.IsTeleportable())
+				{
+					Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
+					return false;
+				}
 				if (CrystalandKeyLogic(PortalName))
                 {
+					//RareMagicPortal.LogInfo($"True, so TargetPortalShould Take over");
+
+					//HandleTeleport(Instancpass);
 					return true; // allow TargetPortal to do it's checks
-                } else
+					//throw new SkipPortalException2();//return false; and stop TargetPortals from executing
+				} else
                 {
+					//RareMagicPortal.LogInfo($"TargetPortal is forced to stop");
 					throw new SkipPortalException2();//return false; and stop TargetPortals from executing
+					
 				}
 				
 									 
@@ -953,6 +967,7 @@ namespace RareMagicPortal
 			private static void Postfix(Minimap __instance)
 			{
 				HoldPins = Minimap.instance.m_pins;
+				//RareMagicPortal.LogWarning("Here is MinimapStart");
 			}
 		}
 
@@ -1032,17 +1047,19 @@ namespace RareMagicPortal
 			 if (Teleporting && Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
 				{
 					//RareMagicPortal.LogInfo($"Made it to Portal Trigger");
-					Minimap.instance.ShowPointOnMap(__instance.transform.position);
+					
 					int colorint;
 					String PName;
 					String PortalName;
 					Minimap instance = Minimap.instance;
+					List<Minimap.PinData> paul = instance.m_pins;
+
+					//instance.ShowPointOnMap(__instance.transform.position);
 					try
 					{
-						PortalName = HandlePortalClick(); //This is making minimap instance correctly
+						//PortalName = HandlePortalClick(); //This is making minimap instance correctly
 					}
 					catch { }
-					List<Minimap.PinData> paul = instance.m_pins;
 					//List<Minimap.PinData> paul = HoldPins;
 					foreach (Minimap.PinData pin in paul)
 					{
@@ -1051,8 +1068,6 @@ namespace RareMagicPortal
 						{	
 							if ( pin.m_icon.name == "TargetPortalIcon") // only selects correct icon now
 							{
-								if (checkiftagisPortal.Contains("$hud") || checkiftagisPortal.Contains("Day "))
-									continue;
 
 								PName = pin.m_name; // icons name - Portalname
 
@@ -1098,6 +1113,7 @@ namespace RareMagicPortal
 
 			}
 		}
+
 
 		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
 		private static class Player_CheckforOwnerP
@@ -1871,7 +1887,9 @@ namespace RareMagicPortal
 
 			CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,Tan,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
 
-            PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
+			ConfigMessageLeft = config("Portal Crystals", "UseTopLeftMessage", false, "In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.");
+
+			PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
 
 			
 
@@ -1899,6 +1917,9 @@ namespace RareMagicPortal
 			EnableExtraYMLLog = (bool)Config["General", "YMLPortalLogs"].BoxedValue;
 			DefaultRestrictString = (string)Config["Portal Config", "Portal_D_Restrict"].BoxedValue;
 			UseGoldASMaster = (bool)Config["Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER"].BoxedValue;
+			msgLeft = (bool)Config["Portal Crystals", "UseTopLeftMessage"].BoxedValue;
+
+
 			//ColorsEnabled = (string)Config["Portal Crystals", "ColorsEnabled"].BoxedValue;
 			/*
 			string[] colorstosearch = ColorsEnabled.Split(',');
@@ -2059,16 +2080,26 @@ namespace RareMagicPortal
 				}
 
 		}
+		private static void HandleTeleport(Minimap Instancpass) // this is just for testing
+        {
+
+			Minimap instance = Instancpass;
+			List<Minimap.PinData> paul = instance.m_pins;
+			Vector3 pos = instance.ScreenToWorldPoint(Input.mousePosition);
+			float radius = instance.m_removeRadius * (instance.m_largeZoom * 2f);
+
+			Quaternion rotation = Quaternion.Euler(0f, 0f, 0f);
+
+			instance.SetMapMode(Minimap.MapMode.Small);
+
+			Player.m_localPlayer.TeleportTo(pos + rotation * Vector3.forward + Vector3.up, rotation, true);
+		}
 		private static string HandlePortalClick()
         {
 			Minimap instance = Minimap.instance;
 			List<Minimap.PinData> paul = instance.m_pins;
 			Vector3 pos = instance.ScreenToWorldPoint(Input.mousePosition);
 			float radius = instance.m_removeRadius * (instance.m_largeZoom * 2f);
-
-			//List<Minimap.PinData> result = MyExcept2(paul, HoldPins);
-			//var result = paul.Intersect( HoldPins).ToList();
-			//var result = paul.Where(f => !HoldPins.Any(t => t.FirmId == f.FirmId)).ToList(); // subtraction
 
 			checkiftagisPortal = "";
 			Minimap.PinData  pinData = null;
@@ -2733,44 +2764,48 @@ namespace RareMagicPortal
 					CorK = "$rmp_crystalorkey";
 
 
+				var hud = MessageHud.MessageType.Center;
+				if (msgLeft)
+					hud = MessageHud.MessageType.TopLeft;
+					
 				//Localizer.AddPlaceholder("rmp_no_red_portal", "No Red Portal");
 				switch (flagCarry)
 				{
 					case 1:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_red_portal {CorK}");
+						player.Message(hud, $"$rmp_no_red_portal {CorK}");
 						return false;
 					case 2:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_green_portal {CorK}");
+						player.Message(hud, $"$rmp_no_green_portal {CorK}");
 						return false;
 					case 3:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_blue_portal {CorK}");
+						player.Message(hud, $"$rmp_no_blue_portal {CorK}");
 						return false;
 					case 4:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_purple_portal {CorK}");
+						player.Message(hud, $"$rmp_no_purple_portal {CorK}");
 						return false;
 					case 5:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_tan_portal {CorK}");
+						player.Message(hud, $"$rmp_no_tan_portal {CorK}");
 						return false;
 					case 9:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_no_gold_portal {CorK}");
+						player.Message(hud, $"$rmp_no_gold_portal {CorK}");
 						return false;
 					case 11:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Red"]} $rmp_required_red {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Red"]} $rmp_required_red {PortalName}");
 						return false;
 					case 12:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Green"]} $rmp_required_green {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Green"]} $rmp_required_green {PortalName}");
 						return false;
 					case 13:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Blue"]} $rmp_required_blue {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Blue"]} $rmp_required_blue {PortalName}");
 						return false;
 					case 14:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Purple"]} $rmp_required_purple {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Purple"]} $rmp_required_purple {PortalName}");
 						return false;
 					case 15:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Tan"]} $rmp_required_tan {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Tan"]} $rmp_required_tan {PortalName}");
 						return false;
 					case 19:
-						player.Message(MessageHud.MessageType.Center, $"{Portal_Crystal_Cost["Gold"]} $rmp_required_gold {PortalName}");
+						player.Message(hud, $"{Portal_Crystal_Cost["Gold"]} $rmp_required_gold {PortalName}");
 						return false;
 					case 21:
 						player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
@@ -2823,7 +2858,7 @@ namespace RareMagicPortal
 						return true;
 
 					default:
-						player.Message(MessageHud.MessageType.Center, $"$rmp_noaccess");
+						player.Message(hud, $"$rmp_noaccess");
 						return false;
 
 
