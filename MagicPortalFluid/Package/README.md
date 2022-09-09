@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.4.0
+`Server and client side required for Server Sync enforcement.` V2.4.2
 
-MinimumRequiredVersion = "2.4.0"
+MinimumRequiredVersion = "2.4.1"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -109,6 +109,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Default Shortcut for admin and !EnabledCrystal && owner color cycling
       * > If Crystals and Keys is disabled than the owner can change coloring. 
       * > Shortcut is LeftControl + E on hovering
+    * Force Portal Animation
+      * > False
+      * > Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded
 
   * [Portal Crystals]
     * Enable Portal Crystals and Keys = false
@@ -121,8 +124,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * USE_GOLD_AS_PORTAL_MASTER = true
       * > Will Set Gold to always be true on regular colors - Making Gold Key the Master Key
       * > If you turn this off, you have to cycle through ALL Portals to get rid of Gold setting
+    * UseTopLeftMessage
+       *>  false, In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.
 
-  * [PortalFluyid]
+  * [PortalFluid]
     * EnablePortalFluid: 
       * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
     * PortalMagicFluidSpawn: 
@@ -181,6 +186,13 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.4.2
+            Added ConfigOption to force Force Portal Animation if TargetPortal is installed. - Not synced
+            Fixed an Error if entered wrong password on joining server.  - Made Server more efficent
+            Got rid of Empty tag, now just '' / Made it so '' should auto update to default color on server
+        Version 2.4.1
+            Fixed TargetPortal Default Icons loading when they arn't suppose to.
+            Added ConfigOption for UseTopLeftMessage - Mostly for OdinsQOL or other announcing center mods
         Version 2.4.0
             Added the color Tan to the mix, after Purple
             Will work with old PortalName Files, but recommend to del - Portals go to Defaults

@@ -2,7 +2,7 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.4.1
+`Server and client side required for Server Sync enforcement.` V2.4.2
 
 MinimumRequiredVersion = "2.4.1"
 
@@ -109,6 +109,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
       * > Default Shortcut for admin and !EnabledCrystal && owner color cycling
       * > If Crystals and Keys is disabled than the owner can change coloring. 
       * > Shortcut is LeftControl + E on hovering
+    * Force Portal Animation
+      * > False
+      * > Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded
 
   * [Portal Crystals]
     * Enable Portal Crystals and Keys = false
@@ -183,9 +186,13 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.4.2
+            Added ConfigOption to force Force Portal Animation if TargetPortal is installed. - Not synced
+            Fixed an Error if entered wrong password on joining server.  - Made Server more efficent
+            Got rid of Empty tag, now just '' / Made it so '' should auto update to default color on server
         Version 2.4.1
             Fixed TargetPortal Default Icons loading when they arn't suppose to.
-            Added ConfigOption for UseTopLeftMessage - Mostly for OdinsQOL or other announcting center mods
+            Added ConfigOption for UseTopLeftMessage - Mostly for OdinsQOL or other announcing center mods
         Version 2.4.0
             Added the color Tan to the mix, after Purple
             Will work with old PortalName Files, but recommend to del - Portals go to Defaults

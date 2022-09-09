@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.1";
+		public const string PluginVersion = "2.4.2";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.1" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.2" };
 
 		private static MagicPortalFluid? plugin;
 		private static MagicPortalFluid context;
@@ -110,6 +110,7 @@ namespace RareMagicPortal
 		public static bool UseGoldASMaster = true;
 		public static string ColorsEnabled = "";
 		public static bool msgLeft = false;
+		public static bool ForceTargetPortalAnimation = false;
 
 		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
 		private static int JustWrote = 0;
@@ -145,6 +146,7 @@ namespace RareMagicPortal
 		private static ConfigEntry<string>? ConfigEnableColorEnable;
 		private static ConfigEntry<KeyboardShortcut>? portalRMPKEY = null!;
 		private static ConfigEntry<bool>? ConfigMessageLeft;
+		private static ConfigEntry<bool>? ConfigTargetPortalAnimation;
 
 		public static string crystalcolorre = ""; // need to reset everytime maybe?
 		public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -318,43 +320,53 @@ namespace RareMagicPortal
 					}
 					else
 					{
-						string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+						string PortalName = __instance.m_nview.m_zdo.GetString("tag");
 						int colorint = CrystalandKeyLogicColor(PortalName); // this should sync up portal colors
 					
 						//Color CurrentZDOColor = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
 
 						Color color;
-						
+						string currentcolor;
 						switch (colorint)
 						{
 							case 0:
+								currentcolor = "Black";
 								color = Color.black;
 								break;
 							case 1:
+								currentcolor = "Yellow";
 								color = Color.yellow;
 								break;
 							case 2:
+								currentcolor = "Red";
 								color = Color.red;
 								break;
 							case 3:
+								currentcolor = "Green";
 								color = Color.green;
 								break;
 							case 4:
+								currentcolor = "Blue";
 								color = Color.cyan;
 								break;
 							case 5:
+								currentcolor = "Purple";
 								color = Purple;
 								break;
 							case 6:
+								currentcolor = "Tan";
 								color = Tan;
 								break;
 							case 7:
-								color = Gold; // go with material change small_portal
+								currentcolor = "Gold";
+								color = Gold;
 								break;
 							case 8:
+								currentcolor = "White";
 								color = Color.white;
 								break;
 							default:
+								currentcolor = "Yellow";
 								color = Color.yellow;
 								break;
 
@@ -367,8 +379,7 @@ namespace RareMagicPortal
 							teleportWorldData.TargetColor = color;
 							SetTeleportWorldColors(teleportWorldData, true);
 						}
-
-						
+				
 					}
 					//if (TargetPortalLoaded)
 					//__instance.gameObject.transform.Find("_target_found").gameObject.SetActive(false);
@@ -392,8 +403,16 @@ namespace RareMagicPortal
 					TargetPortalLoaded = Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal");
 
 					RareMagicPortal.LogInfo("Setting MagicPortal Fluid Afterdelay");
-					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
-																					//LoadAllRecipeData(reload: true); // while loading on world screen
+					if (ZNet.instance.IsDedicated() && ZNet.instance.IsServer())
+					{
+						LoadIN();
+					}
+					else // everyone else
+					{
+						//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
+																						//LoadAllRecipeData(reload: true); // while loading on world screen
+					}
+					
 				}
 			}
 		}
@@ -406,6 +425,8 @@ namespace RareMagicPortal
 			{
 				{
 					StartingitemPrefab();
+					//LoadAllRecipeData(reload: true);
+					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
 				}
 			}
 		}
@@ -436,7 +457,7 @@ namespace RareMagicPortal
 				if (portal.m_creator == closestPlayer.GetPlayerID())
 					sameperson = true;
 
-				string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+				string PortalName = __instance.m_nview.m_zdo.GetString("tag");
 			
 				
 				int colorint = CrystalandKeyLogicColor(PortalName);
@@ -523,6 +544,26 @@ namespace RareMagicPortal
 						__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
 					}
 				}
+
+				if (PortalName == "" && currentcolor != DefaultPortalColor )
+				{
+					if (DefaultPortalColor == "None")
+						colorint = 1;
+					if (DefaultPortalColor == "Red")
+						colorint = 2;
+					if (DefaultPortalColor == "Green")
+						colorint = 3;
+					if (DefaultPortalColor == "Blue")
+						colorint = 4;
+					if (DefaultPortalColor == "Purple")
+						colorint = 5;
+					if (DefaultPortalColor == "Tan")
+						colorint = 6;
+					
+
+					updateYmltoColorChange("", colorint);
+				}
+
 				if (PortalName != "" && PortalName != "Empty tag")
 				{ 
 						if (isAdmin || sameperson && !EnableCrystals)
@@ -611,14 +652,19 @@ namespace RareMagicPortal
 		{
 			private static bool Prefix(ref bool __result)
             {
-               if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
-                {
+				if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+				{
 					__result = true;
 					return false;
 				}
-                if (TargetPortalLoaded ) // I should make a config for this instead
+				if (TargetPortalLoaded && !ForceTargetPortalAnimation) // I should make a config for this instead
 				{
 					__result = false;
+					return false;
+				}
+				if (TargetPortalLoaded && ForceTargetPortalAnimation) // I should make a config for this instead
+				{
+					__result = true;
 					return false;
 				}
 				return true;
@@ -645,7 +691,7 @@ namespace RareMagicPortal
 					//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact");
 					Piece portal = null;
 					portal = __instance.GetComponent<Piece>();
-					string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+					string PortalName = __instance.m_nview.m_zdo.GetString("tag");
 					
 
 					if (portal != null && PortalName !="" && PortalName != "Empty tag")
@@ -1005,7 +1051,7 @@ namespace RareMagicPortal
 					}
 					else
 					{
-						PortalName = zDO.GetString("tag", "Empty tag");
+						PortalName = zDO.GetString("tag");
 					}
 				}
 				// end finding portal name
@@ -1186,6 +1232,7 @@ namespace RareMagicPortal
 			private static void Prefix()
 			{
 				ZRoutedRpc.instance.Register("RequestServerAnnouncementRMP", new Action<long, ZPackage>(RPC_RequestServerAnnouncementRMP)); // Our Server Handler
+				((MonoBehaviour)(object)context).StartCoroutine(RemovedDestroyedTeleportWorldsCoroutine()); // moved to this incase the stop and start joining
 				//ZRoutedRpc.instance.Register("EventServerAnnouncementRMP", new Action<long, ZPackage>(RPC_EventServerAnnouncementRMP)); // event handler
 			}
 		}
@@ -1197,7 +1244,7 @@ namespace RareMagicPortal
 			{
 				RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
 				((MonoBehaviour)(object)context).StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
-
+				((MonoBehaviour)(object)context).StopCoroutine(DelayedLoad());
 
 				NoMoreLoading = true;
 				return true;
@@ -1234,8 +1281,8 @@ namespace RareMagicPortal
 
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
-			StartCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
 			
+
 			IconColors();
 
 
@@ -1891,7 +1938,7 @@ namespace RareMagicPortal
 
 			PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
 
-			
+			ConfigTargetPortalAnimation = config("Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded", false);
 
 			portalRMPKEY = config("Portal Config", "Modifier key for toggle", new KeyboardShortcut(KeyCode.LeftControl), "Modifier key that has to be pressed while hovering over Portal + E", false);
 
@@ -1918,6 +1965,7 @@ namespace RareMagicPortal
 			DefaultRestrictString = (string)Config["Portal Config", "Portal_D_Restrict"].BoxedValue;
 			UseGoldASMaster = (bool)Config["Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER"].BoxedValue;
 			msgLeft = (bool)Config["Portal Crystals", "UseTopLeftMessage"].BoxedValue;
+			ForceTargetPortalAnimation = (bool)Config["Portal Config", "Force Portal Animation"].BoxedValue;
 
 
 			//ColorsEnabled = (string)Config["Portal Crystals", "ColorsEnabled"].BoxedValue;
