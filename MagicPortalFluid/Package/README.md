@@ -4,7 +4,7 @@
 
 `Server and client side required for Server Sync enforcement.` V2.4.2
 
-MinimumRequiredVersion = "2.4.1"
+MinimumRequiredVersion = "2.4.2"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -188,8 +188,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Change Log:
         Version 2.4.2
             Added ConfigOption to force Force Portal Animation if TargetPortal is installed. - Not synced
-            Fixed an Error if entered wrong password on joining server.  - Made Server more efficent
+            Fixed an Error if entered wrong password on joining server.  - Made Server more efficient
             Got rid of Empty tag, now just '' / Made it so '' should auto update to default color on server
+            Changed the way things are loaded. 
         Version 2.4.1
             Fixed TargetPortal Default Icons loading when they arn't suppose to.
             Added ConfigOption for UseTopLeftMessage - Mostly for OdinsQOL or other announcing center mods
