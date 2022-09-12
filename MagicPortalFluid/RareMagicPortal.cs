@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.2";
+		public const string PluginVersion = "2.4.3";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -393,10 +393,10 @@ namespace RareMagicPortal
 		}
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
-		[HarmonyPriority(0)]
-		private static class ZNetScene_Awake_PatchWRare
+		[HarmonyPriority(Priority.Last)]
+		 static class ZNetScene_Awake_PatchWRare
 		{
-			private static void Postfix()
+			 static void Postfix()
 			{
 				{
 					Worldname = ZNet.instance.GetWorldName();// for singleplayer  // won't be ready for multiplayer
@@ -409,10 +409,26 @@ namespace RareMagicPortal
 					}
 					else // everyone else
 					{
-						//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
+						//LoadAllRecipeData(reload: true);
+
+						//context.StartCoroutine(DelayedLoad()); // important
 																						//LoadAllRecipeData(reload: true); // while loading on world screen
 					}
 					
+				}
+			}
+		}
+
+		[HarmonyPatch(typeof(Game), "SpawnPlayer")]
+		private static class Game_SpawnPreRMP
+		{
+			[HarmonyPostfix]
+			private static void Postfix()
+			{
+				{
+					LoadAllRecipeData(reload: true);
+					LoadIN();
+
 				}
 			}
 		}
@@ -425,8 +441,7 @@ namespace RareMagicPortal
 			{
 				{
 					StartingitemPrefab();
-					//LoadAllRecipeData(reload: true);
-					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
+					//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
 				}
 			}
 		}
@@ -441,6 +456,7 @@ namespace RareMagicPortal
 			}
 
 		}
+
 
 		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.GetHoverText))]
 		public static class TeleportWorldGetHoverTextPostfixRMP
@@ -458,9 +474,11 @@ namespace RareMagicPortal
 					sameperson = true;
 
 				string PortalName = __instance.m_nview.m_zdo.GetString("tag");
-			
-				
-				int colorint = CrystalandKeyLogicColor(PortalName);
+				int colorint = 1;
+
+				colorint = CrystalandKeyLogicColor(PortalName);
+
+
 				string currentcolor = "Default";
 				string nextcolor;
 				string text;
@@ -876,14 +894,16 @@ namespace RareMagicPortal
 				if (portalW != null)
 				{
 					//portalW = portal.GetComponent<TeleportWorld>();
-					name = portalW.GetHoverText();
+					name = portalW.GetText(); // much better
 					if (name != null)
                     {
+						/*
 						var found = name.IndexOf(":") + 2;
 						var end = name.IndexOf("\" ");
 						var le = end - found;
 						name = name.Substring(found, le); // lol wish it was more efficent
 						//RareMagicPortal.LogInfo($"Inventory Portal Check name is {name}");
+						*/
 
 						var PortalName = name;
 						bool OdinsKin = false;
@@ -1240,11 +1260,13 @@ namespace RareMagicPortal
 		[HarmonyPatch(typeof(ZNet), "Shutdown")]
 		private class PatchZNetDisconnect
 		{
+		
 			private static bool Prefix()
 			{
 				RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
-				((MonoBehaviour)(object)context).StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
-				((MonoBehaviour)(object)context).StopCoroutine(DelayedLoad());
+
+				context.StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
+				//context.StopCoroutine(myCoroutineRMP);
 
 				NoMoreLoading = true;
 				return true;
@@ -1261,7 +1283,7 @@ namespace RareMagicPortal
 			}
 		}
 
-		private void Awake()
+		public void Awake()
 		{
 			CreateConfigValues();
 			ReadAndWriteConfigValues();
@@ -1270,7 +1292,7 @@ namespace RareMagicPortal
 			english.SetupLanguage("English");
 			LoadAssets();
 
-			context = this;
+			
 
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
@@ -1281,8 +1303,6 @@ namespace RareMagicPortal
 
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
-			
-
 			IconColors();
 
 
@@ -1292,6 +1312,8 @@ namespace RareMagicPortal
 		}
 		private void IconColors()
         {
+			context = this;
+
 			Texture2D tex = IconColor.loadTexture("portal.png");
 			Texture2D temp = IconColor.loadTexture("portaliconTarget.png");
 			IconDefault = IconColor.CreateSprite(temp, false);
@@ -1527,7 +1549,7 @@ namespace RareMagicPortal
 
 				PortalN.Portals.Clear();
 				PortalN = deserializer.Deserialize<PortalName>(yml);
-				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+				if (ZNet.instance.IsServer() )//&& ZNet.instance.IsDedicated()) Any Server
 				{
 					RareMagicPortal.LogInfo("Server Portal YML Manual UPdate " + Worldname);
 					YMLPortalData.Value = yml; 
@@ -1613,7 +1635,7 @@ namespace RareMagicPortal
 				if (EnableExtraYMLLog)
 					RareMagicPortal.LogInfo(yml);
 
-				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+				if (ZNet.instance.IsServer() ) // not just dedicated should send this 
 				{
 					YMLPortalData.Value = yml; // should only be one time and for server
 				}
@@ -1791,14 +1813,14 @@ namespace RareMagicPortal
 
 		public static IEnumerator DelayedLoad()
 		{
-			yield return new WaitForSeconds(0.3f);
+			yield return new WaitForSeconds(0.05f);
 			LoadAllRecipeData(reload: true);
 			//yield break;
 
 			// I need to keep checking until the world name is populated- probably at respawn
-			while (String.IsNullOrEmpty(ZNet.instance.GetWorldName()))
+			while (String.IsNullOrEmpty(ZNet.instance.GetWorldName()) && !NoMoreLoading)
             {
-				yield return new WaitForSeconds(1);
+				yield return new WaitForSeconds(0.1f);
 			}
 			LoadIN();
 			yield break;
@@ -2099,7 +2121,7 @@ namespace RareMagicPortal
 				}
 				else
 				{
-					if (!ZNet.instance.IsServer())
+					if (!ZNet.instance.IsServer()) // is not server
 					{
 						RareMagicPortal.LogInfo("You are connect to a Server");
 						ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
@@ -2124,6 +2146,8 @@ namespace RareMagicPortal
 						if (EnableExtraYMLLog)
 							RareMagicPortal.LogInfo(yamlfull);
 						JustWrote = 2;
+					if (ZNet.instance.IsServer())
+						YMLPortalData.Value = yamlfull; // is coop server so send update to client
 					}
 				}
 
@@ -2177,7 +2201,7 @@ namespace RareMagicPortal
 			return checkiftagisPortal;
 		}
 
-		private static int CrystalandKeyLogicColor(string PortalName)
+		private static int CrystalandKeyLogicColor(string PortalName="")
 		{
 			// 0 is black/admin only
 			// 1 is normal // free passage
@@ -2493,6 +2517,8 @@ namespace RareMagicPortal
 					if (EnableExtraYMLLog)
 						RareMagicPortal.LogInfo(yamlfull);
 					JustWrote = 2;
+					if (ZNet.instance.IsServer()) // not just dedicated
+						YMLPortalData.Value = yamlfull;
 				}
 			}
 
@@ -3118,7 +3144,7 @@ namespace RareMagicPortal
 
 		private static void ServerZDOymlUpdate(int Colorint, string Portalname) // MESSAGE SENDER
         {
-			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+			if (ZNet.instance.IsServer())// && ZNet.instance.IsDedicated()) removed dedicated  // so no singleplayer announcement
 				return;
 
 			ZPackage pkg = new ZPackage(); // Create ZPackage
@@ -3135,7 +3161,7 @@ namespace RareMagicPortal
 
 		public static void RPC_RequestServerAnnouncementRMP(long sender, ZPackage pkg) // MESSAGE RECIEVER
 		{
-			if (ZNet.instance.IsDedicated() && ZNet.instance.IsServer())
+			if ( ZNet.instance.IsServer()) //&& ZNet.instance.IsDedicated() ) If any server than prepare to recieved message
 			{
 				if (pkg != null && pkg.Size() > 0)
 				{ // Check that our Package is not null, and if it isn't check that it isn't empty.

@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.4.2
+`Server and client side required for Server Sync enforcement.` V2.4.3
 
-MinimumRequiredVersion = "2.4.1"
+MinimumRequiredVersion = "2.4.2"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -186,6 +186,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.4.3
+            Made Coop Compatible(no dedicated server)
+            Bug fixes
         Version 2.4.2
             Added ConfigOption to force Force Portal Animation if TargetPortal is installed. - Not synced
             Fixed an Error if entered wrong password on joining server.  - Made Server more efficent
