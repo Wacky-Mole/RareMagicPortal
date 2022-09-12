@@ -115,10 +115,12 @@ namespace RareMagicPortal
 		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
 		private static int JustWrote = 0;
 		private static bool JustWait = false;
+		private static int JustSent = 0;
 		private static bool JustRespawn = false;
 		private static bool NoMoreLoading = false;
 		private static bool Teleporting = false;
 		private static string checkiftagisPortal = null;
+		private static bool JustStop = false;
 
 		private static Player player = null; // need to keep it between patches
 		private static bool m_hadTarget = false;
@@ -563,20 +565,24 @@ namespace RareMagicPortal
 					}
 				}
 
-				if (PortalName == "" && currentcolor != DefaultPortalColor )
+				if (PortalName == "" && currentcolor != DefaultPortalColor && JustSent == 0)
 				{
 					if (DefaultPortalColor == "None")
 						colorint = 1;
-					if (DefaultPortalColor == "Red")
+					else if (DefaultPortalColor == "Red")
 						colorint = 2;
-					if (DefaultPortalColor == "Green")
+					else if (DefaultPortalColor == "Green")
 						colorint = 3;
-					if (DefaultPortalColor == "Blue")
+					else if (DefaultPortalColor == "Blue")
 						colorint = 4;
-					if (DefaultPortalColor == "Purple")
+					else if (DefaultPortalColor == "Purple")
 						colorint = 5;
-					if (DefaultPortalColor == "Tan")
+					else if (DefaultPortalColor == "Tan")
 						colorint = 6;
+					else
+                    {
+						RareMagicPortal.LogWarning($"DefaultPortalColor {DefaultPortalColor} is not an option,this will cause repeating network traffic on no name portals");
+					}
 					
 
 					updateYmltoColorChange("", colorint);
@@ -1525,16 +1531,26 @@ namespace RareMagicPortal
 					//File.WriteAllText(YMLCurrentFile, SyncedString);
 				}
 				JustWrote = 2;
+				JustSent = 0; // ready for another send
+				//StartCoroutine(WaitforJustSent());
 
 			}
 
 		}
 		IEnumerator WaitforReadWrote()
         {
-			yield return new WaitForSeconds(10f);
+			yield return new WaitForSeconds(1);
 
 			JustWrote = 0; // lets manual update happen no problem
 			//StopCoroutine(WaitforReadWrote()); not needed
+		}
+
+		IEnumerator WaitforJustSent()
+		{
+			yield return new WaitForSeconds(1);
+
+			JustSent = 0;
+						   
 		}
 
 		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
@@ -1561,16 +1577,16 @@ namespace RareMagicPortal
 				}
 
 			}
-			if (JustWrote == 2)
-				JustWrote = 0;
+			
 
-			if (JustWrote == 1)
+			if (JustWrote == 2 )
 			{
-				JustWrote = 2;
+				JustWrote = 3; // stops from doing again
 				StartCoroutine(WaitforReadWrote());
 			}
 
-			
+			 if(JustWrote == 1)
+				JustWrote = 2;
 
 			if (!isAdmin)
 			{
@@ -3146,6 +3162,12 @@ namespace RareMagicPortal
         {
 			if (ZNet.instance.IsServer())// && ZNet.instance.IsDedicated()) removed dedicated  // so no singleplayer announcement
 				return;
+			if (JustSent > 0)
+            {
+				JustSent++;
+				return;
+            }
+
 
 			ZPackage pkg = new ZPackage(); // Create ZPackage
 			string textSplit = Portalname + "," + Colorint;
@@ -3156,6 +3178,8 @@ namespace RareMagicPortal
 			}
 			pkg.Write(Portalname + "," + Colorint);
 			RareMagicPortal.LogInfo($"Sending the Server a update for {Portalname} with Color {Colorint}");
+
+			JustSent = 1;
 			ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestServerAnnouncementRMP", new object[] { pkg });
 		}
 

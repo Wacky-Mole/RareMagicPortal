@@ -188,6 +188,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Change Log:
         Version 2.4.3
             Made Coop Compatible(no dedicated server)
+            Bug fix for "" sending crazy amount of data and disconnecting
             Bug fixes
         Version 2.4.2
             Added ConfigOption to force Force Portal Animation if TargetPortal is installed. - Not synced
