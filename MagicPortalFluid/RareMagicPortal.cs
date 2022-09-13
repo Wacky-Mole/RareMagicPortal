@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.3";
+		public const string PluginVersion = "2.4.4";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -121,6 +121,7 @@ namespace RareMagicPortal
 		private static bool Teleporting = false;
 		private static string checkiftagisPortal = null;
 		private static bool JustStop = false;
+		private static bool JustWaitforInventory = true;
 
 		private static Player player = null; // need to keep it between patches
 		private static bool m_hadTarget = false;
@@ -424,8 +425,8 @@ namespace RareMagicPortal
 		[HarmonyPatch(typeof(Game), "SpawnPlayer")]
 		private static class Game_SpawnPreRMP
 		{
-			[HarmonyPostfix]
-			private static void Postfix()
+			[HarmonyPrefix]
+			private static void Prefix()
 			{
 				{
 					LoadAllRecipeData(reload: true);
@@ -442,6 +443,7 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{
 				{
+					JustWaitforInventory = false;
 					StartingitemPrefab();
 					//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
 				}
@@ -856,13 +858,16 @@ namespace RareMagicPortal
 			[HarmonyPriority(Priority.LowerThanNormal)]
 			private static bool Prefix(ref bool __result, ref Inventory __instance)
 			{
-				/*
+                /*
 				if (Game.instance.m_firstSpawn)
 				{
 					return __result;
 				}
 				*/
-
+                if (JustWaitforInventory)
+                {
+					return true;
+                }
 
 				//Player.m_localPlayer
 				bool bo2 = false;
@@ -1275,6 +1280,7 @@ namespace RareMagicPortal
 				//context.StopCoroutine(myCoroutineRMP);
 
 				NoMoreLoading = true;
+				JustWaitforInventory = true;
 				return true;
 			}
 		}
@@ -1286,6 +1292,7 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{ // The Server send once last config sync before destory, but after Shutdown which messes stuff up. 
 				NoMoreLoading = false;
+				
 			}
 		}
 
