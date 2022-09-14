@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.2" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.5" };
 
 		private static MagicPortalFluid? plugin;
 		private static MagicPortalFluid context;
