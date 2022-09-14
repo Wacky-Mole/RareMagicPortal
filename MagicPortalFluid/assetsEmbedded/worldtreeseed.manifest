@@ -1,0 +1,57 @@
+ManifestFileVersion: 0
+CRC: 2034575690
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 779a071a3a5a4187527d94f778d2e16b
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: cce5c6bc177b0c6baf958394c1164fda
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: d8d531e381601b94c984221b5db7323d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: beeab75582e689f4ebd2271089437b6d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: db78838d5448b0a46a64566a8c9fa3fb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ce0660cf497ffea489c9c606137e6a86, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 205
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/CustomItems/WorldTreeSeed.png
+- Assets/CustomItems/WorldTreeSeed.prefab
+Dependencies:
+- C:/Users/Joshua/source/repos/MagicPortalFluid/MagicPortalFluid/assetsEmbedded/wackyportals

@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.4";
+		public const string PluginVersion = "2.4.5";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -1442,6 +1442,10 @@ namespace RareMagicPortal
 			Item PortalKeyTan = new("portalcrystal", "PortalKeyTan", "assetsEmbedded");
 			PortalKeyTan.Name.English("Tan Portal Key");
 			PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
+
+			Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
+			PortalKeyTan.Name.English("WorldTree Seed");
+			PortalKeyTan.Description.English("A seed dropped from Yggdrasil, it is known to have magical properites");
 
 
 
