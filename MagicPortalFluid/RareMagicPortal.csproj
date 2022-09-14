@@ -114,6 +114,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="assetsEmbedded\portalcrystal" />
+    <EmbeddedResource Include="assetsEmbedded\worldtreeseed" />
     <None Include="ILRepack.targets" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
