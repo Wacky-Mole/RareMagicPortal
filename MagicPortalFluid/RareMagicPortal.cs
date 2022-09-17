@@ -1443,9 +1443,9 @@ namespace RareMagicPortal
 			PortalKeyTan.Name.English("Tan Portal Key");
 			PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
 
-			Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
-			PortalKeyTan.Name.English("WorldTree Seed");
-			PortalKeyTan.Description.English("A seed dropped from Yggdrasil, it is known to have magical properites");
+			//Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
+			//PortalKeyTan.Name.English("WorldTree Seed");
+			//PortalKeyTan.Description.English("A seed dropped from Yggdrasil, it is known to have magical properites");
 
 
 
