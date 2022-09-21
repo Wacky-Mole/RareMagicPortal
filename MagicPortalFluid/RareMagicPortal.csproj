@@ -105,6 +105,16 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="ColorfulLights.cs" />
+    <Compile Include="LitJson\IJsonWrapper.cs" />
+    <Compile Include="LitJson\JsonData.cs" />
+    <Compile Include="LitJson\JsonException.cs" />
+    <Compile Include="LitJson\JsonMapper.cs" />
+    <Compile Include="LitJson\JsonMockWrapper.cs" />
+    <Compile Include="LitJson\JsonReader.cs" />
+    <Compile Include="LitJson\JsonWriter.cs" />
+    <Compile Include="LitJson\Lexer.cs" />
+    <Compile Include="LitJson\Netstandard15Polyfill.cs" />
+    <Compile Include="LitJson\ParserToken.cs" />
     <Compile Include="PortalName.cs" />
     <Compile Include="SpriteTools.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
