@@ -188,6 +188,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Change Log:
         Version 2.4.8
             Removed SteamAPI for actual crossplay. Made it so Server doesn't get updated for no named Portal
+            Fixed Icons
         Version 2.4.7
             Updated ServerSync For 211.11 and hopefully fixed another Portal Admin issue. 
         Version 2.4.6
