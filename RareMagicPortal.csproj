@@ -154,9 +154,7 @@
     <ItemGroup>
         <Compile Include="Class1.cs" />
         <Compile Include="ColorfulLights.cs" />
-        <Compile Include="PieceManager\MaterialReplacer.cs" />
-        <Compile Include="PieceManager\PieceManager.cs" />
-        <Compile Include="PieceManager\SnapPointMaker.cs" />
+        <Compile Include="Helper.cs" />
         <Compile Include="RareMagicPortal.cs" />
         <Compile Include="PortalName.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
