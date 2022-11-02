@@ -44,7 +44,7 @@ namespace RareMagicPortal
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.7";
+		public const string PluginVersion = "2.4.8";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.7" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.8" };
 
 		private static MagicPortalFluid? plugin;
 		private static MagicPortalFluid context;
@@ -587,7 +587,7 @@ namespace RareMagicPortal
 					}
 					
 
-					updateYmltoColorChange("", colorint);
+					//updateYmltoColorChange("", colorint); don't update a nonamed one
 				}
 
 				if (PortalName != "" && PortalName != "Empty tag")
@@ -3211,12 +3211,13 @@ namespace RareMagicPortal
 					ZNetPeer peer = ZNet.instance.GetPeer(sender);
 					if (peer != null)
 					{ // Confirm the peer exists
-						string peerSteamID = ((ZSteamSocket)peer.m_socket).GetPeerID().m_SteamID.ToString();
+						//string peerSteamID = ((ZSteamSocket)peer.m_socket).GetPeerID().m_SteamID.ToString(); no more steam
+						string playername = peer.m_playerName;// playername
 						string msg = pkg.ReadString();
 						string[] msgArray = msg.Split(',');
 						string PortalName = msgArray[0];
 						int Colorint = Convert.ToInt32(msgArray[1]);
-						RareMagicPortal.LogInfo($"Server has recieved a YML update from {peerSteamID} for {PortalName} with Color {Colorint}");
+						RareMagicPortal.LogInfo($"Server has recieved a YML update from {playername} for {PortalName} with Color {Colorint}");
 
 						updateYmltoColorChange(PortalName, Colorint);
 
