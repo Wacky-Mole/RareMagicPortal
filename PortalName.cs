@@ -12,7 +12,7 @@ namespace RareMagicPortal
 
         public class Portal
         {
-            public Dictionary <string, int> Portal_Crystal_Cost =
+            public Dictionary<string, int> Portal_Crystal_Cost =
                     new Dictionary<string, int>(){
                                   {"Red", 1},
                                   {"Green", 0},
@@ -35,6 +35,9 @@ namespace RareMagicPortal
             public bool TeleportAnything { get; set; } = false;
 
             public List<string> AdditionalProhibitItems { get; set; } = new List<string>();// { "Blackmetal", "Iron" };
+
+            public int SpecialMode {get; set; } = 0; // 0 - normal, 1 - rainbow, 2 -password lock, - 3 Manual ID lock, -4 AllowedList is Moderator List
+            public List<string> AllowedUsers { get; set; } = new List<string>();// { "SteamID1", "SteamID2" };
 
             public bool Admin_only_Access { get; set; } = false;
 

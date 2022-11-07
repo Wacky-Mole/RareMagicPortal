@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine.UI;
 using HarmonyLib;
 using RareMagicPortal;
-//using PieceManager;
+using PieceManager;
 using ServerSync;
 using ItemManager;
 using BepInEx.Logging;
@@ -32,19 +32,38 @@ using YamlDotNet;
 using YamlDotNet.Serialization;
 using LocalizationManager;
 using StatusEffectManager;
+using RareMagicPortal.PortalWorld;
+
 
 
 
 namespace RareMagicPortal
 {
 	//extra
+	public static class Globals
+    {
+		public static Color Gold = new Color(1f, 215f / 255f, 0, 1f);
+		public static Color m_colorTargetfound = new Color(191f / 255f, 150f / 255f, 0, 25);
+		public static Color lightcolor = new Color(1f, 100f / 255f, 0, 1f);
+		//Material PortalDefMaterial = originalMaterials["portal_small"];
+		public static Color flamesstart = new Color(1f, 194f / 255f, 34f / 255f, 1f);
+		public static Color flamesend = new Color(1f, 0, 0, 1f);
+
+		public static Color Purple = new Color(107f / 255f, 63f / 255f, 160 / 255f, 1f);
+		public static Color Tan = new Color(210f / 255f, 180f / 255f, 140f / 255f, 1f);
+		public static Color Brown = new Color(193f / 255f, 69f / 255f, 19f / 255f, 1f);
+
+		public  static Dictionary<string, Material> originalMaterials;
+
+	}
+
 	[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 	[BepInDependency("org.bepinex.plugins.targetportal", BepInDependency.DependencyFlags.SoftDependency)]  // it loads before this mod// not really required, but whatever
 	internal class MagicPortalFluid : BaseUnityPlugin
 	{
 		public const string PluginGUID = "WackyMole.RareMagicPortal";
 		public const string PluginName = "RareMagicPortal";
-		public const string PluginVersion = "2.4.8";
+		public const string PluginVersion = "3.0.0";
 
 		internal const string ModName = PluginName;
 		internal const string ModVersion = PluginVersion;
@@ -64,7 +83,7 @@ namespace RareMagicPortal
 			BepInEx.Logging.Logger.CreateLogSource(ModName);
 
 		private static readonly ConfigSync ConfigSync = new(ModGUID)
-		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.8" };
+		{ DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "3.0.0" };
 
 		private static MagicPortalFluid? plugin;
 		private static MagicPortalFluid context;
@@ -110,18 +129,15 @@ namespace RareMagicPortal
 		public static bool UseGoldASMaster = true;
 		public static string ColorsEnabled = "";
 		public static bool msgLeft = false;
-		public static bool ForceTargetPortalAnimation = false;
+		public static bool ForceTargetPortalAnimation= false;
 
 		private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
 		private static int JustWrote = 0;
 		private static bool JustWait = false;
-		private static int JustSent = 0;
 		private static bool JustRespawn = false;
 		private static bool NoMoreLoading = false;
 		private static bool Teleporting = false;
 		private static string checkiftagisPortal = null;
-		private static bool JustStop = false;
-		private static bool JustWaitforInventory = true;
 
 		private static Player player = null; // need to keep it between patches
 		private static bool m_hadTarget = false;
@@ -187,12 +203,24 @@ namespace RareMagicPortal
 		public static Sprite IconPurple = null!;
 		public static Sprite IconTan = null!;
 
+		public static string ModelDefault = "small_portal";
+		public static string Model1 = "Torus_cell.002";
+		public static string Model2 = "RuneRing";
+		public static string Model3 = "Gates";
+		public static string Model4 = "QuadPortal";
+
+		static TeleportWorldDataCreator ClassDefault = new TeleportWorldDataCreatorA();
+		static TeleportWorldDataCreator ClassModel1 = new TeleportWorldDataCreatorB();
+		static TeleportWorldDataCreator ClassModel2 = new TeleportWorldDataCreatorC();
+		static TeleportWorldDataCreator ClassModel3 = new TeleportWorldDataCreatorD();
+		static TeleportWorldDataCreator ClassModel4 = new TeleportWorldDataCreatorE();
+
 		internal static Localization english = null!;
 
 		public static CustomSE AllowTeleEverything = new CustomSE("yippeTele");
 		public static List<StatusEffect> statusEffectactive;
 
-		private static readonly List<string> portalPrefabs = new List<string>();
+		private static readonly List<string> portalPrefabs = new();
 
 
 		public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
@@ -207,18 +235,11 @@ namespace RareMagicPortal
 		private static string PortalFluidname;
 		private static bool TargetPortalLoaded = false;
 
-		static readonly Dictionary<TeleportWorld, TeleportWorldDataRMP> _teleportWorldDataCache = new();
+		static readonly Dictionary<TeleportWorld, ClassBase> _teleportWorldDataCacheDefault = new();
+
 		static readonly KeyboardShortcut _changePortalReq= new(KeyCode.E, KeyCode.LeftControl);
 
-		static Color m_colorTargetfound = new Color(191f/255f, 150f/255f, 0, 25);
-		static Color lightcolor = new Color (1f, 100f/255f , 0 , 1f);
-		//Material PortalDefMaterial = originalMaterials["portal_small"];
-		static Color flamesstart = new Color(1f, 194f/255f, 34f/255f, 1f);
-		static Color flamesend = new Color(1f, 0, 0, 1f);
-		static Color Gold = new Color(1f, 215f / 255f, 0, 1f);
-		static Color Purple = new Color(107f / 255f, 63f / 255f, 160 / 255f, 1f);
-		static Color Tan = new Color(210f / 255f, 180f / 255f, 140f / 255f, 1f);
-		static Color Brown = new Color(193f/255f, 69f/255f, 19f/255f, 1f);
+
 
 		static private Dictionary<string, bool> enaColor = new Dictionary<string, bool>(){
 				{"Red", false },
@@ -230,30 +251,33 @@ namespace RareMagicPortal
 			};
 
 
-		static IEnumerator RemovedDestroyedTeleportWorldsCoroutine()
+		public static IEnumerator RemovedDestroyedTeleportWorldsCoroutine() 
 		{
 			WaitForSeconds waitThirtySeconds = new(seconds: 30f);
-			List<KeyValuePair<TeleportWorld, TeleportWorldDataRMP>> existingPortals = new();
+			List<KeyValuePair<TeleportWorld, ClassBase>> existingPortals = new();
 			int portalCount = 0;
 
 			while (true)
 			{
 				yield return waitThirtySeconds;
-				portalCount = _teleportWorldDataCache.Count;
+				portalCount = _teleportWorldDataCacheDefault.Count;
 
-				existingPortals.AddRange(_teleportWorldDataCache.Where(entry => entry.Key));
-				_teleportWorldDataCache.Clear();
+				existingPortals.AddRange(_teleportWorldDataCacheDefault.Where(entry => entry.Key));
+				//existingPortals.AddRange((IEnumerable<KeyValuePair<TeleportWorld, classtype>>)_teleportWorldDataCacheDefault.Where(entry => entry.Key));
+				_teleportWorldDataCacheDefault.Clear();
 
-				foreach (KeyValuePair<TeleportWorld, TeleportWorldDataRMP> entry in existingPortals)
+
+				foreach (KeyValuePair<TeleportWorld, ClassBase> entry in existingPortals)
 				{
-					_teleportWorldDataCache[entry.Key] = entry.Value;
+					_teleportWorldDataCacheDefault[entry.Key] = entry.Value;
 				}
+
 
 				existingPortals.Clear();
 
-				if ((portalCount - _teleportWorldDataCache.Count) > 0)
+				if ((portalCount - _teleportWorldDataCacheDefault.Count) > 0)
 				{
-					RareMagicPortal.LogInfo($"Removed {portalCount - _teleportWorldDataCache.Count}/{portalCount} portal references.");
+					RareMagicPortal.LogInfo($"Removed {portalCount - _teleportWorldDataCacheDefault.Count}/{portalCount} portal references.");
 				}
 			}
 		}
@@ -268,20 +292,23 @@ namespace RareMagicPortal
 			[HarmonyPatch(nameof(TeleportWorld.Awake))]
 			static void TeleportWorldAwakePostfixRMP(ref TeleportWorld __instance)
 			{
-				
+
 				if (!__instance)
 				{
 					return;
 				}
+				//if (__instance.m_model.name != ModelDefault)
+				//	return;
+				//RareMagicPortal.LogWarning($"Name of Model {__instance.m_model.name}"); 
 
 				// Stone 'portal' prefab does not set this property.
 				if (!__instance.m_proximityRoot)
 				{
 					__instance.m_proximityRoot = __instance.transform;
 				}
-				
+
 				// Stone 'portal' prefab does not set this property.
-				if (!__instance.m_target_found ) 
+				if (!__instance.m_target_found)
 				{
 					// The prefab does not have '_target_found_red' but instead '_target_found'.
 					GameObject targetFoundObject = __instance.gameObject.transform.Find("_target_found").gameObject;
@@ -293,83 +320,218 @@ namespace RareMagicPortal
 				}
 				//RareMagicPortal.LogInfo("Adding Portal Awake for all Portals");
 
-				_teleportWorldDataCache.Add(__instance, new TeleportWorldDataRMP(__instance));
+				//ClassBase Data1 = ClassDefault.FactoryMethod(__instance);
+				//ClassBase Data2 = TeleWorldData[1].FactoryMethod(__instance); 
+
+				//RareMagicPortal.LogWarning($"Almost ready to set type");
+				if (__instance.m_model.name == ModelDefault)  //  hopefully a better way can be found
+					_teleportWorldDataCacheDefault.Add(__instance, ClassDefault.FactoryMethod(__instance));
+				else if (__instance.m_model.name == Model1)
+					_teleportWorldDataCacheDefault.Add(__instance, ClassModel1.FactoryMethod(__instance));
+				else if (__instance.m_model.name == Model2)
+					_teleportWorldDataCacheDefault.Add(__instance, ClassModel2.FactoryMethod(__instance));
+				else if (__instance.m_model.name == Model3)
+					_teleportWorldDataCacheDefault.Add(__instance, ClassModel3.FactoryMethod(__instance));
+				else if (__instance.m_model.name == Model4)
+					_teleportWorldDataCacheDefault.Add(__instance, ClassModel4.FactoryMethod(__instance));
 			}
 
-			[HarmonyPostfix]
-			[HarmonyPriority(Priority.Low)]
-			[HarmonyPatch(nameof(TeleportWorld.UpdatePortal))]
-			static void TeleportWorldUpdatePortalPostfixRMP(ref TeleportWorld __instance)
+		}
+
+			[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]  //Have to do this for the connected Status of new portals
+			public class LookforPrefabs
+			{
+				[HarmonyPriority(Priority.Last)]
+				private static void Postfix(ZNetScene __instance)
+				{
+					portalPrefabs.Clear();
+					foreach (GameObject portal in __instance.m_prefabs.Where(p => p.GetComponent<TeleportWorld>()))
+					{
+						portalPrefabs.Add(portal.name);
+						RareMagicPortal.LogInfo($"Added Portal Prefab {portal.name}");
+					}
+					portalPrefabs.Remove("portal_wood"); // base game does this so no need
+				}
+			}
+
+			public static List<ZDO> knownPortals = new();
+
+
+			public static IEnumerator FetchPortals()
+			{
+			yield return new WaitForSeconds(10f);
+			while (true)
+				{
+					List<ZDO> portalList = new();
+					int index = 0;
+					while (!ZDOMan.instance.GetAllZDOsWithPrefabIterative(portalPrefabs, portalList, ref index))
+					{
+						yield return null;
+					}
+
+					if (ZNet.instance.IsServer())
+					{
+						foreach (ZDO zdo in portalList.Except(knownPortals))
+						{
+							ZDOMan.instance.ForceSendZDO(zdo.m_uid);
+						}
+					}
+
+					knownPortals = portalList;
+
+					foreach (ZDO tempPortal in knownPortals) // check on connected ones
+					{
+						ZDOID zDOID = tempPortal.GetZDOID("target");
+						string @string = tempPortal.GetString("tag");
+						if (!zDOID.IsNone())
+						{
+							ZDO zDO = ZDOMan.instance.GetZDO(zDOID);
+							if (zDO == null || zDO.GetString("tag") != @string)
+							{
+								tempPortal.SetOwner(ZDOMan.instance.GetMyID());
+								tempPortal.Set("target", ZDOID.None);
+								ZDOMan.instance.ForceSendZDO(tempPortal.m_uid);
+							}
+						}
+					tempPortal.GetRotation();
+					}
+
+					foreach (ZDO tempPortal2 in knownPortals) // check for unconnected ones
+					{
+						string string2 = tempPortal2.GetString("tag");
+						if (tempPortal2.GetZDOID("target").IsNone())
+						{
+							ZDO zDO2 = Game.instance.FindRandomUnconnectedPortal(knownPortals, tempPortal2, string2);
+							if (zDO2 != null)
+							{
+								tempPortal2.SetOwner(ZDOMan.instance.GetMyID());
+								zDO2.SetOwner(ZDOMan.instance.GetMyID());
+								tempPortal2.Set("target", zDO2.m_uid);
+								zDO2.Set("target", tempPortal2.m_uid);
+								ZDOMan.instance.ForceSendZDO(tempPortal2.m_uid);
+								ZDOMan.instance.ForceSendZDO(zDO2.m_uid);
+							}
+						}
+						
+					}
+
+					yield return new WaitForSeconds(5f);
+				}
+				// ReSharper disable once IteratorNeverReturns
+			}
+
+
+
+
+			[HarmonyPatch(typeof(Player), nameof(Player.TeleportTo))]
+			public class FasterTeleportRMP1
+			{
+				static void Postfix(Player __instance, bool __result)
+				{
+					__instance.m_teleportTimer = 15f;
+				}
+			}
+
+
+			[HarmonyPatch(typeof(Player), nameof(Player.UpdateTeleport))]
+			public class FasterTeleport2RMP
+			{
+				static void Postfix(Player __instance)
+				{
+					__instance.m_teleportCooldown = Mathf.Max(__instance.m_teleportCooldown, 1.5f);
+				}
+			}
+
+		/*
+				[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.UpdatePortal))]
+				public class FasterTeleport2RMPsomethingddd
+				{
+					static bool Prefix(TeleportWorld __instance)
+					{
+						if (!__instance.m_nview.IsValid())
+							return false;
+
+						string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+						bool flag = __instance.HaveTarget();
+						Player closestPlayer = Player.GetClosestPlayer(__instance.m_proximityRoot.position, __instance.m_activationRange);
+						if (flag && !__instance.m_hadTarget)
+						{
+							//__instance.m_connected.Create(base.transform.position, base.transform.rotation);
+							//RareMagicPortal.LogInfo($"Update is true and connected for {PortalName} ");
+						}
+						else
+						{
+							//RareMagicPortal.LogInfo($"Update is false and  not connected for {PortalName} with flag {flag} and hadtarget {__instance.m_hadTarget}");
+						}
+
+						return true;
+					}
+				}
+		*/
+
+
+		[HarmonyPatch(typeof(TeleportWorld), "UpdatePortal")]
+		[HarmonyPriority(Priority.Low)]
+		public class PortalUpdatePost
+		{
+			static void Postfix(ref TeleportWorld __instance)
 			{
 				if (//!ConfigEnableCrystals.Value
 					   !__instance
 					|| !__instance.m_nview
 					|| __instance.m_nview.m_zdo == null
 					|| __instance.m_nview.m_zdo.m_zdoMan == null
-					|| __instance.m_nview.m_zdo.m_vec3 == null )
-					//|| !__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode)) // going to ask for it below, so no reason to get a null
-					//|| !_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData)) // I don't think this will break anything
+					|| __instance.m_nview.m_zdo.m_vec3 == null)
+				//|| !__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode)) // going to ask for it below, so no reason to get a null
+				//|| !_teleportWorldDataCacheDefault.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData)) // I don't think this will break anything
 				{
 					return;
 				}
+				//if (__instance.m_nview.m_zdo.m_prefab != -661882940)
+				//if (__instance.m_model.name != ModelDefault)
+				//	return; // don't do anything until other issues solved.
+
 				try
 				{
-					_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData);
-					if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+
 					{
-						// override color for white
-						teleportWorldData.TargetColor = Color.white;
-						SetTeleportWorldColors(teleportWorldData, false, false);
-					}
-					else
-					{
-						string PortalName = __instance.m_nview.m_zdo.GetString("tag");
+						string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
 						int colorint = CrystalandKeyLogicColor(PortalName); // this should sync up portal colors
-					
+
 						//Color CurrentZDOColor = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
 
 						Color color;
-						string currentcolor;
+
 						switch (colorint)
 						{
 							case 0:
-								currentcolor = "Black";
 								color = Color.black;
 								break;
 							case 1:
-								currentcolor = "Yellow";
 								color = Color.yellow;
 								break;
 							case 2:
-								currentcolor = "Red";
 								color = Color.red;
 								break;
 							case 3:
-								currentcolor = "Green";
 								color = Color.green;
 								break;
 							case 4:
-								currentcolor = "Blue";
 								color = Color.cyan;
 								break;
 							case 5:
-								currentcolor = "Purple";
-								color = Purple;
+								color = Globals.Purple;
 								break;
 							case 6:
-								currentcolor = "Tan";
-								color = Tan;
+								color = Globals.Tan;
 								break;
 							case 7:
-								currentcolor = "Gold";
-								color = Gold;
+								color = Globals.Gold; // go with material change small_portal
 								break;
 							case 8:
-								currentcolor = "White";
 								color = Color.white;
 								break;
 							default:
-								currentcolor = "Yellow";
 								color = Color.yellow;
 								break;
 
@@ -377,61 +539,52 @@ namespace RareMagicPortal
 						//if (!__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode))
 						//	__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
 
-						if (color != teleportWorldData.OldColor)
-						{  // don't waste resources
-							teleportWorldData.TargetColor = color;
-							SetTeleportWorldColors(teleportWorldData, true);
+
+						_teleportWorldDataCacheDefault.TryGetValue(__instance, out ClassBase teleportWorldData);
+
+						//RareMagicPortal.LogInfo($"checking type {teleportWorldData.GetType().Name} and color {color} with old color {teleportWorldData.GetOldColor()}");
+
+						if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+						{
+							// override color for white
+							//teleportWorldData.TargetColor = Color.white;
+							teleportWorldData.SetTeleportWorldColors(Color.white, false, false);
 						}
-				
+						else if (color != teleportWorldData.GetTargetColor())
+						{  // don't waste resources
+						   //teleportWorldData.TargetColor = color;
+							teleportWorldData.SetTeleportWorldColors(color, true);
+
+						}
 					}
 					//if (TargetPortalLoaded)
 					//__instance.gameObject.transform.Find("_target_found").gameObject.SetActive(false);
 
-					
-				}
-				catch { } // catches beginning errors
 
-				
+				}
+				//catch (Exception e) { RareMagicPortal.LogMessage(e); } // catches beginning errors
+				catch { }
+
+
 			}
 		}
+		
 
 		[HarmonyPatch(typeof(ZNetScene), "Awake")]
-		[HarmonyPriority(Priority.Last)]
-		 static class ZNetScene_Awake_PatchWRare
+		[HarmonyPriority(0)]
+		private static class ZNetScene_Awake_PatchWRare
 		{
-			 static void Postfix()
+			private static void Postfix()
 			{
 				{
 					Worldname = ZNet.instance.GetWorldName();// for singleplayer  // won't be ready for multiplayer
 					TargetPortalLoaded = Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal");
+					context.StartCoroutine(FetchPortals());
+					//((MonoBehaviour)(object)context).StartCoroutine(FetchPortals());
 
 					RareMagicPortal.LogInfo("Setting MagicPortal Fluid Afterdelay");
-					if (ZNet.instance.IsDedicated() && ZNet.instance.IsServer())
-					{
-						LoadIN();
-					}
-					else // everyone else
-					{
-						//LoadAllRecipeData(reload: true);
-
-						//context.StartCoroutine(DelayedLoad()); // important
-																						//LoadAllRecipeData(reload: true); // while loading on world screen
-					}
-					
-				}
-			}
-		}
-
-		[HarmonyPatch(typeof(Game), "SpawnPlayer")]
-		private static class Game_SpawnPreRMP
-		{
-			[HarmonyPrefix]
-			private static void Prefix()
-			{
-				{
-					LoadAllRecipeData(reload: true);
-					LoadIN();
-
+					((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
+																					//LoadAllRecipeData(reload: true); // while loading on world screen
 				}
 			}
 		}
@@ -443,9 +596,7 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{
 				{
-					JustWaitforInventory = false;
 					StartingitemPrefab();
-					//((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
 				}
 			}
 		}
@@ -460,7 +611,6 @@ namespace RareMagicPortal
 			}
 
 		}
-
 
 		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.GetHoverText))]
 		public static class TeleportWorldGetHoverTextPostfixRMP
@@ -477,75 +627,85 @@ namespace RareMagicPortal
 				if (portal.m_creator == closestPlayer.GetPlayerID())
 					sameperson = true;
 
-				string PortalName = __instance.m_nview.m_zdo.GetString("tag");
-				int colorint = 1;
-
-				colorint = CrystalandKeyLogicColor(PortalName);
-
-
+				string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
+			
+				
+				int colorint = CrystalandKeyLogicColor(PortalName);
 				string currentcolor = "Default";
 				string nextcolor;
-				string text;
+				string NormalText;
+				string EnabledCrystalsText;
+				string colorHex = "#808000"; // olive
 				Color color;
 				switch (colorint)
 				{
 					case 0:
 						currentcolor = "Black";
 						nextcolor = "Yellow";
-						text = "Admin Only";
+						EnabledCrystalsText = "Admin Only";
+						NormalText = "Admin Only";
 						color = Color.black;
 						break;
 					case 1:
 						currentcolor = "Yellow";
 						nextcolor = "Red";
-						text = "Normal Portal";
+						EnabledCrystalsText = "Normal Portal (Yellow)";
+						NormalText = "Default (Yellow)";
 						color = Color.yellow;
 						break;
 					case 2:
 						currentcolor = "Red";
 						nextcolor = "Green";
-						text = "Red Crystal Portal";
+						EnabledCrystalsText = "Red Crystal Portal";
+						NormalText = "Red Portal";
 						color = Color.red;
 						break;
 					case 3:
 						currentcolor = "Green";
 						nextcolor = "Blue";
-						text = "Green Crystal Portal";
+						EnabledCrystalsText = "Green Crystal Portal";
+						NormalText = "Green Portal";
 						color = Color.green;
 						break;
 					case 4:
-						currentcolor = "Blue";
+						currentcolor = "Cyan";
 						nextcolor = "Gold";
-						text = "Blue Crystal Portal";
+						EnabledCrystalsText = "Cyan Crystal Portal";
+						NormalText = "Cyan Portal";
 						color = Color.cyan;
 						break;
 					case 5:
 						currentcolor = "Purple";
 						nextcolor = "Tan";
-						text = "Purple Crystal Portal";
-						color = Purple;
+						EnabledCrystalsText = "Purple Crystal Portal";
+						NormalText = "Purple Portal";
+						color = Globals.Purple;
 						break;
 					case 6:
-						currentcolor = "Tan";
+						currentcolor = "Brown";
 						nextcolor = "Gold";
-						text = "Tan Crystal Portal";
-						color = Tan;
+						EnabledCrystalsText = "Brown Crystal Portal";
+						NormalText = "Brown Portal";
+						color = Globals.Brown;
 						break;
 					case 7:
 						currentcolor = "Gold";
 						nextcolor = "White";
-						text = "Gold Crystal Portal";
-						color = Gold;
+						EnabledCrystalsText = "Gold Crystal Portal";
+						NormalText = "Gold Portal";
+						color = Globals.Gold;
 						break;
 					case 8:
 						currentcolor = "White";
 						nextcolor = "Black";
-						text = "Any Teleportation Portal with No Crystal Cost";
+						EnabledCrystalsText = "Any Teleportation Portal with No Crystal Cost";
+						NormalText = "White Portal";
 						color = Color.white;
 						break;
 					default:
 						currentcolor = "Yellow";
-						text = "";
+						EnabledCrystalsText = "";
+						NormalText = "";
 						nextcolor = currentcolor;
 						color = Color.yellow;
 						break;
@@ -555,40 +715,25 @@ namespace RareMagicPortal
 				!__instance.m_nview
 				|| __instance.m_nview.m_zdo == null
 				|| __instance.m_nview.m_zdo.m_zdoMan == null
-				|| __instance.m_nview.m_zdo.m_vec3 == null)
+				|| __instance.m_nview.m_zdo.m_vec3 == null) 
 				{
-					RareMagicPortal.LogInfo("Setting Portal Color For First Time");
-					if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
+					//if (__instance.m_nview.m_zdo.m_prefab == -661882940)
 					{
-						teleportWorldData.TargetColor = color;
-						SetTeleportWorldColors(teleportWorldData, true);
-						__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
-						__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
+						RareMagicPortal.LogInfo("Setting Portal Color For First Time");
+
+						if (_teleportWorldDataCacheDefault.TryGetValue(__instance, out ClassBase teleportWorldData))
+						{
+							//teleportWorldData.TargetColor = color;
+							teleportWorldData.SetTeleportWorldColors(color, true);
+							__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
+							__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
+						}
 					}
 				}
+				_teleportWorldDataCacheDefault.TryGetValue(__instance, out ClassBase teleportWorldData2);
+				//RareMagicPortal.LogMessage($"ClassType {teleportWorldData2.GetType().Name }");
 
-				if (PortalName == "" && currentcolor != DefaultPortalColor && JustSent == 0)
-				{
-					if (DefaultPortalColor == "None")
-						colorint = 1;
-					else if (DefaultPortalColor == "Red")
-						colorint = 2;
-					else if (DefaultPortalColor == "Green")
-						colorint = 3;
-					else if (DefaultPortalColor == "Blue")
-						colorint = 4;
-					else if (DefaultPortalColor == "Purple")
-						colorint = 5;
-					else if (DefaultPortalColor == "Tan")
-						colorint = 6;
-					else
-                    {
-						RareMagicPortal.LogWarning($"DefaultPortalColor {DefaultPortalColor} is not an option,this will cause repeating network traffic on no name portals");
-					}
 					
-
-					//updateYmltoColorChange("", colorint); don't update a nonamed one
-				}
 
 				if (PortalName != "" && PortalName != "Empty tag")
 				{ 
@@ -610,24 +755,25 @@ namespace RareMagicPortal
 									string.Format(
 										"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Crystal to: [<color={3}>{3}</color>]</size>\n<size={4}>{6}</size>",
 										__result,
-										currentcolor,
+										colorHex,
 										portalRMPKEY.Value + " + " + "E",//_changePortalReq,
 										nextcolor,
 										15,
 										"Yellow",
-										text);
+										EnabledCrystalsText);
 							}
 							else
 							{
 								__result =
 									string.Format(
-										"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Color to: [<color={3}>{3}</color>] </size>",
+										"{0}\n<size={4}>[<color={5}>{2}</color>] Change <color={1}>Portal</color>[{1}] Color to: [<color={3}>{3}</color>] </size>\n<size={4}>{6}</size>",
 										__result,
 										currentcolor,
 										portalRMPKEY.Value + " + " + "E", //_changePortalReq,
 										nextcolor,
 										15,
-										"Yellow"
+										"Yellow",
+										NormalText
 										);
 							}
 						}
@@ -642,18 +788,19 @@ namespace RareMagicPortal
 										currentcolor,
 										15,
 										"Yellow",
-										text
+										EnabledCrystalsText
 										);
 							}
 							else
 							{
 								__result =
 									string.Format(
-										"{0}\n<size={2}><color={1}>{1} Portal</color></size>",
+										"{0}\n<size={2}><color={1}>{1} Portal</color></size>\n<size={2}>{4}</size>",
 										__result,
 										currentcolor,
 										15,
-										"Yellow"
+										"Yellow",
+										NormalText
 										);
 							}
 
@@ -673,17 +820,29 @@ namespace RareMagicPortal
 				} 
 			}
 		}
+
+		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.HaveTarget))]
+		public static class HaveTargetRMP
+		{
+			private static void Postfix(TeleportWorld __instance, ref bool __result)
+			{
+				//RareMagicPortal.LogInfo($"PortalName {__instance.m_nview.m_zdo.GetString("tag", "Empty tag")}  Have Target is {__result}");
+				
+
+			}
+		}
+
 		[HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.TargetFound))]
 		public static class DisabldHaveTarget
 		{
 			private static bool Prefix(ref bool __result)
             {
-				if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
-				{
+               if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+                {
 					__result = true;
 					return false;
 				}
-				if (TargetPortalLoaded && !ForceTargetPortalAnimation) // I should make a config for this instead
+                if (TargetPortalLoaded && !ForceTargetPortalAnimation) // I should make a config for this instead
 				{
 					__result = false;
 					return false;
@@ -717,7 +876,7 @@ namespace RareMagicPortal
 					//RareMagicPortal.LogInfo($"Made it to Map during Portal Interact");
 					Piece portal = null;
 					portal = __instance.GetComponent<Piece>();
-					string PortalName = __instance.m_nview.m_zdo.GetString("tag");
+					string PortalName = __instance.m_nview.m_zdo.GetString("tag", "Empty tag");
 					
 
 					if (portal != null && PortalName !="" && PortalName != "Empty tag")
@@ -738,7 +897,6 @@ namespace RareMagicPortal
 							string nextcolor;
 							string text;
 							Color color = Color.yellow;
-							Color Gold = new Color(1f, 215f/255f, 0, 1f);
 
 							// color needs to be the nextcolor color = Color.white;
 							switch (colorint)
@@ -771,19 +929,19 @@ namespace RareMagicPortal
 									currentcolor = "Blue";
 									nextcolor = "Purple";
 									text = "Blue Crystal Portal";
-									color = Purple;
+									color = Globals.Purple;
 									break;
 								case 5:
 									currentcolor = "Purple";
 									nextcolor = "Tan";
 									text = "Purple Crystal Portal";
-									color = Tan;
+									color = Globals.Tan;
 									break;
 								case 6:
 									currentcolor = "Tan";
 									nextcolor = "Gold";
 									text = "Tan Crystal Portal";
-									color = Gold;
+									color = Globals.Gold;
 									break;
 								case 7:
 									currentcolor = "Gold";
@@ -805,12 +963,15 @@ namespace RareMagicPortal
 									break;
 
 							}
-
-							if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
+							
+							if (_teleportWorldDataCacheDefault.TryGetValue(__instance, out ClassBase teleportWorldData))
 							{
-								teleportWorldData.TargetColor = color;
-								SetTeleportWorldColors(teleportWorldData, true);
+							//	RareMagicPortal.LogInfo($"Typeclass Before {teleportWorldData.GetType().Name} and old color {teleportWorldData.GetOldColor()}  target color {teleportWorldData.GetTargetColor()} ");
+								//teleportWorldData.TargetColor = color;
+								teleportWorldData.SetTeleportWorldColors(color, true);
+								//teleportWorldData.
 							}
+							//RareMagicPortal.LogInfo($"Typeclass {teleportWorldData.GetType().Name} and color {teleportWorldData.GetOldColor()}");
 							__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
 							//__instance.m_nview.m_zdo.Set(_teleportWorldColorAlphaHashCode, color);
 							__instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
@@ -858,16 +1019,13 @@ namespace RareMagicPortal
 			[HarmonyPriority(Priority.LowerThanNormal)]
 			private static bool Prefix(ref bool __result, ref Inventory __instance)
 			{
-                /*
+				/*
 				if (Game.instance.m_firstSpawn)
 				{
 					return __result;
 				}
 				*/
-                if (JustWaitforInventory)
-                {
-					return true;
-                }
+
 
 				//Player.m_localPlayer
 				bool bo2 = false;
@@ -905,16 +1063,14 @@ namespace RareMagicPortal
 				if (portalW != null)
 				{
 					//portalW = portal.GetComponent<TeleportWorld>();
-					name = portalW.GetText(); // much better
+					name = portalW.GetHoverText();
 					if (name != null)
                     {
-						/*
 						var found = name.IndexOf(":") + 2;
 						var end = name.IndexOf("\" ");
 						var le = end - found;
 						name = name.Substring(found, le); // lol wish it was more efficent
 						//RareMagicPortal.LogInfo($"Inventory Portal Check name is {name}");
-						*/
 
 						var PortalName = name;
 						bool OdinsKin = false;
@@ -1082,7 +1238,7 @@ namespace RareMagicPortal
 					}
 					else
 					{
-						PortalName = zDO.GetString("tag");
+						PortalName = zDO.GetString("tag", "Empty tag");
 					}
 				}
 				// end finding portal name
@@ -1191,7 +1347,7 @@ namespace RareMagicPortal
 			}
 		}
 
-
+/*
 		[HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
 		private static class Player_CheckforOwnerP
 		{
@@ -1218,6 +1374,7 @@ namespace RareMagicPortal
 			}
 		}
 
+		
 		[HarmonyPatch(typeof(Player), "PlacePiece")]
 		private static class Player_MessageforPortal_Patch
         {
@@ -1255,6 +1412,7 @@ namespace RareMagicPortal
 			}
 					
         }
+		*/
 
 		[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
 		private static class ZrouteMethodsClientRMP
@@ -1263,7 +1421,6 @@ namespace RareMagicPortal
 			private static void Prefix()
 			{
 				ZRoutedRpc.instance.Register("RequestServerAnnouncementRMP", new Action<long, ZPackage>(RPC_RequestServerAnnouncementRMP)); // Our Server Handler
-				((MonoBehaviour)(object)context).StartCoroutine(RemovedDestroyedTeleportWorldsCoroutine()); // moved to this incase the stop and start joining
 				//ZRoutedRpc.instance.Register("EventServerAnnouncementRMP", new Action<long, ZPackage>(RPC_EventServerAnnouncementRMP)); // event handler
 			}
 		}
@@ -1271,16 +1428,13 @@ namespace RareMagicPortal
 		[HarmonyPatch(typeof(ZNet), "Shutdown")]
 		private class PatchZNetDisconnect
 		{
-		
 			private static bool Prefix()
 			{
 				RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
+				((MonoBehaviour)(object)context).StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
 
-				context.StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
-				//context.StopCoroutine(myCoroutineRMP);
 
 				NoMoreLoading = true;
-				JustWaitforInventory = true;
 				return true;
 			}
 		}
@@ -1292,11 +1446,10 @@ namespace RareMagicPortal
 			private static void Postfix()
 			{ // The Server send once last config sync before destory, but after Shutdown which messes stuff up. 
 				NoMoreLoading = false;
-				
 			}
 		}
 
-		public void Awake()
+		private void Awake()
 		{
 			CreateConfigValues();
 			ReadAndWriteConfigValues();
@@ -1305,7 +1458,7 @@ namespace RareMagicPortal
 			english.SetupLanguage("English");
 			LoadAssets();
 
-			
+			context = this;
 
 			assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
 			Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
@@ -1316,6 +1469,8 @@ namespace RareMagicPortal
 
 			YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
+			StartCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
+			
 			IconColors();
 
 
@@ -1325,8 +1480,6 @@ namespace RareMagicPortal
 		}
 		private void IconColors()
         {
-			context = this;
-
 			Texture2D tex = IconColor.loadTexture("portal.png");
 			Texture2D temp = IconColor.loadTexture("portaliconTarget.png");
 			IconDefault = IconColor.CreateSprite(temp, false);
@@ -1341,13 +1494,13 @@ namespace RareMagicPortal
 			IconGreen = IconColor.CreateSprite(tex, true);
 			IconColor.setTint(Color.blue);
 			IconBlue = IconColor.CreateSprite(tex, true);
-			IconColor.setTint(Gold);
+			IconColor.setTint(Globals.Gold);
 			IconGold = IconColor.CreateSprite(tex, true);
 			IconColor.setTint(Color.white);
 			IconWhite = IconColor.CreateSprite(tex, true);
-			IconColor.setTint(Purple);
+			IconColor.setTint(Globals.Purple);
 			IconPurple = IconColor.CreateSprite(tex, true);
-			IconColor.setTint(Brown);
+			IconColor.setTint(Globals.Brown);
 			IconTan = IconColor.CreateSprite(tex, true);
 
 		}
@@ -1443,10 +1596,54 @@ namespace RareMagicPortal
 			PortalKeyTan.Name.English("Tan Portal Key");
 			PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
 
-			//Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
-			//PortalKeyTan.Name.English("WorldTree Seed");
-			//PortalKeyTan.Description.English("A seed dropped from Yggdrasil, it is known to have magical properites");
+			
+			BuildPiece wackyPortal1 = new("wackyportals", "wacky_portal1", "assetsEmbedded");
+			wackyPortal1.Name.English("WackyPortal"); // Localize the name and description for the building piece for a language.
+			wackyPortal1.Description.English("Portal For testing the Piece Manager");
+			wackyPortal1.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal1.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal1.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal1.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			
+			BuildPiece wackyPortal2 = new("wackyportals", "wacky_portal2", "assetsEmbedded");
+			wackyPortal2.Name.English("WackyPortal2"); // Localize the name and description for the building piece for a language.
+			wackyPortal2.Description.English("Portal For testing the Piece Manager");
+			wackyPortal2.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal2.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal2.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal2.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
+			BuildPiece wackyPortal3 = new("wackyportals", "wacky_portal3", "assetsEmbedded");
+			wackyPortal3.Name.English("WackyPortal3"); // Localize the name and description for the building piece for a language.
+			wackyPortal3.Description.English("Portal For testing the Piece Manager");
+			wackyPortal3.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal3.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal3.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal3.Crafting.Set(PieceManager.CraftingTable.Workbench);
+
+			BuildPiece wackyPortal4 = new("wackyportals", "wacky_portal4", "assetsEmbedded");
+			wackyPortal4.Name.English("WackyPortal4"); // Localize the name and description for the building piece for a language.
+			wackyPortal4.Description.English("Portal For testing the Piece Manager");
+			wackyPortal4.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal4.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal4.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal4.Crafting.Set(PieceManager.CraftingTable.Workbench);
+
+			BuildPiece wackyPortal5 = new("wackyportals", "wacky_portal5", "assetsEmbedded");
+			wackyPortal5.Name.English("WackyPortal5"); // Localize the name and description for the building piece for a language.
+			wackyPortal5.Description.English("Portal For testing the Piece Manager");
+			wackyPortal5.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal5.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal5.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal5.Crafting.Set(PieceManager.CraftingTable.Workbench);
+
+			BuildPiece wackyPortal6 = new("wackyportals", "wacky_portal6", "assetsEmbedded");
+			wackyPortal6.Name.English("WackyPortal6"); // Localize the name and description for the building piece for a language.
+			wackyPortal6.Description.English("Portal For testing the Piece Manager");
+			wackyPortal6.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
+			wackyPortal6.RequiredItems.Add("SurtlingCore", 2, false);
+			wackyPortal6.Category.Add(BuildPieceCategory.Misc);
+			wackyPortal6.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 
 
@@ -1523,7 +1720,9 @@ namespace RareMagicPortal
 					RareMagicPortal.LogInfo("You are now connected to Server World" + Worldname);
 					LoggingOntoServerFirst = false;
 				}
-				
+
+				isLocal = false;
+
 				string SyncedString = YMLPortalData.Value;
 
 				if (EnableExtraYMLLog)
@@ -1540,36 +1739,16 @@ namespace RareMagicPortal
 					//File.WriteAllText(YMLCurrentFile, SyncedString);
 				}
 				JustWrote = 2;
-				JustSent = 0; // ready for another send
-				//StartCoroutine(WaitforJustSent());
 
-			}
-			if (!ZNet.instance.IsServer())
-			{
-				isLocal = false;
-				bool admin = ConfigSync.IsAdmin;
-				isAdmin = admin;
-				if (isAdmin)
-					RareMagicPortal.LogInfo("You are RMP admin");
-				else
-					RareMagicPortal.LogInfo("You are NOT RMP admin");
 			}
 
 		}
 		IEnumerator WaitforReadWrote()
         {
-			yield return new WaitForSeconds(1);
+			yield return new WaitForSeconds(10f);
 
 			JustWrote = 0; // lets manual update happen no problem
 			//StopCoroutine(WaitforReadWrote()); not needed
-		}
-
-		IEnumerator WaitforJustSent()
-		{
-			yield return new WaitForSeconds(1);
-
-			JustSent = 0;
-						   
 		}
 
 		private void ReadYMLValues(object sender, FileSystemEventArgs e) // Thx Azumatt // This gets hit after writing
@@ -1584,7 +1763,7 @@ namespace RareMagicPortal
 
 				PortalN.Portals.Clear();
 				PortalN = deserializer.Deserialize<PortalName>(yml);
-				if (ZNet.instance.IsServer() )//&& ZNet.instance.IsDedicated()) Any Server
+				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
 					RareMagicPortal.LogInfo("Server Portal YML Manual UPdate " + Worldname);
 					YMLPortalData.Value = yml; 
@@ -1596,16 +1775,16 @@ namespace RareMagicPortal
 				}
 
 			}
-			
+			if (JustWrote == 2)
+				JustWrote = 0;
 
-			if (JustWrote == 2 )
+			if (JustWrote == 1)
 			{
-				JustWrote = 3; // stops from doing again
+				JustWrote = 2;
 				StartCoroutine(WaitforReadWrote());
 			}
 
-			 if(JustWrote == 1)
-				JustWrote = 2;
+			
 
 			if (!isAdmin)
 			{
@@ -1670,7 +1849,7 @@ namespace RareMagicPortal
 				if (EnableExtraYMLLog)
 					RareMagicPortal.LogInfo(yml);
 
-				if (ZNet.instance.IsServer() ) // not just dedicated should send this 
+				if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				{
 					YMLPortalData.Value = yml; // should only be one time and for server
 				}
@@ -1683,7 +1862,7 @@ namespace RareMagicPortal
             if (!File.Exists(ConfigFileFullPath)) return;
 
 
-            bool admin = ConfigSync.IsAdmin;
+			bool admin = ConfigSync.IsAdmin;
 			bool locked = ConfigSync.IsLocked;
 			bool islocaladmin = false;
 			bool isdedServer = false;
@@ -1848,14 +2027,14 @@ namespace RareMagicPortal
 
 		public static IEnumerator DelayedLoad()
 		{
-			yield return new WaitForSeconds(0.05f);
+			yield return new WaitForSeconds(0.3f);
 			LoadAllRecipeData(reload: true);
 			//yield break;
 
 			// I need to keep checking until the world name is populated- probably at respawn
-			while (String.IsNullOrEmpty(ZNet.instance.GetWorldName()) && !NoMoreLoading)
+			while (String.IsNullOrEmpty(ZNet.instance.GetWorldName()))
             {
-				yield return new WaitForSeconds(0.1f);
+				yield return new WaitForSeconds(1);
 			}
 			LoadIN();
 			yield break;
@@ -2024,7 +2203,6 @@ namespace RareMagicPortal
 			msgLeft = (bool)Config["Portal Crystals", "UseTopLeftMessage"].BoxedValue;
 			ForceTargetPortalAnimation = (bool)Config["Portal Config", "Force Portal Animation"].BoxedValue;
 
-
 			//ColorsEnabled = (string)Config["Portal Crystals", "ColorsEnabled"].BoxedValue;
 			/*
 			string[] colorstosearch = ColorsEnabled.Split(',');
@@ -2033,7 +2211,7 @@ namespace RareMagicPortal
 				//col.Value = false;
             }
 			foreach (string color in colorstosearch)
-		bool admin = ConfigSync.IsAdmin;	{
+			{
 				enaColor[color] = true;
 			}
 			*/
@@ -2156,7 +2334,7 @@ namespace RareMagicPortal
 				}
 				else
 				{
-					if (!ZNet.instance.IsServer()) // is not server
+					if (!ZNet.instance.IsServer())
 					{
 						RareMagicPortal.LogInfo("You are connect to a Server");
 						ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
@@ -2181,8 +2359,6 @@ namespace RareMagicPortal
 						if (EnableExtraYMLLog)
 							RareMagicPortal.LogInfo(yamlfull);
 						JustWrote = 2;
-					if (ZNet.instance.IsServer())
-						YMLPortalData.Value = yamlfull; // is coop server so send update to client
 					}
 				}
 
@@ -2236,7 +2412,7 @@ namespace RareMagicPortal
 			return checkiftagisPortal;
 		}
 
-		private static int CrystalandKeyLogicColor(string PortalName="")
+		private static int CrystalandKeyLogicColor(string PortalName)
 		{
 			// 0 is black/admin only
 			// 1 is normal // free passage
@@ -2552,8 +2728,6 @@ namespace RareMagicPortal
 					if (EnableExtraYMLLog)
 						RareMagicPortal.LogInfo(yamlfull);
 					JustWrote = 2;
-					if (ZNet.instance.IsServer()) // not just dedicated
-						YMLPortalData.Value = yamlfull;
 				}
 			}
 
@@ -3015,11 +3189,11 @@ namespace RareMagicPortal
 			}
 
 
-		static bool TryGetTeleportWorld(TeleportWorld key, out TeleportWorldDataRMP value)
+		static bool TryGetTeleportWorld(TeleportWorld key, out ClassBase value)
 		{
 			if (key)
 			{
-				return _teleportWorldDataCache.TryGetValue(key, out value);
+				return _teleportWorldDataCacheDefault.TryGetValue(key, out value);
 			}
 
 			value = default;
@@ -3027,137 +3201,18 @@ namespace RareMagicPortal
 		}
 
 
-		static void SetTeleportWorldColors(TeleportWorldDataRMP teleportWorldData, bool SetcolorTarget=false, bool SetMaterial = false)
-		{
 
-			teleportWorldData.OldColor = teleportWorldData.TargetColor;
-			//Color Gold = new Color(1f, 215f / 255f, 0, 1f);
-			//Color Cyan = Color.cyan
-
-			if (teleportWorldData.TargetColor == Gold)
-			{
-				try
-				{
-					Material mat = originalMaterials["shaman_prupleball"];
-					foreach (Renderer red in teleportWorldData.MeshRend)
-					{
-						red.material = mat;
-					}
-				}
-				catch { }
-			}
-			else if (teleportWorldData.TargetColor == Color.black)
-			{
-				try
-				{
-					Material mat = originalMaterials["silver_necklace"];
-					foreach (Renderer red in teleportWorldData.MeshRend)
-					{
-						red.material = mat;
-					}
-				}
-				catch { }
-			}
-			/*
-			else if (teleportWorldData.TargetColor == Tan)
-			{
-				try
-				{
-					Material mat = originalMaterials["ball2"];
-					foreach (Renderer red in teleportWorldData.MeshRend)
-					{
-						red.material = mat;
-					}
-				}
-				catch { }
-			}*/
-			else
-            {
-				Material mat = originalMaterials["portal_small"];
-				foreach (Renderer red in teleportWorldData.MeshRend)
-				{
-					red.material = mat;
-				}
-			}
-
-			foreach (Light light in teleportWorldData.Lights)
-			{
-				if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
-				{
-					light.color = lightcolor;
-				}
-				else
-					light.color = teleportWorldData.TargetColor;
-			}
-
-			Color FlamePurple = new Color(191f / 255f, 0f, 191f / 255f, 1);
-			foreach (ParticleSystem system in teleportWorldData.Systems)
-			{
-				ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
-				if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
-				{
-					colorOverLifetime.color = new ParticleSystem.MinMaxGradient(flamesstart, flamesend);
-				}
-
-				ParticleSystem.MainModule main = system.main;
-				if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
-				{
-					main.startColor = flamesstart;
-				}
-				else
-					main.startColor = teleportWorldData.TargetColor;
-			}
-
-			//teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor; // set color
-
-			foreach (Material material in teleportWorldData.Materials)
-			{
-				if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
-				{
-					material.color = flamesstart;
-				}
-				else
-					material.color = teleportWorldData.TargetColor;
-			}
-			
-			if (SetcolorTarget)
-            {
-				if (teleportWorldData.TargetColor == Color.black)
-				{
-					teleportWorldData.TeleportW.m_colorTargetfound = Color.black * 10;
-				}
-				else if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
-				{
-					teleportWorldData.TeleportW.m_colorTargetfound = m_colorTargetfound * 7;
-				}
-				else if (teleportWorldData.TargetColor == Gold)
-				{
-					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor;
-				}
-				else if (teleportWorldData.TargetColor == Tan)
-				{
-					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor *3;
-				}
-				else if (teleportWorldData.TargetColor == Color.cyan) // cyan now
-				{
-					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor*4;
-				}
-				else
-					teleportWorldData.TeleportW.m_colorTargetfound = teleportWorldData.TargetColor * 7; // set color // set intensity very high
-			}
-			
-		}
-		private static Dictionary<string, Material> originalMaterials;
+		
 
 		public static void GetAllMaterials()
 		{
 			Material[] array = Resources.FindObjectsOfTypeAll<Material>();
-			originalMaterials = new Dictionary<string, Material>();
+			Globals.originalMaterials = new Dictionary<string, Material>();
 			Material[] array2 = array;
 			foreach (Material val in array2)
 			{
 				// Dbgl($"Material {val.name}" );
-				originalMaterials[val.name] = val;
+				Globals.originalMaterials[val.name] = val;
 			}
 		}
 
@@ -3179,14 +3234,8 @@ namespace RareMagicPortal
 
 		private static void ServerZDOymlUpdate(int Colorint, string Portalname) // MESSAGE SENDER
         {
-			if (ZNet.instance.IsServer())// && ZNet.instance.IsDedicated()) removed dedicated  // so no singleplayer announcement
+			if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
 				return;
-			if (JustSent > 0)
-            {
-				JustSent++;
-				return;
-            }
-
 
 			ZPackage pkg = new ZPackage(); // Create ZPackage
 			string textSplit = Portalname + "," + Colorint;
@@ -3197,27 +3246,24 @@ namespace RareMagicPortal
 			}
 			pkg.Write(Portalname + "," + Colorint);
 			RareMagicPortal.LogInfo($"Sending the Server a update for {Portalname} with Color {Colorint}");
-
-			JustSent = 1;
 			ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestServerAnnouncementRMP", new object[] { pkg });
 		}
 
 		public static void RPC_RequestServerAnnouncementRMP(long sender, ZPackage pkg) // MESSAGE RECIEVER
 		{
-			if ( ZNet.instance.IsServer()) //&& ZNet.instance.IsDedicated() ) If any server than prepare to recieved message
+			if (ZNet.instance.IsDedicated() && ZNet.instance.IsServer())
 			{
 				if (pkg != null && pkg.Size() > 0)
 				{ // Check that our Package is not null, and if it isn't check that it isn't empty.
 					ZNetPeer peer = ZNet.instance.GetPeer(sender);
 					if (peer != null)
 					{ // Confirm the peer exists
-						//string peerSteamID = ((ZSteamSocket)peer.m_socket).GetPeerID().m_SteamID.ToString(); no more steam
-						string playername = peer.m_playerName;// playername
+						string peerSteamID = ((ZSteamSocket)peer.m_socket).GetPeerID().m_SteamID.ToString();
 						string msg = pkg.ReadString();
 						string[] msgArray = msg.Split(',');
 						string PortalName = msgArray[0];
 						int Colorint = Convert.ToInt32(msgArray[1]);
-						RareMagicPortal.LogInfo($"Server has recieved a YML update from {playername} for {PortalName} with Color {Colorint}");
+						RareMagicPortal.LogInfo($"Server has recieved a YML update from {peerSteamID} for {PortalName} with Color {Colorint}");
 
 						updateYmltoColorChange(PortalName, Colorint);
 
@@ -3243,8 +3289,6 @@ namespace RareMagicPortal
 				? ColorUtility.ToHtmlStringRGB(color)
 				: ColorUtility.ToHtmlStringRGBA(color);
 		}
-
-
 
 	}// end of namespace class
 	public static class ObjectExtensions
