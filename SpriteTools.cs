@@ -44,6 +44,7 @@ namespace RareMagicPortal
         {
             Texture2D texture = new(64, 64);
             texture.LoadImage(ReadEmbeddedFileBytes(name));
+        
             return texture;
         }
 
