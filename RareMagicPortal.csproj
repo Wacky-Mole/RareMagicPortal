@@ -154,12 +154,16 @@
     <ItemGroup>
         <Compile Include="Class1.cs" />
         <Compile Include="ColorfulLights.cs" />
-        <Compile Include="PieceManager\MaterialReplacer.cs" />
-        <Compile Include="PieceManager\PieceManager.cs" />
-        <Compile Include="PieceManager\SnapPointMaker.cs" />
+        <Compile Include="Helper.cs" />
+        <Compile Include="PortalWorld\Enumeration.cs" />
+        <Compile Include="PortalWorld\FireLights.cs" />
         <Compile Include="RareMagicPortal.cs" />
         <Compile Include="PortalName.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Scripts\PortalFX_AxisRotateByTime.cs" />
+        <Compile Include="Scripts\PortalFX_Turbulence.cs" />
+        <Compile Include="Scripts\PortalFX_UVAnimation.cs" />
+        <Compile Include="Scripts\PortalsFX_RandomMoves.cs" />
         <Compile Include="SpriteTools.cs" />
     </ItemGroup>
     <ItemGroup>
