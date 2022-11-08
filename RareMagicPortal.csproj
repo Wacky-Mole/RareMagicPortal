@@ -83,11 +83,6 @@
     <Reference Include="LocalizationManager">
       <HintPath>Libs\LocalizationManager.dll</HintPath>
     </Reference>
-    <Reference Include="PieceManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libs\PieceManager.dll</HintPath>
-    </Reference>
-
     <Reference Include="ServerSync">
       <HintPath>Libs\ServerSync.dll</HintPath>
     </Reference>
