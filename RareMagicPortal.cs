@@ -1602,48 +1602,48 @@ namespace RareMagicPortal
 			wackyPortal1.Description.English("Portal For testing the Piece Manager");
 			wackyPortal1.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal1.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal1.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal1.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal1.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal1.Crafting.Set(PieceManager.CraftingTable.Workbench);
 			
 			BuildPiece wackyPortal2 = new("wackyportals", "wacky_portal2", "assetsEmbedded");
 			wackyPortal2.Name.English("WackyPortal2"); // Localize the name and description for the building piece for a language.
 			wackyPortal2.Description.English("Portal For testing the Piece Manager");
 			wackyPortal2.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal2.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal2.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal2.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal2.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal2.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 			BuildPiece wackyPortal3 = new("wackyportals", "wacky_portal3", "assetsEmbedded");
 			wackyPortal3.Name.English("WackyPortal3"); // Localize the name and description for the building piece for a language.
 			wackyPortal3.Description.English("Portal For testing the Piece Manager");
 			wackyPortal3.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal3.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal3.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal3.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal3.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal3.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 			BuildPiece wackyPortal4 = new("wackyportals", "wacky_portal4", "assetsEmbedded");
 			wackyPortal4.Name.English("WackyPortal4"); // Localize the name and description for the building piece for a language.
 			wackyPortal4.Description.English("Portal For testing the Piece Manager");
 			wackyPortal4.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal4.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal4.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal4.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal4.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal4.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 			BuildPiece wackyPortal5 = new("wackyportals", "wacky_portal5", "assetsEmbedded");
 			wackyPortal5.Name.English("WackyPortal5"); // Localize the name and description for the building piece for a language.
 			wackyPortal5.Description.English("Portal For testing the Piece Manager");
 			wackyPortal5.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal5.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal5.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal5.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal5.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal5.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 			BuildPiece wackyPortal6 = new("wackyportals", "wacky_portal6", "assetsEmbedded");
 			wackyPortal6.Name.English("WackyPortal6"); // Localize the name and description for the building piece for a language.
 			wackyPortal6.Description.English("Portal For testing the Piece Manager");
 			wackyPortal6.RequiredItems.Add("FineWood", 20, false); // Set the required items to build. Format: ("PrefabName", Amount, Recoverable)
 			wackyPortal6.RequiredItems.Add("SurtlingCore", 2, false);
-			wackyPortal6.Category.Add(BuildPieceCategory.Misc);
-			wackyPortal6.Crafting.Set(PieceManager.CraftingTable.Workbench);
+			//wackyPortal6.Category.Add(BuildPieceCategory.Misc);
+			//wackyPortal6.Crafting.Set(PieceManager.CraftingTable.Workbench);
 
 
 
