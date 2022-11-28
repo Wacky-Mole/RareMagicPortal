@@ -150,6 +150,7 @@ namespace RareMagicPortal
         private static ConfigEntry<KeyboardShortcut>? portalRMPKEY = null!;
         private static ConfigEntry<bool>? ConfigMessageLeft;
         private static ConfigEntry<bool>? ConfigTargetPortalAnimation;
+        private static ConfigEntry<int>? ConfigMaxWeight;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -869,6 +870,7 @@ namespace RareMagicPortal
                 {
                     return true;
                 }
+               // __instance.GetTotalWeight()
 
                 //Player.m_localPlayer
                 bool bo2 = false;
@@ -877,7 +879,7 @@ namespace RareMagicPortal
                     bo2 = true;
                 }
 
-
+                
                 Piece portal = null;
                 String name = null;
                 Vector3 hi = Player.m_localPlayer.transform.position;
@@ -962,6 +964,18 @@ namespace RareMagicPortal
                                 }
                             }
                         }// end !bo2
+                        if (!bo2 && ConfigMaxWeight.Value > 0)
+                        {
+                            var playerweight = __instance.GetTotalWeight();
+                            if (playerweight > ConfigMaxWeight.Value)
+                            {
+                                RareMagicPortal.LogInfo($"Player Weight is greater than Max Portal Weight");
+                                Player.m_localPlayer.Message(MessageHud.MessageType.Center, "You are carrying too much, max is " + ConfigMaxWeight.Value);
+                                __result = false;
+                                return false;
+                            }
+                        }
+
 
                     }
                 }
@@ -2010,6 +2024,7 @@ namespace RareMagicPortal
 
             portalRMPKEY = config("Portal Config", "Modifier key for toggle", new KeyboardShortcut(KeyCode.LeftControl), "Modifier key that has to be pressed while hovering over Portal + E", false);
 
+            ConfigMaxWeight = config("Portal Config", "Max Weight Allowed for Portals ", 0, "This affects all portals - Enter the max weight that can transit through a portal at a time. Value of 0 disables the check");
         }
 
         private void ReadAndWriteConfigValues()
