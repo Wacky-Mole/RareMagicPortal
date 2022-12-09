@@ -2,15 +2,17 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.4.8
+`Server and client side required for Server Sync enforcement.` V2.5.0
 
-MinimumRequiredVersion = "2.4.8"
+MinimumRequiredVersion = "2.5.0"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
 Do you want to see more PVP or more cooperation between your buddies and their bases?<br>
 Do you want more colors on your portals or more freedom or restrictions?<br>
 Well, I've a mod for you!
+
+Support me at https://www.buymeacoffee.com/WackyMole   <img src="https://wackymole.com/hosts/bmc_qr.png" width="200"/>
 
 ### Main Feature:
 * Magical Portal Fluid
@@ -36,6 +38,8 @@ Well, I've a mod for you!
   * If you just want to see different Portal Colors, this mod is great for that.
 
 #### How to Get Crystals/Keys/Fluid in your World
+Added Drop Config for Fluid,Drink and Crystals - Keys in the future maybe
+By Default Fluid drops from Elder - 100% chance for 1-2 drops. 
 The Crystals/Keys/Fluid are mostly meant for Multiplayer Worlds<br>
 The Admins can add them to the world in several different ways. <br>
 Drop That mod : https://valheim.thunderstore.io/package/ASharpPen/Drop_That/ <br>
@@ -112,6 +116,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * Force Portal Animation
       * > False
       * > Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded
+    * ConfigMaxWeight
+       * > Makes it so any player weight above this amount can not teleport. 
+       * > Default is 0. Which disables checks
+       * > Will apply checks to all portals
 
   * [Portal Crystals]
     * Enable Portal Crystals and Keys = false
@@ -135,10 +143,17 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * PortalFluidValue: 
       * > Default 0 coins 
         >> Set to value of 1 or more to sale at Haldor
+    * portalmagicfluid.DropsFrom.Add("gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids
 
   * [Portal Drink]
     * Portal_drink_timer = 120 : Seconds that PortalDrink lasts
 
+  * [Drops for Fluid,Drink and Crystals]
+    * "gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids for example
+
+
+
+     
 
 ### YML (config/Portal_Names/*.yml)
   * > *The mod will auto generate default data into each yml named after your current world **upon getting close to ANY portal.***
@@ -186,6 +201,10 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.5.0
+            Updated for Mistlands, ItemManager, Added ConfigMaxWeight for all portals (maybe individual in future)
+            Added Drop configs for Fluid,Crystals and Drink
+            Messed up All your configs, no need to thank me with a donation. 
         Version 2.4.8
             Removed SteamAPI for actual crossplay. Made it so Server doesn't get updated for no named Portal
             Fixed Icons
