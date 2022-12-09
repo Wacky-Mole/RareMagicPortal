@@ -44,7 +44,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.4.8";
+        public const string PluginVersion = "2.5.0";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -64,7 +64,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         private static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.4.8" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.0" };
 
         private static MagicPortalFluid? plugin;
         private static MagicPortalFluid context;
@@ -88,6 +88,7 @@ namespace RareMagicPortal
         public static string Worldname = "demo_world";
         public static bool LoggingOntoServerFirst = true;
 
+        /*
         public static int PortalMagicFluidSpawn = 3; // default
         public static bool EnablePortalJuice = false; // it is true
         public static bool EnableExtraYMLLog = true;
@@ -111,6 +112,7 @@ namespace RareMagicPortal
         public static string ColorsEnabled = "";
         public static bool msgLeft = false;
         public static bool ForceTargetPortalAnimation = false;
+        */
 
         private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
         private static int JustWrote = 0;
@@ -119,6 +121,7 @@ namespace RareMagicPortal
         private static bool JustRespawn = false;
         private static bool NoMoreLoading = false;
         private static bool Teleporting = false;
+        private static int TeleportingforWeight = 0;
         private static string checkiftagisPortal = null;
         private static bool JustStop = false;
         private static bool JustWaitforInventory = true;
@@ -964,16 +967,23 @@ namespace RareMagicPortal
                                 }
                             }
                         }// end !bo2
-                        if (!bo2 && ConfigMaxWeight.Value > 0)
+                        if (!bo2 && ConfigMaxWeight.Value > 0 && TeleportingforWeight > 0)
                         {
                             var playerweight = __instance.GetTotalWeight();
+                            
                             if (playerweight > ConfigMaxWeight.Value)
                             {
                                 RareMagicPortal.LogInfo($"Player Weight is greater than Max Portal Weight");
                                 Player.m_localPlayer.Message(MessageHud.MessageType.Center, "You are carrying too much, max is " + ConfigMaxWeight.Value);
+                                TeleportingforWeight++;
+
+                                if (TeleportingforWeight > 10)
+                                    TeleportingforWeight = 0;
+
                                 __result = false;
                                 return false;
                             }
+                            TeleportingforWeight = 0;
                         }
 
 
@@ -1083,7 +1093,7 @@ namespace RareMagicPortal
                 {
                     throw new SkipPortalException();
                 }
-
+                TeleportingforWeight = 1;
 
                 player = collider.GetComponent<Player>();
                 string PortalName = "";
@@ -1410,60 +1420,75 @@ namespace RareMagicPortal
             Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
             portalmagicfluid.Name.English("Magical Portal Fluid");
             portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
+            portalmagicfluid.ToggleConfigurationVisibility(Configurability.Drop);
 
             PortalFluidname = portalmagicfluid.Prefab.name;
 
             Item PortalDrink = new("portalmagicfluid", "PortalDrink", "assetsEmbedded");
             PortalDrink.Name.English("Magical Portal Drink");
             PortalDrink.Description.English("Odin's Blood of Teleportation");
+            PortalDrink.ToggleConfigurationVisibility(Configurability.Drop);
+  
 
             Item PortalCrystalMaster = new("portalcrystal", "PortalCrystalMaster", "assetsEmbedded");
             PortalCrystalMaster.Name.English("Gold Portal Crystal");
             PortalCrystalMaster.Description.English("Odin's Golden Crystal allows for Golden Portal Traveling and maybe more Portals");
+            PortalCrystalMaster.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalCrystalRed = new("portalcrystal", "PortalCrystalRed", "assetsEmbedded");
             PortalCrystalRed.Name.English("Red Portal Crystal");
             PortalCrystalRed.Description.English("Odin's Traveling Crystals allow for Red Portal Traveling");
+            PortalCrystalRed.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalCrystalGreen = new("portalcrystal", "PortalCrystalGreen", "assetsEmbedded");
             PortalCrystalGreen.Name.English("Green Portal Crystal");
             PortalCrystalGreen.Description.English("Odin's Traveling Crystals allow for Green Portal Traveling");
+            PortalCrystalGreen.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalCrystalBlue = new("portalcrystal", "PortalCrystalBlue", "assetsEmbedded");
             PortalCrystalBlue.Name.English("Blue Portal Crystal");
             PortalCrystalBlue.Description.English("Odin's Traveling Crystals allow for Blue Portal Traveling");
+            PortalCrystalBlue.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalCrystalPurple = new("portalcrystal", "PortalCrystalPurple", "assetsEmbedded");
             PortalCrystalPurple.Name.English("Purple Portal Crystal");
             PortalCrystalPurple.Description.English("Odin's Traveling Crystals allow for Purple Portal Traveling");
+            PortalCrystalPurple.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalCrystalTan = new("portalcrystal", "PortalCrystalTan", "assetsEmbedded");
             PortalCrystalTan.Name.English("Tan Portal Crystal");
             PortalCrystalTan.Description.English("Odin's Traveling Crystals allow for Tan Portal Traveling");
+            PortalCrystalTan.ToggleConfigurationVisibility(Configurability.Drop);
 
             Item PortalKeyRed = new("portalcrystal", "PortalKeyRed", "assetsEmbedded");
             PortalKeyRed.Name.English("Red Portal Key");
             PortalKeyRed.Description.English("Unlock Portals Requiring The Red Key");
+            PortalKeyRed.ToggleConfigurationVisibility(Configurability.Disabled);
 
             Item PortalKeyGold = new("portalcrystal", "PortalKeyGold", "assetsEmbedded");
             PortalKeyGold.Name.English("Gold Portal Key");
             PortalKeyGold.Description.English("Unlock Gold Portals and perhaps more Portals");
+            PortalKeyGold.ToggleConfigurationVisibility(Configurability.Disabled);
 
             Item PortalKeyBlue = new("portalcrystal", "PortalKeyBlue", "assetsEmbedded");
             PortalKeyBlue.Name.English("Blue Portal Key");
             PortalKeyBlue.Description.English("Unlock Portals Requiring The Blue Key");
+            PortalKeyBlue.ToggleConfigurationVisibility(Configurability.Disabled);
 
             Item PortalKeyGreen = new("portalcrystal", "PortalKeyGreen", "assetsEmbedded");
             PortalKeyGreen.Name.English("Green Portal Key");
             PortalKeyGreen.Description.English("Unlock Portals Requiring The Green Key");
+            PortalKeyGreen.ToggleConfigurationVisibility(Configurability.Disabled);
 
             Item PortalKeyPurple = new("portalcrystal", "PortalKeyPurple", "assetsEmbedded");
             PortalKeyPurple.Name.English("Purple Portal Key");
             PortalKeyPurple.Description.English("Unlock Portals Requiring The Purple Key");
+            PortalKeyPurple.ToggleConfigurationVisibility(Configurability.Disabled);
 
             Item PortalKeyTan = new("portalcrystal", "PortalKeyTan", "assetsEmbedded");
             PortalKeyTan.Name.English("Tan Portal Key");
             PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
+            PortalKeyTan.ToggleConfigurationVisibility(Configurability.Disabled);
 
             //Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
             //PortalKeyTan.Name.English("WorldTree Seed");
@@ -1972,63 +1997,66 @@ namespace RareMagicPortal
 
         private void CreateConfigValues()
         {
-            _serverConfigLocked = config("General", "Force Server Config", true, "Force Server Config");
+            _serverConfigLocked = config("1.General", "Force Server Config", true, "Force Server Config");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
-            ConfigEnableYMLLogs = config("General", "YMLPortalLogs", false, "Show YML Portal Logs after Every update", false);
+            ConfigEnableYMLLogs = config("1.General", "YMLPortalLogs", false, "Show YML Portal Logs after Every update", false);
 
             // Add server config which gets pushed to all clients connecting and can only be edited by admins
             // In local/single player games the player is always considered the admin
 
-            ConfigFluid = config("PortalFluid", "EnablePortalFluid", false,
+            ConfigFluid = config("2.PortalFluid", "EnablePortalFluid", false,
                             "Enable PortalFluid requirement?");
 
-            ConfigSpawn = config("PortalFluid", "PortalMagicFluidSpawn", 3,
+            ConfigSpawn = config("2.PortalFluid", "PortalMagicFluidSpawn", 3,
                 "How much PortalMagicFluid to start with on a new character?");
 
-            ConfigFluidValue = config("PortalFluid", "PortalFluidValue", 0, "What is the value of MagicPortalFluid? " + System.Environment.NewLine + "A Value of 1 or more, makes the item saleable to trader");
+            ConfigFluidValue = config("2.PortalFluid", "PortalFluidValue", 0, "What is the value of MagicPortalFluid? " + System.Environment.NewLine + "A Value of 1 or more, makes the item saleable to trader");
 
-            ConfigTable = config("Portal Config", "CraftingStation_Requirement", DefaultTable,
+            ConfigTable = config("3.Portal Config", "CraftingStation_Requirement", DefaultTable,
                 "Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation " + System.Environment.NewLine + "Pick a valid table otherwise default is workbench"); // $piece_workbench , $piece_forge , $piece_artisanstation
 
-            ConfigTableLvl = config("Portal Config", "Level_of_CraftingStation_Req", 1,
+            ConfigTableLvl = config("3.Portal Config", "Level_of_CraftingStation_Req", 1,
                 "What level of CraftingStation is required for placing Portal?");
 
-            ConfigCreator = config("Portal Config", "OnlyCreatorCanDeconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
+            ConfigCreator = config("3.Portal Config", "OnlyCreatorCanDeconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
 
-            ConfiglHealth = config("Portal Config", "Portal_Health", 400f, "Health of Portal");
+            ConfiglHealth = config("3.Portal Config", "Portal_Health", 400f, "Health of Portal");
 
-            ConfigAddRestricted = config("Portal Config", "Portal_D_Restrict", "", "Additional Items to Restrict by Default - 'Wood,Stone'");
+            ConfigAddRestricted = config("3.Portal Config", "Portal_D_Restrict", "", "Additional Items to Restrict by Default - 'Wood,Stone'");
 
-            ConfigCreatorLock = config("Portal Config", "OnlyCreatorCanChange", false, "Only Creator can change Portal name");
+            ConfigCreatorLock = config("3.Portal Config", "OnlyCreatorCanChange", false, "Only Creator can change Portal name");
 
-            ConfigEnableCrystals = config("Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
+            ConfigTargetPortalAnimation = config("3.Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded", false);
 
-            ConfigEnableGoldAsMaster = config("Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
+            portalRMPKEY = config("3.Portal Config", "Modifier key for toggle", new KeyboardShortcut(KeyCode.LeftControl), "Modifier key that has to be pressed while hovering over Portal + E", false);
+
+            ConfigMaxWeight = config("3.Portal Config", "Max Weight Allowed for Portals", 0, "This affects all portals - Enter the max weight that can transit through a portal at a time. Value of 0 disables the check");
+
+            ConfigEnableCrystals = config("4.Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
+
+            ConfigEnableGoldAsMaster = config("4.Portal Crystals", "USE_GOLD_AS_PORTAL_MASTER", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
 
             //ConfigEnableColorEnable = config("Portal Crystals", "ColorsEnabled", "Red,Green,Blue,Purple,Gold", "Whether anyone can use these Colored Portals, even if they have the requirements-  Red,Green,Blue,Purple,Gold");
 
             //ConfigEnableKeys = config("Portal Keys", "Portal_Keys_Enable", false, "Enable Portal Crystals");
 
-            ConfigCrystalsConsumable = config("Portal Crystals", "Crystal_Consume_Default", 1, "What is the Default number of crystals to consume for each New Portal? - Depending on the default Color, all other colors will be 0 (no access)" + System.Environment.NewLine + " Gold/Master gets set to this regardless of Default Color" + System.Environment.NewLine + " 0 - Means that passage is denied for this color");
+            ConfigCrystalsConsumable = config("4.Portal Crystals", "Crystal_Consume_Default", 1, "What is the Default number of crystals to consume for each New Portal? - Depending on the default Color, all other colors will be 0 (no access)" + System.Environment.NewLine + " Gold/Master gets set to this regardless of Default Color" + System.Environment.NewLine + " 0 - Means that passage is denied for this color");
 
             //ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
-            CrystalKeyDefaultColor = config("Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,Tan,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
+            CrystalKeyDefaultColor = config("4.Portal Crystals", "Portal_Crystal_Color_Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,Tan,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
 
-            ConfigMessageLeft = config("Portal Crystals", "UseTopLeftMessage", false, "In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.");
+            ConfigMessageLeft = config("4.Portal Crystals", "UseTopLeftMessage", false, "In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.");
 
-            PortalDrinkTimer = config("Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
+            PortalDrinkTimer = config("5.Portal Drink", "Portal_drink_timer", 120, "How Long Odin's Drink lasts");
 
-            ConfigTargetPortalAnimation = config("Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded", false);
 
-            portalRMPKEY = config("Portal Config", "Modifier key for toggle", new KeyboardShortcut(KeyCode.LeftControl), "Modifier key that has to be pressed while hovering over Portal + E", false);
-
-            ConfigMaxWeight = config("Portal Config", "Max Weight Allowed for Portals ", 0, "This affects all portals - Enter the max weight that can transit through a portal at a time. Value of 0 disables the check");
         }
 
         private void ReadAndWriteConfigValues()
         {
+            /*
             //RareMagicPortal.LogInfo("Reached Read and Write");
             EnablePortalJuice = (bool)Config["PortalFluid", "EnablePortalFluid"].BoxedValue;
             PortalMagicFluidSpawn = (int)Config["PortalFluid", "PortalMagicFluidSpawn"].BoxedValue;
@@ -2051,25 +2079,12 @@ namespace RareMagicPortal
             ForceTargetPortalAnimation = (bool)Config["Portal Config", "Force Portal Animation"].BoxedValue;
 
 
-            //ColorsEnabled = (string)Config["Portal Crystals", "ColorsEnabled"].BoxedValue;
-            /*
-			string[] colorstosearch = ColorsEnabled.Split(',');
-			foreach (var col in enaColor)
-            {
-				//col.Value = false;
-            }
-			foreach (string color in colorstosearch)
-		bool admin = ConfigSync.IsAdmin;	{
-				enaColor[color] = true;
-			}
-			*/
-            //
-
             AllowTeleEverything.Effect.m_cooldown = DrinkDuration;
 
             if (CraftingStationlvl > 10 || CraftingStationlvl < 1)
                 CraftingStationlvl = 1;
 
+            */
         }
 
         private static void WritetoYML(string PortalName, string updateP = null) // this only happens if portal is not in yml file at all
