@@ -12,7 +12,8 @@ Do you want to see more PVP or more cooperation between your buddies and their b
 Do you want more colors on your portals or more freedom or restrictions?<br>
 Well, I've a mod for you!
 
-Support me at https://www.buymeacoffee.com/WackyMole   <img src="https://wackymole.com/hosts/bmc_qr.png" width="200"/>
+Support me at https://www.buymeacoffee.com/WackyMole 
+<img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
 
 ### Main Feature:
 * Magical Portal Fluid
