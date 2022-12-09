@@ -1,5 +1,9 @@
 # RareMagicPortal
 
+Support me at https://www.buymeacoffee.com/WackyMole 
+
+<img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
+
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
 `Server and client side required for Server Sync enforcement.` V2.5.0
@@ -12,8 +16,6 @@ Do you want to see more PVP or more cooperation between your buddies and their b
 Do you want more colors on your portals or more freedom or restrictions?<br>
 Well, I've a mod for you!
 
-Support me at https://www.buymeacoffee.com/WackyMole 
-<img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
 
 ### Main Feature:
 * Magical Portal Fluid
