@@ -112,6 +112,7 @@ namespace RareMagicPortal
         public static bool ForceTargetPortalAnimation = false;
         */
 
+        public static bool FluidwasTrue = false;
         public static bool piecehaslvl = false;
         public static string DefaultTable = "$piece_workbench";
         private static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
@@ -423,6 +424,8 @@ namespace RareMagicPortal
                     }
 
                 }
+               // ObjectDB dat2 = ObjectDB.instance;
+                //dat2.GetItemPrefab("PortalCrystalRed").transform.localScale = new Vector3(.1f, .1f, .1f);
             }
         }
 
@@ -449,6 +452,7 @@ namespace RareMagicPortal
                 {
                     JustWaitforInventory = false;
                     StartingitemPrefab();
+                    
                     //((MonoBehaviour)(object)context).StartCoroutine(DelayedLoad()); // important
                 }
             }
@@ -555,25 +559,12 @@ namespace RareMagicPortal
                         break;
 
                 }
-                if (
-                !__instance.m_nview
-                || __instance.m_nview.m_zdo == null
-                || __instance.m_nview.m_zdo.m_zdoMan == null
-                || __instance.m_nview.m_zdo.m_vec3 == null)
-                {
-                    RareMagicPortal.LogInfo("Setting Portal Color For First Time");
-                    if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
-                    {
-                        teleportWorldData.TargetColor = color;
-                        SetTeleportWorldColors(teleportWorldData, true);
-                        __instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
-                        __instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
-                    }
-                }
 
                 if (PortalName == "" && currentcolor != CrystalKeyDefaultColor.Value && JustSent == 0)
                 {
                     if (CrystalKeyDefaultColor.Value == "None")
+                        colorint = 1;
+                    else if (CrystalKeyDefaultColor.Value == "none")
                         colorint = 1;
                     else if (CrystalKeyDefaultColor.Value == "Red")
                         colorint = 2;
@@ -590,9 +581,26 @@ namespace RareMagicPortal
                         RareMagicPortal.LogWarning($"DefaultPortalColor {CrystalKeyDefaultColor.Value} is not an option,this will cause repeating network traffic on no name portals");
                     }
 
-
-                    //updateYmltoColorChange("", colorint); don't update a nonamed one
                 }
+                if (
+                !__instance.m_nview
+                || __instance.m_nview.m_zdo == null
+                || __instance.m_nview.m_zdo.m_zdoMan == null
+                || __instance.m_nview.m_zdo.m_vec3 == null)
+                {
+                    RareMagicPortal.LogInfo("Setting Portal Color For First Time");
+                    if (_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
+                    {
+                        teleportWorldData.TargetColor = color;
+                        SetTeleportWorldColors(teleportWorldData, true);
+                        __instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
+                        __instance.m_nview.m_zdo.Set(_portalLastColoredByHashCode, Player.m_localPlayer?.GetPlayerID() ?? 0L);
+                    }
+                    if (PortalName == "")
+                        updateYmltoColorChange("", colorint); // update only once
+                }
+
+
 
                 if (PortalName != "" && PortalName != "Empty tag")
                 {
@@ -967,7 +975,7 @@ namespace RareMagicPortal
                                 }
                             }
                         }// end !bo2
-                        if (!bo2 && ConfigMaxWeight.Value > 0 && TeleportingforWeight > 0)
+                        if (!bo2 && ConfigMaxWeight.Value > 0 && (TeleportingforWeight > 0 || Teleporting))
                         {
                             var playerweight = __instance.GetTotalWeight();
                             
@@ -1131,7 +1139,7 @@ namespace RareMagicPortal
 
                 if (CrystalandKeyLogic(PortalName))
                 {
-                    Teleporting = true;
+                   // Teleporting = true;
                     return true;
 
                 }
@@ -1419,6 +1427,9 @@ namespace RareMagicPortal
 
         private void LoadAssets()
         {
+
+            //ObjectDB Dat = ObjectDB.instance;
+
             Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
             portalmagicfluid.Name.English("Magical Portal Fluid");
             portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");
@@ -1443,6 +1454,7 @@ namespace RareMagicPortal
             PortalCrystalRed.Name.English("Red Portal Crystal");
             PortalCrystalRed.Description.English("Odin's Traveling Crystals allow for Red Portal Traveling");
             PortalCrystalRed.ToggleConfigurationVisibility(Configurability.Drop);
+            
 
             Item PortalCrystalGreen = new("portalcrystal", "PortalCrystalGreen", "assetsEmbedded");
             PortalCrystalGreen.Name.English("Green Portal Crystal");
@@ -1871,8 +1883,12 @@ namespace RareMagicPortal
 
                 Piece petercomponent = peter.GetComponent<Piece>();
                 petercomponent.m_craftingStation = GetCraftingStation(CraftingStationforPaul.m_name); // sets crafting station workbench/forge /ect
+
                 if (ConfigFluid.Value)
-                    petercomponent.m_resources = requirements.ToArray(); // only updates if true
+                    FluidwasTrue = true;
+
+                if (ConfigFluid.Value || FluidwasTrue)
+                petercomponent.m_resources = requirements.ToArray(); // always update?
 
                 //RareMagicPortal.LogInfo($"There changing fluid value {PortalFluidname}");
                 ObjectDB.instance.GetItemPrefab(PortalFluidname).GetComponent<ItemDrop>().m_itemData.m_shared.m_value = ConfigFluidValue.Value;
@@ -1921,6 +1937,7 @@ namespace RareMagicPortal
             {
 
                 PortalChanger();
+                
 
             }
         }
@@ -2029,7 +2046,7 @@ namespace RareMagicPortal
 
             ConfigAddRestricted = config("3.Portal Config", "Portal D Restrict", "", "Additional Items to Restrict by Default - 'Wood,Stone'");
 
-            ConfigCreatorLock = config("3.Portal Config", "Only Creator Can Change", false, "Only Creator can change Portal name");
+            ConfigCreatorLock = config("3.Portal Config", "Only Creator Can Change Name", false, "Only Creator can change Portal name");
 
             ConfigTargetPortalAnimation = config("3.Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded", false);
 

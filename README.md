@@ -206,7 +206,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
 ## Change Log:
         Version 2.5.0
             Updated for Mistlands, ItemManager, Added ConfigMaxWeight for all portals (maybe individual in future)
-            Added Drop configs for Fluid,Crystals and Drink
+            Added Drop configs for Fluid,Crystals and Drink. Fixed Crystal Size, adjusted CrystalTan
             Messed up All your configs, no need to thank me with a donation. 
         Version 2.4.8
             Removed SteamAPI for actual crossplay. Made it so Server doesn't get updated for no named Portal
@@ -267,7 +267,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
             Now shows TargetPortal Icon colors based on color of Portal
             bug fixes
         Version 2.1.1
-            Changed Default for EnablePortalJuice to false for everyone that just wants PortalColors.
+            Changed Default for EnablePortalFluid to false for everyone that just wants PortalColors.
             Changed ConfigEnableYMLLogs to allow for indivudal log settings. 
             Fixed Spelling errors. 
         Version 2.1.0
@@ -277,7 +277,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
             Added TeleportAnything for individual Portals- White Portals allows anything thorugh
             Defaults changed on PortalJuiceValue
             Bug fixes for TargetPortal mod
-            Fixed WackysDatabase comptability with Portals- Keep EnablePortalJuice = false and add PortalJuice with Wackysdb instead if you want unique reqs
+            Fixed WackysDatabase comptability with Portals- Keep EnablePortalFluid = false and add PortalFluid with Wackysdb instead if you want unique reqs
         Version 2.0.0
             Rewrite of mod: Added Crystals and Keys. YML configuration on entering portals. 4 Different types of crystals and keys. 
             Crystals are Consumable. Keys are not. TargetPortal, AnyPortal, TeleportAnything compatibility. YML file for each world. ServerSynced admin control

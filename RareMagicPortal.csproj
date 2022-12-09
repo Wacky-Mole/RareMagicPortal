@@ -169,8 +169,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="RareMagicPortal-2.4.8\manifest.json" />
-    <None Include="RareMagicPortal-2.4.8\README.md" />
+    <None Include="RareMagicPortal-2.5.0\manifest.json" />
+    <None Include="RareMagicPortal-2.5.0\README.md" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
@@ -232,8 +232,8 @@
     <EmbeddedResource Include="portaliconTarget.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="RareMagicPortal-2.4.8\icon.png" />
-    <Content Include="RareMagicPortal-2.4.8\plugins\RareMagicPortal.dll" />
+    <Content Include="RareMagicPortal-2.5.0\icon.png" />
+    <Content Include="RareMagicPortal-2.5.0\plugins\RareMagicPortal.dll" />
     <EmbeddedResource Include="translations\English.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
