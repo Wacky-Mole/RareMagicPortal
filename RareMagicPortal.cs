@@ -8,6 +8,9 @@
 // Project: MagicPortalFluid
 // create yml file for portal names, put example file in it and explain that it only does something with EnableCrystals and Consumable is true
 // load portal names After every change
+// black, yellow (normal), red, green, blue, purple, tan, gold, white
+//
+//
 
 using System.Collections;
 using System.Collections.Generic;
@@ -44,7 +47,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.5.0";
+        public const string PluginVersion = "2.5.1";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -150,11 +153,12 @@ namespace RareMagicPortal
         private static ConfigEntry<bool>? ConfigEnableYMLLogs;
         private static ConfigEntry<string>? ConfigAddRestricted;
         private static ConfigEntry<bool>? ConfigEnableGoldAsMaster;
-       // private static ConfigEntry<string>? ConfigEnableColorEnable;
+        private static ConfigEntry<string>? ConfigEnableColorEnable;
         private static ConfigEntry<KeyboardShortcut>? portalRMPKEY = null!;
         private static ConfigEntry<bool>? ConfigMessageLeft;
         private static ConfigEntry<bool>? ConfigTargetPortalAnimation;
         private static ConfigEntry<int>? ConfigMaxWeight;
+        private static ConfigEntry<bool>? ConfigUseBiomeColors;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -332,7 +336,10 @@ namespace RareMagicPortal
                         int colorint = CrystalandKeyLogicColor(PortalName); // this should sync up portal colors
 
                         //Color CurrentZDOColor = Utils.Vec3ToColor(__instance.m_nview.m_zdo.m_vec3.GetValueSafe(_teleportWorldColorHashCode));
+                        if (ConfigUseBiomeColors.Value)
+                        {
 
+                        }
                         Color color;
                         string currentcolor;
                         switch (colorint)
@@ -484,6 +491,9 @@ namespace RareMagicPortal
                 bool sameperson = false;
                 if (portal.m_creator == closestPlayer.GetPlayerID())
                     sameperson = true;
+
+                RareMagicPortal.LogInfo("Biome Currently in is " + closestPlayer.GetCurrentBiome());
+                    
 
                 string PortalName = __instance.m_nview.m_zdo.GetString("tag");
                 int colorint = 1;
