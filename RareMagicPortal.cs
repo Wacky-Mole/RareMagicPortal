@@ -67,7 +67,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         private static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.0" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.1" };
 
         private static MagicPortalFluid? plugin;
         private static MagicPortalFluid context;
@@ -492,7 +492,7 @@ namespace RareMagicPortal
                 if (portal.m_creator == closestPlayer.GetPlayerID())
                     sameperson = true;
 
-                RareMagicPortal.LogInfo("Biome Currently in is " + closestPlayer.GetCurrentBiome());
+               // RareMagicPortal.LogInfo("Biome Currently in is " + closestPlayer.GetCurrentBiome());
                     
 
                 string PortalName = __instance.m_nview.m_zdo.GetString("tag");

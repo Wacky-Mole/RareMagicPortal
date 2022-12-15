@@ -6,9 +6,9 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.5.0
+`Server and client side required for Server Sync enforcement.` V2.5.1
 
-MinimumRequiredVersion = "2.5.0"
+MinimumRequiredVersion = "2.5.1"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -204,6 +204,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.5.1
+            Special ItemManager update for RMP
         Version 2.5.0
             Updated for Mistlands, ItemManager, Added ConfigMaxWeight for all portals (maybe individual in future)
             Added Drop configs for Fluid,Crystals and Drink. Fixed Crystal Size, adjusted CrystalTan
