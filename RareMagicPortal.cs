@@ -197,6 +197,7 @@ namespace RareMagicPortal
         public static Sprite IconTan = null!;
 
         internal static Localization english = null!;
+        internal static Localization spanish = null!;
 
         public static CustomSE AllowTeleEverything = new CustomSE("yippeTele");
         public static List<StatusEffect> statusEffectactive;
@@ -1355,6 +1356,8 @@ namespace RareMagicPortal
             Localizer.Load();
             english = new Localization();
             english.SetupLanguage("English");
+            spanish = new Localization();
+            spanish.SetupLanguage("Spanish");
             LoadAssets();
 
 

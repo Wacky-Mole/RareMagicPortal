@@ -169,9 +169,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="RareMagicPortal-2.5.0\manifest.json" />
-    <None Include="RareMagicPortal-2.5.0\README.md" />
     <None Include="README.md" />
+    <EmbeddedResource Include="translations\Spanish.yml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
@@ -232,8 +231,6 @@
     <EmbeddedResource Include="portaliconTarget.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="RareMagicPortal-2.5.0\icon.png" />
-    <Content Include="RareMagicPortal-2.5.0\plugins\RareMagicPortal.dll" />
     <EmbeddedResource Include="translations\English.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
