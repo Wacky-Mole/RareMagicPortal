@@ -6,9 +6,9 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.5.1
+`Server and client side required for Server Sync enforcement.` V2.5.2
 
-MinimumRequiredVersion = "2.5.1"
+MinimumRequiredVersion = "2.5.2"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -204,6 +204,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.5.2
+            Fixed Color visual, added Spanish Translations <br/>
+            Made it so if you have PortalFluid disabled then it doesn't spawn PortalFluid not matter the number. 
         Version 2.5.1
             Special ItemManager update for RMP
         Version 2.5.0

@@ -152,7 +152,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="functions.cs" />
+    <Compile Include="PortalColorLogic.cs" />
+    <Compile Include="RecipeData.cs" />
     <Compile Include="ColorfulLights.cs" />
     <Compile Include="RareMagicPortal.cs" />
     <Compile Include="PortalName.cs" />
