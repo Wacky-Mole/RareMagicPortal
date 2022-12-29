@@ -33,6 +33,11 @@ namespace RareMagicPortal
         internal static PortalName PortalN;
         internal static Player player = null; // need to keep it between patches
 
+        internal enum PortalColors
+        {
+            
+        }
+
 
 
         #region Patches
@@ -945,8 +950,9 @@ namespace RareMagicPortal
                     return true;
                 }
 
-
-                int CrystalCountMaster = player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
+                Dictionary<PortalColors,int> CrystalCount;
+                Dictionary<PortalColors,int> KeyCount;
+                CrystalCount.Add(PortalColors, player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
                 int CrystalCountRed = player.m_inventory.CountItems(MagicPortalFluid.CrystalRed);
                 int CrystalCountGreen = player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen);
                 int CrystalCountBlue = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);

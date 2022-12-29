@@ -26,14 +26,64 @@ Gold = master/ endgame
 White =endgame/ special
 Portal Drink = rainbow mode? Or current white override.
 
-            // 0 is black/admin only
-            // 1 is normal // free passage
-            // 2 red
-            // 3 green
-            // 4 blue
-            // 5 Purple
-            // 6 gold 
-            // 7 white (Only allow free passage with PortalDrink or enablecrystals)
+
+// 1 Yellow // free passage - Maybe add Yellow Crystal and Key
+// 2 red
+// 3 green
+// 4 blue
+// 5 Purple
+// 6 Brown
+// 7 Cyan
+// 8 Orange
+// 20 Gold // Can be used as mater/engame
+// 21 White (Only allow free passage with PortalDrink or enablecrystals)
+// 22 Black
+
+101 // Yellow Crystal required this many items
+201 Yellow Crystal Grants accesss
+301 Yellow $rmp_redKey_access Key Access
+999 $rmp_noaccess
+
+PortalColors enum
+foreach (var col in enum){
+var num = col.enum num
+        if (Portal_Crystal_Cost[col] > 0 || Portal_Key[col])
+                {
+                    if (CrystalCount[col] == 0) 
+                        flagCarry = num;
+                    else if (Portal_Crystal_Cost["Red"] > CrystalCount[col]) // has less than required
+                        flagCarry = 100+num;
+                    else flagCarry = 200+num; // has more than required
+
+                    if (Portal_Key[col])
+                    {
+                        if (Portal_Crystal_Cost[col] == 0)
+                        {
+                            crystalorkey = 1;
+                            if (KeyCount[col] > 0)
+                                flagCarry = 300+num;
+                            else
+                                flagCarry = num; // no crystal cost, but key cost with no key
+                        }
+                        else
+                        {
+                            if (KeyCount[col] > 0 && flagCarry < 200)
+                                flagCarry = 300+num;
+                            else
+                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
+                        }
+                    }
+                }
+                if (flagCarry > 200)
+                    foundAccess = true;
+                if (flagCarry < 200 && lowest == 0)
+                    lowest = flagCarry;
+
+}
+
+
+
+
 */
 
 using System.Collections;
@@ -220,7 +270,7 @@ namespace RareMagicPortal
         internal static readonly Dictionary<TeleportWorld, TeleportWorldDataRMP> _teleportWorldDataCache = new();
         static readonly KeyboardShortcut _changePortalReq = new(KeyCode.E, KeyCode.LeftControl);
 
-      
+
 
         static internal Dictionary<string, bool> enaColor = new Dictionary<string, bool>(){
                 {"Red", false },
