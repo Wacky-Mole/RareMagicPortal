@@ -29,7 +29,7 @@ Portal Drink = rainbow mode? Or current white override.
 
 // 1 Yellow // free passage - Maybe add Yellow Crystal and Key
 // 2 red
-// 3 green
+/   
 // 4 blue
 // 5 Purple
 // 6 Brown
@@ -39,6 +39,7 @@ Portal Drink = rainbow mode? Or current white override.
 // 21 White (Only allow free passage with PortalDrink or enablecrystals)
 // 22 Black
 
+
 101 // Yellow Crystal required this many items
 201 Yellow Crystal Grants accesss
 301 Yellow $rmp_redKey_access Key Access
@@ -47,36 +48,36 @@ Portal Drink = rainbow mode? Or current white override.
 PortalColors enum
 foreach (var col in enum){
 var num = col.enum num
-        if (Portal_Crystal_Cost[col] > 0 || Portal_Key[col])
+if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
                 {
-                    if (CrystalCount[col] == 0) 
-                        flagCarry = num;
-                    else if (Portal_Crystal_Cost["Red"] > CrystalCount[col]) // has less than required
-                        flagCarry = 100+num;
-                    else flagCarry = 200+num; // has more than required
+                    if (CrystalCountRed == 0) // has none of required
+                        flagCarry = 1;
+                    else if (Portal_Crystal_Cost["Red"] > CrystalCountRed) // has less than required
+                        flagCarry = 11;
+                    else flagCarry = 21; // has more than required
 
-                    if (Portal_Key[col])
+                    if (Portal_Key["Red"])
                     {
-                        if (Portal_Crystal_Cost[col] == 0)
+                        if (Portal_Crystal_Cost["Red"] == 0)
                         {
                             crystalorkey = 1;
-                            if (KeyCount[col] > 0)
-                                flagCarry = 300+num;
+                            if (KeyCountRed > 0)
+                                flagCarry = 111;
                             else
-                                flagCarry = num; // no crystal cost, but key cost with no key
+                                flagCarry = 1; // no crystal cost, but key cost with no key
                         }
                         else
                         {
-                            if (KeyCount[col] > 0 && flagCarry < 200)
-                                flagCarry = 300+num;
+                            if (KeyCountRed > 0 && flagCarry < 20)
+                                flagCarry = 111;
                             else
                                 crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
                         }
                     }
                 }
-                if (flagCarry > 200)
+                if (flagCarry > 20)
                     foundAccess = true;
-                if (flagCarry < 200 && lowest == 0)
+                if (flagCarry < 20 && lowest == 0)
                     lowest = flagCarry;
 
 }

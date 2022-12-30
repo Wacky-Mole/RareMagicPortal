@@ -33,10 +33,52 @@ namespace RareMagicPortal
         internal static PortalName PortalN;
         internal static Player player = null; // need to keep it between patches
 
-        internal enum PortalColors
+
+        internal enum PortalColor // gold - master should always be last or highest int
         {
-            
+            Yellow = 1,
+            Red =2,
+            Green = 3,
+            Blue = 4,
+            Purple = 5,
+            Brown = 6,
+            Cyan = 7,
+            Orange=8,
+            White = 20,
+            Black = 21,
+            Gold = 22,
+
         }
+
+        internal static Dictionary<(String Name, Color HexName), int> PortalColors = new Dictionary<(String, Color), int>()
+        {
+            {(nameof(PortalColor.Yellow), Color.yellow),(int)PortalColor.Yellow },
+            {(nameof(PortalColor.Red), Color.red),(int)PortalColor.Red },
+            {(nameof(PortalColor.Green), Color.green),(int)PortalColor.Green },
+            {(nameof(PortalColor.Blue), Color.blue),(int)PortalColor.Blue },
+            {(nameof(PortalColor.Purple), Purple),(int)PortalColor.Purple },
+            {(nameof(PortalColor.Brown), Brown),(int)PortalColor.Brown },
+            {(nameof(PortalColor.Cyan), Color.cyan),(int)PortalColor.Cyan },
+            {(nameof(PortalColor.Orange), Color.yellow),(int)PortalColor.Orange },
+            {(nameof(PortalColor.White), Color.white),(int)PortalColor.White },
+            {(nameof(PortalColor.Black), Color.black),(int)PortalColor.Black },
+            {(nameof(PortalColor.Gold), Gold),(int)PortalColor.Gold }
+       
+
+            /*
+            { "Yellow", (Color.yellow, 1 )},
+            { "Red",(Color.red, 2 ) },
+            {"Green",(Color.green, 3 ) },
+            {"Blue",(Color.blue, 4 ) },
+            {"Purple",(Purple, 5 ) },
+            {"Brown",(Brown, 6 )  },
+            {"Cyan",(Color.cyan, 7 )  },
+            {"Orange",(Color.gray, 8 )  },
+            { "Gold", (Gold, 20 ) },
+            {"White",(Color.white, 21 )  },
+            {"Black",(Color.black, 22)  }
+            */
+        };
 
 
 
@@ -950,225 +992,66 @@ namespace RareMagicPortal
                     return true;
                 }
 
-                Dictionary<PortalColors,int> CrystalCount;
-                Dictionary<PortalColors,int> KeyCount;
-                CrystalCount.Add(PortalColors, player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
-                int CrystalCountRed = player.m_inventory.CountItems(MagicPortalFluid.CrystalRed);
-                int CrystalCountGreen = player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen);
-                int CrystalCountBlue = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);
-                int CrystalCountPurple = player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple);
-                int CrystalCountTan = player.m_inventory.CountItems(MagicPortalFluid.CrystalTan);
+                Dictionary<string,int> CrystalCount = new Dictionary<string, int>();
+                Dictionary<string, int> KeyCount = new Dictionary<string, int>();
 
-                int KeyCountGold = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold);
-                int KeyCountRed = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed);
-                int KeyCountGreen = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGreen);
-                int KeyCountBlue = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlue);
-                int KeyCountPurple = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyPurple);
-                int KeyCountTan = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyTan);
+                CrystalCount.Add(nameof(PortalColor.Gold), player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster));
+                CrystalCount.Add(nameof(PortalColor.Red), player.m_inventory.CountItems(MagicPortalFluid.CrystalRed));
+                CrystalCount.Add(nameof(PortalColor.Green), player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen));
+                CrystalCount.Add(nameof(PortalColor.Blue), player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue));
+                CrystalCount.Add(nameof(PortalColor.Purple), player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple));
+                CrystalCount.Add(nameof(PortalColor.Brown), player.m_inventory.CountItems(MagicPortalFluid.CrystalTan));
+
+                KeyCount.Add(nameof(PortalColor.Gold), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold));
+                KeyCount.Add(nameof(PortalColor.Red), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed));
+                KeyCount.Add(nameof(PortalColor.Green), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGreen));
+                KeyCount.Add(nameof(PortalColor.Blue), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlue));
+                KeyCount.Add(nameof(PortalColor.Purple), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyPurple));
+                KeyCount.Add(nameof(PortalColor.Brown), player.m_inventory.CountItems(MagicPortalFluid.PortalKeyTan));
 
                 int flagCarry = 0; // don't have any keys or crystals
                 int crystalorkey = 0;// 0 is crystal, 1 is key, 2 is both
-
                 bool foundAccess = false;
                 int lowest = 0;
 
-                if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
+                int coun = PortalColors.Count;
+                foreach (var col in PortalColors)
                 {
-                    if (CrystalCountRed == 0) // has none of required
-                        flagCarry = 1;
-                    else if (Portal_Crystal_Cost["Red"] > CrystalCountRed) // has less than required
-                        flagCarry = 11;
-                    else flagCarry = 21; // has more than required
-
-                    if (Portal_Key["Red"])
+                    if (CrystalCount[col.Key.Name] > 0 || KeyCount[col.Key.Name] > 0)
                     {
-                        if (Portal_Crystal_Cost["Red"] == 0)
+                        if (CrystalCount[col.Key.Name] == 0) 
+                            flagCarry = col.Value;
+                        else if (Portal_Crystal_Cost[col.Key.Name] > CrystalCount[col.Key.Name]) // has less than required
+                            flagCarry = 100+ col.Value;
+                        else flagCarry = 200+ col.Value; // has more than required
+
+                        if (Portal_Key[col.Key.Name])
                         {
-                            crystalorkey = 1;
-                            if (KeyCountRed > 0)
-                                flagCarry = 111;
+                            if (Portal_Crystal_Cost[col.Key.Name] == 0)
+                            {
+                                crystalorkey = 1;
+                                if (KeyCount[col.Key.Name] > 0)
+                                    flagCarry = 300+col.Value;
+                                else
+                                    flagCarry = col.Value; // no crystal cost, but key cost with no key
+                            }
                             else
-                                flagCarry = 1; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountRed > 0 && flagCarry < 20)
-                                flagCarry = 111;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
+                            {
+                                if (KeyCount[col.Key.Name] > 0 && flagCarry< 200)
+                                    flagCarry = 300+col.Value;
+                                else
+                                    crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
+                            }
                         }
                     }
-                }
-                if (flagCarry > 20)
-                    foundAccess = true;
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
+                    if (flagCarry > 200)
+                        foundAccess = true;
+                    if (flagCarry < 200 && lowest == 0)
+                        lowest = flagCarry;
+
+                }// for every color
 
 
-                if (!foundAccess && (Portal_Crystal_Cost["Green"] > 0 || Portal_Key["Green"]))
-                {
-                    if (CrystalCountGreen == 0) // has none of required
-                        flagCarry = 2;
-                    else if (Portal_Crystal_Cost["Green"] > CrystalCountGreen) // has less than required
-                        flagCarry = 12;
-                    else flagCarry = 22; // has more than required
-
-                    if (Portal_Key["Green"])
-                    {
-                        if (Portal_Crystal_Cost["Green"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountGreen > 0)
-                                flagCarry = 222;
-                            else
-                                flagCarry = 2; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountGreen > 0 && flagCarry < 20)
-                                flagCarry = 222;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
-                if (flagCarry > 20)
-                    foundAccess = true;
-
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
-
-                if (!foundAccess && (Portal_Crystal_Cost["Blue"] > 0 || Portal_Key["Blue"]))
-                {
-                    if (CrystalCountBlue == 0) // has none of required
-                        flagCarry = 3;
-                    else if (Portal_Crystal_Cost["Blue"] > CrystalCountBlue) // has less than required
-                        flagCarry = 13;
-                    else flagCarry = 33; // has more than required
-
-                    if (Portal_Key["Blue"])
-                    {
-                        if (Portal_Crystal_Cost["Blue"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountBlue > 0)
-                                flagCarry = 333;
-                            else
-                                flagCarry = 3; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountBlue > 0 && flagCarry < 20)
-                                flagCarry = 333;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
-                if (flagCarry > 30)
-                    foundAccess = true;
-
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
-
-
-                if (!foundAccess && (Portal_Crystal_Cost["Purple"] > 0 || Portal_Key["Purple"]))
-                {
-
-                    if (CrystalCountPurple == 0) // has none of required
-                        flagCarry = 4;
-                    else if (Portal_Crystal_Cost["Purple"] > CrystalCountPurple) // has less than required
-                        flagCarry = 14;
-                    else flagCarry = 44; // has more than required
-
-                    if (Portal_Key["Purple"])
-                    {
-                        if (Portal_Crystal_Cost["Purple"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountPurple > 0)
-                                flagCarry = 444;
-                            else
-                                flagCarry = 4; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountPurple > 0 && flagCarry < 20)
-                                flagCarry = 444;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
-
-                if (flagCarry > 40)
-                    foundAccess = true;
-
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
-
-
-                if (!foundAccess && (Portal_Crystal_Cost["Tan"] > 0 || Portal_Key["Tan"]))
-                {
-                    if (CrystalCountTan == 0) // has none of required
-                        flagCarry = 5;
-                    else if (Portal_Crystal_Cost["Tan"] > CrystalCountTan) // has less than required
-                        flagCarry = 15;
-                    else flagCarry = 55; // has more than required
-
-                    if (Portal_Key["Tan"])
-                    {
-                        if (Portal_Crystal_Cost["Tan"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountTan > 0)
-                                flagCarry = 555;
-                            else
-                                flagCarry = 5; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountTan > 0 && flagCarry < 20)
-                                flagCarry = 555;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
-                if (flagCarry > 50)
-                    foundAccess = true;
-
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
-
-
-                if (!foundAccess && (Portal_Crystal_Cost["Gold"] > 0 || Portal_Key["Gold"]))
-                {
-                    if (CrystalCountMaster == 0) // has none of required
-                        flagCarry = 9;
-                    else if (Portal_Crystal_Cost["Gold"] > CrystalCountMaster) // has less than required
-                        flagCarry = 19;
-                    else flagCarry = 99; // has more than required
-
-                    if (Portal_Key["Gold"])
-                    {
-                        if (Portal_Crystal_Cost["Gold"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountGold > 0)
-                                flagCarry = 999;
-                            else
-                                flagCarry = 9; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountGold > 0 && flagCarry < 20)
-                                flagCarry = 999;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
                 if (flagCarry < 20 && lowest == 0)
                     lowest = flagCarry;
 
