@@ -122,7 +122,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.5.2";
+        public const string PluginVersion = "2.5.3";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -895,10 +895,10 @@ namespace RareMagicPortal
             CreateConfigValues();
             ReadAndWriteConfigValues();
             Localizer.Load();
-            english = new Localization();
-            english.SetupLanguage("English");
-            spanish = new Localization();
-            spanish.SetupLanguage("Spanish");
+            //english = new Localization();
+            //english.SetupLanguage("English");
+            //spanish = new Localization();
+            //spanish.SetupLanguage("Spanish");
             LoadAssets();
 
 

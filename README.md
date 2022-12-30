@@ -6,7 +6,7 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.5.2
+`Server and client side required for Server Sync enforcement.` V2.5.3
 
 MinimumRequiredVersion = "2.5.2"
 
@@ -204,6 +204,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.5.3
+            I didn't do spanish correctly, fixed some spanish yml error.
         Version 2.5.2
             Fixed Color visual, added Spanish Translations <br/>
             Made it so if you have PortalFluid disabled then it doesn't spawn PortalFluid not matter the number. 
