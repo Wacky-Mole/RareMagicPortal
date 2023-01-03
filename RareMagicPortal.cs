@@ -210,6 +210,7 @@ namespace RareMagicPortal
         internal static ConfigEntry<bool>? ConfigTargetPortalAnimation;
         internal static ConfigEntry<int>? ConfigMaxWeight;
         internal static ConfigEntry<bool>? ConfigUseBiomeColors;
+        internal static ConfigEntry<string>? BiomeRepColors;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -265,6 +266,8 @@ namespace RareMagicPortal
         internal static readonly int _teleportWorldColorHashCode = "TeleportWorldColorRMP".GetStableHashCode(); // I should probably change this
         internal static readonly int _teleportWorldColorAlphaHashCode = "TeleportWorldColorAlphaRMP".GetStableHashCode();
         internal static readonly int _portalLastColoredByHashCode = "PortalLastColoredByRMP".GetStableHashCode();
+        internal static readonly int _portalCreatorHashCode = "PortalCreatorRMP".GetStableHashCode();
+        internal static readonly int _portalBiomeHashCode = "PortalBiomeRMP".GetStableHashCode();
         internal static string PortalFluidname;
         internal static bool TargetPortalLoaded = false;
 
@@ -423,6 +426,8 @@ namespace RareMagicPortal
             [HarmonyPriority(Priority.LowerThanNormal)]
             internal static bool Prefix(ref bool __result, ref Inventory __instance)
             {
+                if (__instance == null || Player.m_localPlayer == null)
+                    return true;
                 /*
 				if (Game.instance.m_firstSpawn)
 				{
@@ -1608,9 +1613,9 @@ namespace RareMagicPortal
 
             ConfigMaxWeight = config("3.Portal Config", "Max Weight Allowed for Portals", 0, "This affects all portals - Enter the max weight that can transit through a portal at a time. Value of 0 disables the check");
 
-           // ConfigUseBiomeColors = config("6.ForceBiomeColors", "Force Biome Colors for Default", false, "This will Override Default Colors and Use Specific Colors for Biomes");
+            ConfigUseBiomeColors = config("6.ForceBiomeColors", "Force Biome Colors for Default", false, "This will Override Default Colors and Use Specific Colors for Biomes");
 
-           // BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Brown,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biome Colors Represented");
+            BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Brown,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biome Colors Represented");
 
             ConfigEnableCrystalsNKeys = config("4.Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
 
