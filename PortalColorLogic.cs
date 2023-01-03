@@ -15,6 +15,8 @@ using YamlDotNet.Core.Tokens;
 
 namespace RareMagicPortal
 {
+
+
     internal class PortalColorLogic
     {
 
@@ -52,19 +54,19 @@ namespace RareMagicPortal
 
         }
 
-        internal static Dictionary<(String Name, Color HexName), int> PortalColors = new Dictionary<(String, Color), int>()
+        internal static Dictionary<String,(Color HexName, int Pos) > PortalColors = new Dictionary<String,(Color, int)>()
         {
-            {(nameof(PortalColor.Yellow), Color.yellow),(int)PortalColor.Yellow },
-            {(nameof(PortalColor.Red), Color.red),(int)PortalColor.Red },
-            {(nameof(PortalColor.Green), Color.green),(int)PortalColor.Green },
-            {(nameof(PortalColor.Blue), Color.blue),(int)PortalColor.Blue },
-            {(nameof(PortalColor.Purple), Purple),(int)PortalColor.Purple },
-            {(nameof(PortalColor.Brown), Brown),(int)PortalColor.Brown },
-            {(nameof(PortalColor.Cyan), Color.cyan),(int)PortalColor.Cyan },
-            {(nameof(PortalColor.Orange), Color.yellow),(int)PortalColor.Orange },
-            {(nameof(PortalColor.White), Color.white),(int)PortalColor.White },
-            {(nameof(PortalColor.Black), Color.black),(int)PortalColor.Black },
-            {(nameof(PortalColor.Gold), Gold),(int)PortalColor.Gold }
+            {nameof(PortalColor.Yellow),(Color.yellow,(int)PortalColor.Yellow ) },
+            {nameof(PortalColor.Red), (Color.red,(int)PortalColor.Red) },
+            {nameof(PortalColor.Green), (Color.green,(int)PortalColor.Green )},
+            {nameof(PortalColor.Blue), (Color.blue,(int)PortalColor.Blue) },
+            {nameof(PortalColor.Purple),( Purple,(int)PortalColor.Purple) },
+            {nameof(PortalColor.Brown), (Brown,(int)PortalColor.Brown )},
+            {nameof(PortalColor.Cyan), (Color.cyan,(int)PortalColor.Cyan) },
+            {nameof(PortalColor.Orange),( Color.yellow,(int)PortalColor.Orange) },
+            {nameof(PortalColor.White), (Color.white,(int)PortalColor.White) },
+            {nameof(PortalColor.Black), (Color.black,(int)PortalColor.Black )},
+            {nameof(PortalColor.Gold), (Gold,(int)PortalColor.Gold )}
        
 
             /*
@@ -81,6 +83,37 @@ namespace RareMagicPortal
             {"Black",(Color.black, 22)  }
             */
         };
+
+
+        internal static Dictionary<string, int> CrystalCount = new Dictionary<string, int>();
+        internal static Dictionary<string, int> KeyCount = new Dictionary<string, int>(); 
+        
+        public static void initRCL ()
+        {
+            foreach (var cols in PortalColors) // setup for all that don't have a count or crystal/key
+            {
+                CrystalCount.Add(cols.Key, 0);
+                KeyCount.Add(cols.Key, 0);
+            }
+
+
+            CrystalCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
+            CrystalCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalRed);
+            CrystalCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen);
+            CrystalCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);
+            CrystalCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple);
+            CrystalCount[nameof(PortalColor.Brown)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalTan);
+
+            KeyCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold);
+            KeyCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed);
+            KeyCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGreen);
+            KeyCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlue);
+            KeyCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyPurple);
+            KeyCount[nameof(PortalColor.Brown)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyTan);
+
+        }
+        
+
 
         
 
@@ -394,11 +427,13 @@ namespace RareMagicPortal
                 string PortalName = __instance.m_nview.m_zdo.GetString("tag");
                 int colorint = 1;
 
-                colorint = PortalColorLogic.CrystalandKeyLogicColor(PortalName);
-
 
                 string currentcolor = "Default";
                 string nextcolor;
+                Color currentcolorHex;
+                colorint = CrystalandKeyLogicColor(out currentcolor, out currentcolorHex, out nextcolor, PortalName);
+
+
                 string text;
                 Color color;
                 switch (colorint)
@@ -505,10 +540,10 @@ namespace RareMagicPortal
                             
                             foreach (var col in PortalColors)
                             {
-                                if (col.Key.Name == single[1])
+                                if (col.Key == single[1])
                                 {
-                                    teleportWorldData.BiomeColor = col.Key.HexName;
-                                    newColor = col.Key.HexName;
+                                    teleportWorldData.BiomeColor = col.Value.HexName;
+                                    newColor = col.Value.HexName;
                                 }
                             }
                         }
@@ -615,6 +650,10 @@ namespace RareMagicPortal
         internal static int CrystalandKeyLogicColor(string PortalName = "")
         {
 
+        }
+        internal static int CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, string PortalName = "")
+        {
+
 
             int CrystalForPortal = MagicPortalFluid.ConfigCrystalsConsumable.Value;
             bool OdinsKin = false;
@@ -629,16 +668,42 @@ namespace RareMagicPortal
             var Portal_Key = PortalN.Portals[PortalName].Portal_Key; // rgbG
             if (OdinsKin)
             {
-                return 0;
+                currentColor = PortalColor.Black.ToString();
+                currentColorHex = PortalColors[currentColor].HexName;
+                //int som = Convert.ToInt32(PortalColor.Yellow); // or PortalColors[currentColor].Pos +1
+                nextcolor = PortalColor.Black.Next().ToString(); //PortalColor.Red.ToString();
+                return PortalColors[currentColor].Pos;
             }
 
             if (Free_Passage)
-                return 1;
+            {
+                currentColor = PortalColor.Yellow.ToString();
+                currentColorHex = PortalColors[currentColor].HexName;
+                nextcolor = PortalColor.Yellow.Next().ToString(); //PortalColor.Red.ToString();
+                return PortalColors[currentColor].Pos;
+            }
 
             if (PortalN.Portals[PortalName].TeleportAnything)
             {
-                //CycleWhite = false;
-                return 8;
+                currentColor = PortalColor.White.ToString();
+                currentColorHex = PortalColors[currentColor].HexName;
+                nextcolor = PortalColor.White.Next().ToString(); //PortalColor.Red.ToString();
+                return PortalColors[currentColor].Pos;
+            }
+
+            foreach(var pc in PortalColors)
+            {
+              var name = pc.Key;
+                try
+                {
+                    if (Portal_Crystal_Cost[name] > 0 || Portal_Key[name])
+                    {
+                        currentColor = name;
+                        currentColorHex = PortalColors[currentColor].HexName;
+                        nextcolor = ; //PortalColor.Red.ToString();
+                        return pc.Value.Pos;
+                    }
+                } catch { }// not in file so maybe add?
             }
 
             if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
@@ -1009,29 +1074,7 @@ namespace RareMagicPortal
                     return true;
                 }
 
-                Dictionary<string,int> CrystalCount = new Dictionary<string, int>();
 
-                Dictionary<string, int> KeyCount = new Dictionary<string, int>();                
-                foreach (var cols in PortalColors) // setup for all that don't have a count or crystal/key
-                {
-                    CrystalCount.Add(cols.Key.Name, 0);
-                    KeyCount.Add(cols.Key.Name, 0);
-                }
-               
-
-                CrystalCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
-                CrystalCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalRed);
-                CrystalCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen);
-                CrystalCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);
-                CrystalCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple);
-                CrystalCount[nameof(PortalColor.Brown)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalTan);
-
-                KeyCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold);
-                KeyCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed);
-                KeyCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGreen);
-                KeyCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlue);
-                KeyCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyPurple);
-                KeyCount[nameof(PortalColor.Brown)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyTan);
 
                 int flagCarry = 0; // don't have any keys or crystals
                 int crystalorkey = 0;// 0 is crystal, 1 is key, 2 is both
@@ -1041,28 +1084,28 @@ namespace RareMagicPortal
                 int coun = PortalColors.Count;
                 foreach (var col in PortalColors)
                 {
-                    if (CrystalCount[col.Key.Name] > 0 || KeyCount[col.Key.Name] > 0)
+                    if (CrystalCount[col.Key] > 0 || KeyCount[col.Key] > 0)
                     {
-                        if (CrystalCount[col.Key.Name] == 0) 
-                            flagCarry = col.Value;
-                        else if (Portal_Crystal_Cost[col.Key.Name] > CrystalCount[col.Key.Name]) // has less than required
-                            flagCarry = 100+ col.Value;
-                        else flagCarry = 200+ col.Value; // has more than required
+                        if (CrystalCount[col.Key] == 0) 
+                            flagCarry = col.Value.Pos;
+                        else if (Portal_Crystal_Cost[col.Key] > CrystalCount[col.Key]) // has less than required
+                            flagCarry = 100+ col.Value.Pos;
+                        else flagCarry = 200+ col.Value.Pos; // has more than required
 
-                        if (Portal_Key[col.Key.Name])
+                        if (Portal_Key[col.Key])
                         {
-                            if (Portal_Crystal_Cost[col.Key.Name] == 0)
+                            if (Portal_Crystal_Cost[col.Key] == 0)
                             {
                                 crystalorkey = 1;
-                                if (KeyCount[col.Key.Name] > 0)
-                                    flagCarry = 300+col.Value;
+                                if (KeyCount[col.Key] > 0)
+                                    flagCarry = 300+col.Value.Pos;
                                 else
-                                    flagCarry = col.Value; // no crystal cost, but key cost with no key
+                                    flagCarry = col.Value.Pos; // no crystal cost, but key cost with no key
                             }
                             else
                             {
-                                if (KeyCount[col.Key.Name] > 0 && flagCarry< 200)
-                                    flagCarry = 300+col.Value;
+                                if (KeyCount[col.Key] > 0 && flagCarry< 200)
+                                    flagCarry = 300+col.Value.Pos;
                                 else
                                     crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
                             }
@@ -1555,5 +1598,18 @@ namespace RareMagicPortal
             return false;
         }
 
+    }
+
+    public static class Extensions
+    {
+
+        public static T Next<T>(this T src) where T : struct
+        {
+            if (!typeof(T).IsEnum) throw new ArgumentException(String.Format("Argument {0} is not an Enum", typeof(T).FullName));
+
+            T[] Arr = (T[])Enum.GetValues(src.GetType());
+            int j = Array.IndexOf<T>(Arr, src) + 1;
+            return (Arr.Length == j) ? Arr[0] : Arr[j];
+        }
     }
 }

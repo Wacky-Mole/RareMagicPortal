@@ -918,6 +918,7 @@ namespace RareMagicPortal
             YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
             IconColors();
+            PortalColorLogic.initRCL();
 
 
             RareMagicPortal.LogInfo($"MagicPortalFluid has loaded start assets");
