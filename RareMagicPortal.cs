@@ -45,45 +45,6 @@ Portal Drink = rainbow mode? Or current white override.
 301 Yellow $rmp_redKey_access Key Access
 999 $rmp_noaccess
 
-PortalColors enum
-foreach (var col in enum){
-var num = col.enum num
-if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
-                {
-                    if (CrystalCountRed == 0) // has none of required
-                        flagCarry = 1;
-                    else if (Portal_Crystal_Cost["Red"] > CrystalCountRed) // has less than required
-                        flagCarry = 11;
-                    else flagCarry = 21; // has more than required
-
-                    if (Portal_Key["Red"])
-                    {
-                        if (Portal_Crystal_Cost["Red"] == 0)
-                        {
-                            crystalorkey = 1;
-                            if (KeyCountRed > 0)
-                                flagCarry = 111;
-                            else
-                                flagCarry = 1; // no crystal cost, but key cost with no key
-                        }
-                        else
-                        {
-                            if (KeyCountRed > 0 && flagCarry < 20)
-                                flagCarry = 111;
-                            else
-                                crystalorkey = 2; // yes crystal cost, and key cost with no key, so let user know both is good
-                        }
-                    }
-                }
-                if (flagCarry > 20)
-                    foundAccess = true;
-                if (flagCarry < 20 && lowest == 0)
-                    lowest = flagCarry;
-
-}
-
-
-
 
 */
 

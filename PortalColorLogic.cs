@@ -54,19 +54,19 @@ namespace RareMagicPortal
 
         }
 
-        internal static Dictionary<String,(Color HexName, int Pos) > PortalColors = new Dictionary<String,(Color, int)>()
+        internal static Dictionary<String,(Color HexName, int Pos,bool Enabled) > PortalColors = new Dictionary<String,(Color, int, bool)>()
         {
-            {nameof(PortalColor.Yellow),(Color.yellow,(int)PortalColor.Yellow ) },
-            {nameof(PortalColor.Red), (Color.red,(int)PortalColor.Red) },
-            {nameof(PortalColor.Green), (Color.green,(int)PortalColor.Green )},
-            {nameof(PortalColor.Blue), (Color.blue,(int)PortalColor.Blue) },
-            {nameof(PortalColor.Purple),( Purple,(int)PortalColor.Purple) },
-            {nameof(PortalColor.Brown), (Brown,(int)PortalColor.Brown )},
-            {nameof(PortalColor.Cyan), (Color.cyan,(int)PortalColor.Cyan) },
-            {nameof(PortalColor.Orange),( Color.yellow,(int)PortalColor.Orange) },
-            {nameof(PortalColor.White), (Color.white,(int)PortalColor.White) },
-            {nameof(PortalColor.Black), (Color.black,(int)PortalColor.Black )},
-            {nameof(PortalColor.Gold), (Gold,(int)PortalColor.Gold )}
+            {nameof(PortalColor.Yellow),(Color.yellow,(int)PortalColor.Yellow, true ) },
+            {nameof(PortalColor.Red), (Color.red,(int)PortalColor.Red, true) },
+            {nameof(PortalColor.Green), (Color.green,(int)PortalColor.Green, true )},
+            {nameof(PortalColor.Blue), (Color.blue,(int)PortalColor.Blue, true) },
+            {nameof(PortalColor.Purple),( Purple,(int)PortalColor.Purple, true) },
+            {nameof(PortalColor.Brown), (Brown,(int)PortalColor.Brown, true)},
+            {nameof(PortalColor.Cyan), (Color.cyan,(int)PortalColor.Cyan, true) },
+            {nameof(PortalColor.Orange),( Color.yellow,(int)PortalColor.Orange, true) },
+            {nameof(PortalColor.White), (Color.white,(int)PortalColor.White, true) },
+            {nameof(PortalColor.Black), (Color.black,(int)PortalColor.Black, true)},
+            {nameof(PortalColor.Gold), (Gold,(int)PortalColor.Gold, true )}
        
 
             /*
@@ -94,6 +94,11 @@ namespace RareMagicPortal
             {
                 CrystalCount.Add(cols.Key, 0);
                 KeyCount.Add(cols.Key, 0);
+                // get enabled
+            }
+            foreach (var cols in PortalColors) // setup for all that don't have a count or crystal/key
+            {
+                if (cols.Value.Enabled)
             }
 
 
@@ -691,19 +696,21 @@ namespace RareMagicPortal
                 return PortalColors[currentColor].Pos;
             }
 
-            foreach(var pc in PortalColors)
+            foreach (var pc in PortalColors)
             {
-              var name = pc.Key;
-                try
-                {
-                    if (Portal_Crystal_Cost[name] > 0 || Portal_Key[name])
+                var name = pc.Key;
+                if (pc.Value.Enabled) { 
+                    try
                     {
-                        currentColor = name;
-                        currentColorHex = PortalColors[currentColor].HexName;
-                        nextcolor = ; //PortalColor.Red.ToString();
-                        return pc.Value.Pos;
-                    }
-                } catch { }// not in file so maybe add?
+                        if (Portal_Crystal_Cost[name] > 0 || Portal_Key[name])
+                        {
+                            currentColor = name;
+                            currentColorHex = PortalColors[currentColor].HexName;
+                            nextcolor = pc.; //PortalColor.Red.ToString();
+                            return pc.Value.Pos;
+                        }
+                    } catch { }// not in file so maybe add?
+                }
             }
 
             if (Portal_Crystal_Cost["Red"] > 0 || Portal_Key["Red"])
