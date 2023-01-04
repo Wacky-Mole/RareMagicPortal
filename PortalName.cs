@@ -36,6 +36,8 @@ namespace RareMagicPortal
 
             public List<string> AdditionalProhibitItems { get; set; } = new List<string>();// { "Blackmetal", "Iron" };
 
+            public string BiomeColor { get; set; }
+
             public int SpecialMode {get; set; } = 0; // 0 - normal, 1 - rainbow, 2 -password lock, - 3 Manual ID lock, -4 AllowedList is Moderator List
             public List<string> AllowedUsers { get; set; } = new List<string>();// { "SteamID1", "SteamID2" };
 

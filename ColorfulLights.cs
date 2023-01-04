@@ -40,10 +40,10 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         public List<ParticleSystem> Systems { get; } = new List<ParticleSystem>();
         public List<Material> Materials { get; } = new List<Material>();
         public String Biome { get; set; }
+        public String BiomeColor  { get; set; }
 
         public Color TargetColor = Color.clear;
         public Color LinkColor = Color.clear;
-        public Color BiomeColor = Color.clear;
         public Color OldColor = Color.clear;
         public List<Renderer> MeshRend { get; } = new List<Renderer>();
         public String MaterialPortName { get; set; }

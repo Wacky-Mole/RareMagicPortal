@@ -8,6 +8,7 @@
 			<InputAssemblies Include="$(OutputPath)\YamlDotNet.dll" />
 			<InputAssemblies Include="$(OutputPath)\LocalizationManager.dll" />
 			<InputAssemblies Include="$(OutputPath)\StatusEffectManager.dll" />
+			<InputAssemblies Include="$(OutputPath)\System.ValueTuple.dll" />
 
 
 		</ItemGroup>

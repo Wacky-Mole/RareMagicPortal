@@ -17,11 +17,11 @@ Black = mountain
 Yellow = normal
 Red = ashlands
 Green = swamp
-Brown = blackforest 
+Tan = blackforest 
 Purple = mistlands
 Cyan = deepnorth
 Orange = plains
-Brown = meadows
+Tan = meadows
 Gold = master/ endgame
 White =endgame/ special
 Portal Drink = rainbow mode? Or current white override.
@@ -32,7 +32,7 @@ Portal Drink = rainbow mode? Or current white override.
 /   
 // 4 blue
 // 5 Purple
-// 6 Brown
+// 6 Tan
 // 7 Cyan
 // 8 Orange
 // 20 Gold // Can be used as mater/engame
@@ -172,6 +172,10 @@ namespace RareMagicPortal
         internal static ConfigEntry<int>? ConfigMaxWeight;
         internal static ConfigEntry<bool>? ConfigUseBiomeColors;
         internal static ConfigEntry<string>? BiomeRepColors;
+        internal static ConfigEntry<string>? EnabledColors;
+        internal static ConfigEntry<string>? FreePassageColor;
+        internal static ConfigEntry<string>? AdminColor;
+        internal static ConfigEntry<string>? PortalDrinkColor;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -910,7 +914,7 @@ namespace RareMagicPortal
             IconWhite = IconColor.CreateSprite(tex, true);
             IconColor.setTint(PortalColorLogic.Purple);
             IconPurple = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(PortalColorLogic.Brown);
+            IconColor.setTint(PortalColorLogic.Tan);
             IconTan = IconColor.CreateSprite(tex, true);
 
         }
@@ -1575,15 +1579,9 @@ namespace RareMagicPortal
 
             ConfigMaxWeight = config("3.Portal Config", "Max Weight Allowed for Portals", 0, "This affects all portals - Enter the max weight that can transit through a portal at a time. Value of 0 disables the check");
 
-            ConfigUseBiomeColors = config("6.ForceBiomeColors", "Force Biome Colors for Default", false, "This will Override Default Colors and Use Specific Colors for Biomes");
-
-            BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Brown,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biome Colors Represented");
-
             ConfigEnableCrystalsNKeys = config("4.Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
 
             ConfigEnableGoldAsMaster = config("4.Portal Crystals", "Use Gold as Portal Master", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
-
-            //ConfigEnableColorEnable = config("Portal Crystals", "ColorsEnabled", "Red,Green,Blue,Purple,Gold", "Whether anyone can use these Colored Portals, even if they have the requirements-  Red,Green,Blue,Purple,Gold");
 
             //ConfigEnableKeys = config("Portal Keys", "Portal_Keys_Enable", false, "Enable Portal Crystals");
 
@@ -1591,11 +1589,23 @@ namespace RareMagicPortal
 
             //ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
-            CrystalKeyDefaultColor = config("4.Portal Crystals", "Portal Crystal Color Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Red,Green,Blue,Purple,Tan,None" + System.Environment.NewLine + " None - will set Portals to Free Passage by default");
+            CrystalKeyDefaultColor = config("4.Portal Crystals", "Portal Crystal Color Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold,none,None" + System.Environment.NewLine + " None - will set Portals to Free Passage (Yellow) by default");
 
             ConfigMessageLeft = config("4.Portal Crystals", "Use Top Left Message", false, "In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.");
 
             PortalDrinkTimer = config("5.Portal Drink", "Portal Drink Timer", 120, "How Long Odin's Drink lasts");
+
+            ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", true, "This will Override -Portal Crystal Color Default- and Use Specific Colors for Biomes");
+
+            BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Tan,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biomes and their related Colors. - No spaces");
+
+            EnabledColors = config("7.Colors", "Enabled Colors for Portals", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are available Colors that can be enabled- maybe in future custom colors");
+
+            FreePassageColor = config("7.Colors", "Free Passage Color", "Yellow", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are the available Colors that can be selected for the Free Passage Color - Only 1 can be set - Default is Yellow");
+
+            AdminColor = config("7.Colors", "Admin only Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Admin only portals - Only 1 can be set - Default is none, but I recommend Black");
+
+            PortalDrinkColor = config("7.Colors", "Portal Drink Color", "White", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or rainbow are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is rainbow - Don't mess with this option" );
 
 
         }
