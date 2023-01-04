@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 1768640734
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: exampleswordtest
+      Dependencies:
+        Dependency_0: wackyportals
+    Info_1:
+      Name: portalmagicfluid
+      Dependencies:
+        Dependency_0: wackyportals
+    Info_2:
+      Name: portalcrystal
+      Dependencies:
+        Dependency_0: wackyportals
+    Info_3:
+      Name: wackyportals
+      Dependencies: {}
+    Info_4:
+      Name: worldtreeseed
+      Dependencies:
+        Dependency_0: wackyportals

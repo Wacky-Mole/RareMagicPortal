@@ -1,0 +1,66 @@
+ManifestFileVersion: 0
+CRC: 3148513412
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: bf086e1280a802f5faef6c60f96f16a0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: bbc48ad260a81d79a47a96b96b4140dc
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: d8d531e381601b94c984221b5db7323d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: beeab75582e689f4ebd2271089437b6d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1c2f8d58a6d59584391300be9718ce35, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ce0660cf497ffea489c9c606137e6a86, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 205
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/CustomItems/PortalCrystalRed.prefab
+- Assets/CustomItems/PortalKeyBlue.prefab
+- Assets/CustomItems/PortalKeyTan.prefab
+- Assets/CustomItems/PortalCrystalBlue.prefab
+- Assets/CustomItems/PortalKeyGreen.prefab
+- Assets/CustomItems/PortalCrystalPurple.prefab
+- Assets/CustomItems/PortalKeyGold.prefab
+- Assets/CustomItems/PortalCrystalGreen.prefab
+- Assets/CustomItems/PortalKeyRed.prefab
+- Assets/CustomItems/PortalKeyPurple.prefab
+- Assets/CustomItems/PortalCrystalMaster.prefab
+- Assets/CustomItems/PortalCrystalTan.prefab
+Dependencies: []
