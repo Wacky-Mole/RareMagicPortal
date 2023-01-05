@@ -38,6 +38,7 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
     {
         public List<Light> Lights { get; } = new List<Light>();
         public List<ParticleSystem> Systems { get; } = new List<ParticleSystem>();
+        public List<ParticleSystem> Sucks { get; } = new List<ParticleSystem>();
         public List<Material> Materials { get; } = new List<Material>();
         public String Biome { get; set; }
         public String BiomeColor  { get; set; }
@@ -57,6 +58,8 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
 
             Systems.AddRange(teleportWorld.GetComponentsInNamedChild<ParticleSystem>("suck particles"));
             Systems.AddRange(teleportWorld.GetComponentsInNamedChild<ParticleSystem>("Particle System"));
+            Sucks.AddRange(teleportWorld.GetComponentsInNamedChild<ParticleSystem>("Black_suck"));
+
 
             Materials.AddRange(
                 teleportWorld.GetComponentsInNamedChild<ParticleSystemRenderer>("blue flames")

@@ -98,7 +98,7 @@ namespace RareMagicPortal
 		*/
 
 
-        static string GetColorHtmlString(Color color)
+        internal static string GetColorHtmlString(Color color)
         {
             return color.a == 1.0f
                 ? ColorUtility.ToHtmlStringRGB(color)

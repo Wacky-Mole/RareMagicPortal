@@ -179,7 +179,7 @@ namespace RareMagicPortal
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
-        public string message_eng_MasterCost = $", Rainbow Crystals Required"; // 3, Master Crystals Required
+        public string message_eng_MasterCost = $", Gold Crystals Required"; // 3, Master Crystals Required
         public string message_eng_NotCreator = $"";
         public string message_eng_Grants_Acess = $"";
         public string message_eng_Crystal_Consumed = $"";
@@ -202,16 +202,10 @@ namespace RareMagicPortal
 
         SpriteTools IconColor = new SpriteTools();
 
-        public static Sprite IconBlack = null!;
-        public static Sprite IconYellow = null!;
-        public static Sprite IconRed = null!;
-        public static Sprite IconGreen = null!;
-        public static Sprite IconBlue = null!;
-        public static Sprite IconGold = null!;
-        public static Sprite IconWhite = null!;
+        public static Dictionary<string, Sprite> Icons = new Dictionary<string, Sprite>();
+
         public static Sprite IconDefault = null!;
-        public static Sprite IconPurple = null!;
-        public static Sprite IconTan = null!;
+
 
         internal static Localization english = null!;
         internal static Localization spanish = null!;
@@ -238,17 +232,6 @@ namespace RareMagicPortal
 
         internal static readonly Dictionary<TeleportWorld, TeleportWorldDataRMP> _teleportWorldDataCache = new();
         static readonly KeyboardShortcut _changePortalReq = new(KeyCode.E, KeyCode.LeftControl);
-
-
-
-        static internal Dictionary<string, bool> enaColor = new Dictionary<string, bool>(){
-                {"Red", false },
-                {"Blue", false },
-                {"Green", false },
-                {"Gold", false },
-                {"Purple",false },
-                {"Tan",false }
-            };
 
 
         static IEnumerator RemovedDestroyedTeleportWorldsCoroutine()
@@ -645,7 +628,6 @@ namespace RareMagicPortal
                     }
                 }
                 // end finding portal name
-
                 m_hadTarget = __instance.m_tp.m_hadTarget;
                 OutsideP = PortalName;
                 // keep player and m_hadTarget for future patch for targetportal
@@ -665,7 +647,7 @@ namespace RareMagicPortal
                     return true;
 
                 }
-                else // false 
+                else // false never gets run
                 {
                     Teleporting = false;
                     if (Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal")) // or any other mods that need to be skipped // this shoudn't be hit
@@ -684,7 +666,6 @@ namespace RareMagicPortal
                 if (Teleporting && Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal"))
                 {
                     //RareMagicPortal.LogInfo($"Made it to Portal Trigger");
-
                     int colorint;
                     String PName;
                     String PortalName;
@@ -705,43 +686,18 @@ namespace RareMagicPortal
                         {
                             if (pin.m_icon.name == "TargetPortalIcon") // only selects correct icon now
                             {
-
                                 PName = pin.m_name; // icons name - Portalname
 
-                                colorint = PortalColorLogic.CrystalandKeyLogicColor(PName); // kindof expensive task to do this cpu wize for all portals
-                                switch (colorint)
-                                {
-                                    case 0:
-                                        pin.m_icon = IconBlack;
-                                        break;
-                                    case 1:
-                                        pin.m_icon = IconDefault;
-                                        break;
-                                    case 2:
-                                        pin.m_icon = IconRed;
-                                        break;
-                                    case 3:
-                                        pin.m_icon = IconGreen;
-                                        break;
-                                    case 4:
-                                        pin.m_icon = IconBlue;
-                                        break;
-                                    case 5:
-                                        pin.m_icon = IconPurple;
-                                        break;
-                                    case 6:
-                                        pin.m_icon = IconTan;
-                                        break;
-                                    case 7:
-                                        pin.m_icon = IconGold;
-                                        break;
-                                    case 8:
-                                        pin.m_icon = IconWhite;
-                                        break;
-                                    default:
-                                        pin.m_icon = IconDefault;
-                                        break;
+                                colorint = PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName); // kindof expensive task to do this cpu wize for all portals
+
+                                if (colorint == 0 || colorint == 999)
+                                    pin.m_icon = IconDefault;
+                                else { 
+                                    PortalColorLogic.PortalColor givemecolor = (PortalColorLogic.PortalColor)colorint;
+
+                                    pin.m_icon = Icons[nameof(givemecolor)];
                                 }
+
                                 pin.m_icon.name = "TargetPortalIcon"; // test after 2.4
                             }
                         }
@@ -897,26 +853,14 @@ namespace RareMagicPortal
             Texture2D tex = IconColor.loadTexture("portal.png");
             Texture2D temp = IconColor.loadTexture("portaliconTarget.png");
             IconDefault = IconColor.CreateSprite(temp, false);
-            //Color Gold = new Color(1f, 215f / 255f, 0, 1f);
-            IconColor.setTint(Color.black);
-            IconBlack = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(Color.yellow);
-            IconYellow = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(Color.red);
-            IconRed = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(Color.green);
-            IconGreen = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(Color.blue);
-            IconBlue = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(PortalColorLogic.Gold);
-            IconGold = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(Color.white);
-            IconWhite = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(PortalColorLogic.Purple);
-            IconPurple = IconColor.CreateSprite(tex, true);
-            IconColor.setTint(PortalColorLogic.Tan);
-            IconTan = IconColor.CreateSprite(tex, true);
+            
+            foreach(var col in PortalColorLogic.PortalColors)
+            {
+                IconColor.setTint(col.Value.HexName);
+                Icons.Add(col.Key,IconColor.CreateSprite(tex, true));
 
+            }
+ 
         }
 
         internal static void LoadIN()
