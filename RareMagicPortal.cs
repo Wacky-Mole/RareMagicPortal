@@ -83,7 +83,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.5.3";
+        public const string PluginVersion = "2.6.0";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -103,7 +103,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.2" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.0" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -227,6 +227,7 @@ namespace RareMagicPortal
         internal static readonly int _portalLastColoredByHashCode = "PortalLastColoredByRMP".GetStableHashCode();
         internal static readonly int _portalCreatorHashCode = "PortalCreatorRMP".GetStableHashCode();
         internal static readonly int _portalBiomeHashCode = "PortalBiomeRMP".GetStableHashCode();
+        internal static readonly int _portalBiomeColorHashCode = "PortalBiomeColorRMP".GetHashCode();
         internal static string PortalFluidname;
         internal static bool TargetPortalLoaded = false;
 
@@ -435,10 +436,12 @@ namespace RareMagicPortal
                         List<string> AdditionalProhibitItems;
 
                         string BiomeC = "";
+
                         if (PortalName.Contains(PortalColorLogic.NameIdentifier))
                         {
-                            BiomeC = PortalName.Substring(PortalName.IndexOf(PortalColorLogic.NameIdentifier) + 1);
-                            PortalName = PortalName.TrimEnd(PortalColorLogic.NameIdentifier); // deletes
+                            BiomeC = PortalName.Substring(PortalName.IndexOf(PortalColorLogic.NameIdentifier));//
+                            var index = PortalName.IndexOf(PortalColorLogic.NameIdentifier);
+                            PortalName = PortalName.Substring(0, index);
                         }
 
                         if (!PortalColorLogic.PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
@@ -688,7 +691,18 @@ namespace RareMagicPortal
                             {
                                 PName = pin.m_name; // icons name - Portalname
 
-                                colorint = PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName); // kindof expensive task to do this cpu wize for all portals
+                                string BiomeC = "";
+                                if (PName.Contains(PortalColorLogic.NameIdentifier))
+                                {
+                                    BiomeC = PName.Substring(PName.IndexOf(PortalColorLogic.NameIdentifier) + 1);//
+                                    var index = PName.IndexOf(PortalColorLogic.NameIdentifier);
+                                    PName = PName.Substring(0, index);
+                                    colorint = Int32.Parse(BiomeC);
+                                }
+                                else
+                                {
+                                    colorint = PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName); // kindof expensive task to do this cpu wize for all portals
+                                }
 
                                 if (colorint == 0 || colorint == 999)
                                     pin.m_icon = IconDefault;
@@ -1561,7 +1575,7 @@ namespace RareMagicPortal
                 CraftingStationlvl = 1;
 
             */
-
+            PortalColorLogic.reloaded = true;
             AllowTeleEverything.Effect.m_cooldown = PortalDrinkTimer.Value;
         }
 
