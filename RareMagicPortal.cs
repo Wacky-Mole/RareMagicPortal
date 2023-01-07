@@ -427,19 +427,19 @@ namespace RareMagicPortal
                     name = portalW.GetText(); // much better
                     if (name != null)
                     {
-                        /*
-						var found = name.IndexOf(":") + 2;
-						var end = name.IndexOf("\" ");
-						var le = end - found;
-						name = name.Substring(found, le); // lol wish it was more efficent
-						//RareMagicPortal.LogInfo($"Inventory Portal Check name is {name}");
-						*/
 
                         var PortalName = name;
                         bool OdinsKin = false;
                         bool Free_Passage = false;
                         bool TeleportAny = false;
                         List<string> AdditionalProhibitItems;
+
+                        string BiomeC = "";
+                        if (PortalName.Contains(PortalColorLogic.NameIdentifier))
+                        {
+                            BiomeC = PortalName.Substring(PortalName.IndexOf(PortalColorLogic.NameIdentifier) + 1);
+                            PortalName = PortalName.TrimEnd(PortalColorLogic.NameIdentifier); // deletes
+                        }
 
                         if (!PortalColorLogic.PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
                         {
