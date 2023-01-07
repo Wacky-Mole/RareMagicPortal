@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3148513412
+CRC: 3750749320
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: bf086e1280a802f5faef6c60f96f16a0
+    Hash: 6d9b33c70b732db43e40b1b0286108b9
   TypeTreeHash:
     serializedVersion: 2
     Hash: bbc48ad260a81d79a47a96b96b4140dc
@@ -51,16 +51,39 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/CustomItems/PortalCrystalBlack.png
+- Assets/CustomItems/PortalCrystalBlack.prefab
+- Assets/CustomItems/PortalKeyOrange.prefab
 - Assets/CustomItems/PortalCrystalRed.prefab
+- Assets/CustomItems/PortalCrystalWhite.png
+- Assets/CustomItems/PortalCrystalOrange.prefab
+- Assets/CustomItems/PortalCrystalCyan.png
+- Assets/CustomItems/PortalKeyYellow.prefab
+- Assets/CustomItems/PortalKeyBlack.prefab
+- Assets/CustomItems/PortalCrystalRed.png
+- Assets/CustomItems/PortalKeyRed.png
 - Assets/CustomItems/PortalKeyBlue.prefab
 - Assets/CustomItems/PortalKeyTan.prefab
 - Assets/CustomItems/PortalCrystalBlue.prefab
+- Assets/CustomItems/PortalCrystalWhite.prefab
+- Assets/CustomItems/goldkey.png
+- Assets/CustomItems/PortalKeyCyan.prefab
 - Assets/CustomItems/PortalKeyGreen.prefab
+- Assets/CustomItems/PortalCrystalYellow.prefab
+- Assets/CustomItems/PortalKeyTan.png
 - Assets/CustomItems/PortalCrystalPurple.prefab
+- Assets/CustomItems/PortalCrystalCyan.prefab
 - Assets/CustomItems/PortalKeyGold.prefab
+- Assets/CustomItems/PortalMagicCrystalIcon.png
+- Assets/CustomItems/PortalCrystalTan.prefab
 - Assets/CustomItems/PortalCrystalGreen.prefab
 - Assets/CustomItems/PortalKeyRed.prefab
+- Assets/CustomItems/PortalKeyBlack.png
+- Assets/CustomItems/PortalKeyWhite.png
+- Assets/CustomItems/PortalKeyCyan.png
 - Assets/CustomItems/PortalKeyPurple.prefab
+- Assets/CustomItems/greencrystal.png
 - Assets/CustomItems/PortalCrystalMaster.prefab
-- Assets/CustomItems/PortalCrystalTan.prefab
+- Assets/CustomItems/PortalCrystalYellow.png
+- Assets/CustomItems/PortalKeyWhite.prefab
 Dependencies: []

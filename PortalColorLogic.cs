@@ -766,7 +766,7 @@ namespace RareMagicPortal
 
             }
         }
-        internal static int CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, string PortalName = "", TeleportWorld __instance = null)
+        internal static int CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, string PortalName = "", TeleportWorld __instance = null, int overrideInt = 0)
         {
             string BiomeC = "";
             if (PortalName.Contains(NameIdentifier))
@@ -1042,7 +1042,7 @@ namespace RareMagicPortal
             OdinsKin = PortalN.Portals[PortalName].Admin_only_Access;
             Free_Passage = PortalN.Portals[PortalName].Free_Passage;
             var Portal_Crystal_Cost = PortalN.Portals[PortalName].Portal_Crystal_Cost; // rgbG  // 0 means it can't be used, (Keys only) anything greater means the cost. -1 means same as 0
-            var Portal_Key = PortalN.Portals[PortalName].Portal_Key; // rgbG
+            var Portal_Key_Cost = PortalN.Portals[PortalName].Portal_Key; // rgbG
             var TeleportEvery = PortalN.Portals[PortalName].TeleportAnything;
 
 
@@ -1091,6 +1091,11 @@ namespace RareMagicPortal
                 CrystalCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);
                 CrystalCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple);
                 CrystalCount[nameof(PortalColor.Tan)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalTan);
+                CrystalCount[nameof(PortalColor.Yellow)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalYellow);
+                CrystalCount[nameof(PortalColor.White)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalWhite);
+                CrystalCount[nameof(PortalColor.Black)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlack);
+                CrystalCount[nameof(PortalColor.Cyan)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalCyan);
+                CrystalCount[nameof(PortalColor.Orange)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalOrange);
 
                 KeyCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold);
                 KeyCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed);
@@ -1098,6 +1103,11 @@ namespace RareMagicPortal
                 KeyCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlue);
                 KeyCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyPurple);
                 KeyCount[nameof(PortalColor.Tan)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyTan);
+                KeyCount[nameof(PortalColor.White)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyWhite);
+                KeyCount[nameof(PortalColor.Yellow)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyYellow);
+                KeyCount[nameof(PortalColor.Black)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyBlack);
+                KeyCount[nameof(PortalColor.Cyan)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyCyan);
+                KeyCount[nameof(PortalColor.Orange)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyOrange);
 
 
                 int flagCarry = 0; // don't have any keys or crystals
@@ -1108,7 +1118,7 @@ namespace RareMagicPortal
                 int coun = PortalColors.Count;
                 foreach (var col in PortalColors)
                 {
-                    if (CrystalCount[col.Key] > 0 || KeyCount[col.Key] > 0)
+                    if (Portal_Crystal_Cost[col.Key] > 0 || Portal_Key_Cost[col.Key])
                     {
                         if (CrystalCount[col.Key] == 0) 
                             flagCarry = col.Value.Pos;
@@ -1116,7 +1126,7 @@ namespace RareMagicPortal
                             flagCarry = 100+ col.Value.Pos;
                         else flagCarry = 200+ col.Value.Pos; // has more than required
 
-                        if (Portal_Key[col.Key])
+                        if (Portal_Key_Cost[col.Key])
                         {
                             if (Portal_Crystal_Cost[col.Key] == 0)
                             {
@@ -1142,12 +1152,13 @@ namespace RareMagicPortal
 
                 }// for every color
 
-
-            if (flagCarry < 20 && lowest == 0)
+                RMP.LogInfo("FlagCarry before " + flagCarry + " Lowest " + lowest + "FoundAccess "+ foundAccess);
+            if (flagCarry < 22 && lowest == 0) // not sure what this is for I think it is important though
                 lowest = flagCarry;
 
-            if (flagCarry < 20 && lowest != 0)
+            if (flagCarry == 22 && lowest != 0) // for gold override 
                 flagCarry = lowest;
+
 
             string CorK = "$rmp_crystals";
             if (crystalorkey == 1)
@@ -1159,7 +1170,7 @@ namespace RareMagicPortal
             var hud = MessageHud.MessageType.Center;
             if (MagicPortalFluid.ConfigMessageLeft.Value)
                 hud = MessageHud.MessageType.TopLeft;
-
+                RMP.LogInfo("FlagCarry " + flagCarry + " Lowest " + lowest);
                 switch (flagCarry)
                 {
                     case 1:
@@ -1233,7 +1244,7 @@ namespace RareMagicPortal
                     case 201:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Yellow"]} $rmp_consumed_yellow");
-                        //player.m_inventory.RemoveItem(MagicPortalFluid.Crystal, Portal_Crystal_Cost["Yellow"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.Crystal, Portal_Crystal_Cost["Yellow"]);
                         return true;
                     case 202:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
@@ -1263,22 +1274,22 @@ namespace RareMagicPortal
                     case 207:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Cyan"]} $rmp_consumed_cyan");
-                        //player.m_inventory.RemoveItem(MagicPortalFluid.CrystalMaster, Portal_Crystal_Cost["Cyan"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalCyan, Portal_Crystal_Cost["Cyan"]);
                         return true;
                     case 208:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Orange"]} $rmp_consumed_orange");
-                        //player.m_inventory.RemoveItem(MagicPortalFluid.CrystalMaster, Portal_Crystal_Cost["Orange"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalOrange, Portal_Crystal_Cost["Orange"]);
                         return true;
                     case 220:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["White"]} $rmp_consumed_white");
-                        //player.m_inventory.RemoveItem(MagicPortalFluid.CrystalMaster, Portal_Crystal_Cost["White"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalWhite, Portal_Crystal_Cost["White"]);
                         return true;
                     case 221:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Black"]} $rmp_consumed_black");
-                        //player.m_inventory.RemoveItem(MagicPortalFluid.CrystalMaster, Portal_Crystal_Cost["Black"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalBlack, Portal_Crystal_Cost["Black"]);
                         return true;
                     case 222:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");

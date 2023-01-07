@@ -186,19 +186,30 @@ namespace RareMagicPortal
         public string message_eng_Odins_Kin = $"Only Odin's Kin are Allowed";
         public string message_only_Owner_Can_Change = $"Only the Owner Can change Name";
 
-        public const string CrystalMaster = "$item_PortalCrystalMaster";  // RGB
-        public const string CrystalRed = "$item_PortalCrystalRed";
-        public const string CrystalGreen = "$item_PortalCrystalGreen";
-        public const string CrystalBlue = "$item_PortalCrystalBlue";
-        public const string CrystalPurple = "$item_PortalCrystalPurple";
-        public const string CrystalTan = "$item_PortalCrystalTan";
+        public static string CrystalMaster = "$item_PortalCrystalMaster"; 
+        public static string CrystalRed = "$item_PortalCrystalRed";
+        public static string CrystalGreen = "$item_PortalCrystalGreen";
+        public static string CrystalBlue = "$item_PortalCrystalBlue";
+        public static string CrystalPurple = "$item_PortalCrystalPurple";
+        public static string CrystalTan = "$item_PortalCrystalTan";
+        public static string CrystalYellow = "$item_PortalCrystalYellow";
+        public static string CrystalWhite = "$item_PortalCrystalWhite";
+        public static string CrystalCyan = "$item_PortalCrystalCyan";
+        public static string CrystalBlack = "$item_PortalCrystalBlack";
+        public static string CrystalOrange = "$item_PortalCrystalOrange";
 
-        public const string PortalKeyGold = "$item_PortalKeyGold";
-        public const string PortalKeyRed = "$item_PortalKeyRed";
-        public const string PortalKeyGreen = "$item_PortalKeyGreen";
-        public const string PortalKeyBlue = "$item_PortalKeyBlue";
-        public const string PortalKeyPurple = "$item_PortalKeyPurple";
-        public const string PortalKeyTan = "$item_PortalKeyTan";
+        public static string PortalKeyGold = "$item_PortalKeyGold";
+        public static string PortalKeyRed = "$item_PortalKeyRed";
+        public static string PortalKeyGreen = "$item_PortalKeyGreen";
+        public static string PortalKeyBlue = "$item_PortalKeyBlue";
+        public static string PortalKeyPurple = "$item_PortalKeyPurple";
+        public static string PortalKeyTan = "$item_PortalKeyTan";
+        public static string PortalKeyYellow = "$item_PortalKeyYellow";
+        public static string PortalKeyBlack = "$item_PortalKeyBlack";
+        public static string PortalKeyWhite = "$item_PortalKeyWhite";
+        public static string PortalKeyCyan = "$item_PortalKeyCyan";
+        public static string PortalKeyOrange = "$item_PortalKeyOrange";
+
 
         SpriteTools IconColor = new SpriteTools();
 
@@ -271,6 +282,7 @@ namespace RareMagicPortal
             static void Postfix()
             {
                 {
+
                     Worldname = ZNet.instance.GetWorldName();// for singleplayer  // won't be ready for multiplayer
                     TargetPortalLoaded = Chainloader.PluginInfos.ContainsKey("org.bepinex.plugins.targetportal");
 
@@ -698,6 +710,7 @@ namespace RareMagicPortal
                                     var index = PName.IndexOf(PortalColorLogic.NameIdentifier);
                                     PName = PName.Substring(0, index);
                                     colorint = Int32.Parse(BiomeC);
+                                    //PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName, null,colorint);
                                 }
                                 else
                                 {
@@ -839,16 +852,16 @@ namespace RareMagicPortal
             //english.SetupLanguage("English");
             //spanish = new Localization();
             //spanish.SetupLanguage("Spanish");
+
             LoadAssets();
-
-
+            PortalDrink();
 
             assetPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), typeof(MagicPortalFluid).Namespace);
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), (string)null);
 
             SetupWatcher();
             setupYMLFolderWatcher();
-            PortalDrink();
+            
 
             YMLPortalData.ValueChanged += CustomSyncEventDetected;
 
@@ -937,7 +950,13 @@ namespace RareMagicPortal
             PortalCrystalRed.Name.English("Red Portal Crystal");
             PortalCrystalRed.Description.English("Odin's Traveling Crystals allow for Red Portal Traveling");
             PortalCrystalRed.ToggleConfigurationVisibility(Configurability.Drop);
-            
+           // PortalCrystalRed.Snapshot();
+
+            Item PortalCrystalYellow = new("portalcrystal", "PortalCrystalYellow", "assetsEmbedded");
+            PortalCrystalYellow.Name.English("Yellow Portal Crystal");
+            PortalCrystalYellow.Description.English("Odin's Traveling Crystals allow for Yellow Portal Traveling");
+            PortalCrystalYellow.ToggleConfigurationVisibility(Configurability.Drop);
+            //PortalCrystalYellow.Snapshot();
 
             Item PortalCrystalGreen = new("portalcrystal", "PortalCrystalGreen", "assetsEmbedded");
             PortalCrystalGreen.Name.English("Green Portal Crystal");
@@ -948,6 +967,13 @@ namespace RareMagicPortal
             PortalCrystalBlue.Name.English("Blue Portal Crystal");
             PortalCrystalBlue.Description.English("Odin's Traveling Crystals allow for Blue Portal Traveling");
             PortalCrystalBlue.ToggleConfigurationVisibility(Configurability.Drop);
+            //PortalCrystalBlue.Snapshot();
+
+            Item PortalCrystalCyan = new("portalcrystal", "PortalCrystalCyan", "assetsEmbedded");
+            PortalCrystalCyan.Name.English("Cyan Portal Crystal");
+            PortalCrystalCyan.Description.English("Odin's Traveling Crystals allow for Cyan Portal Traveling");
+            PortalCrystalCyan.ToggleConfigurationVisibility(Configurability.Drop);
+           // PortalCrystalCyan.Snapshot();
 
             Item PortalCrystalPurple = new("portalcrystal", "PortalCrystalPurple", "assetsEmbedded");
             PortalCrystalPurple.Name.English("Purple Portal Crystal");
@@ -959,10 +985,36 @@ namespace RareMagicPortal
             PortalCrystalTan.Description.English("Odin's Traveling Crystals allow for Tan Portal Traveling");
             PortalCrystalTan.ToggleConfigurationVisibility(Configurability.Drop);
 
+            Item PortalCrystalOrange = new("portalcrystal", "PortalCrystalOrange", "assetsEmbedded");
+            PortalCrystalOrange.Name.English("Orange Portal Crystal");
+            PortalCrystalOrange.Description.English("Odin's Traveling Crystals allow for Orange Portal Traveling");
+            PortalCrystalOrange.ToggleConfigurationVisibility(Configurability.Drop);
+            //PortalCrystalOrange.Snapshot();
+
+            Item PortalCrystalWhite = new("portalcrystal", "PortalCrystalWhite", "assetsEmbedded");
+            PortalCrystalWhite.Name.English("White Portal Crystal");
+            PortalCrystalWhite.Description.English("Odin's Traveling Crystals allow for White Portal Traveling");
+            PortalCrystalWhite.ToggleConfigurationVisibility(Configurability.Drop);
+           // PortalCrystalWhite.Snapshot();
+
+            Item PortalCrystalBlack = new("portalcrystal", "PortalCrystalBlack", "assetsEmbedded");
+            PortalCrystalBlack.Name.English("Black Portal Crystal");
+            PortalCrystalBlack.Description.English("Odin's Traveling Crystals allow for Black Portal Traveling");
+            PortalCrystalBlack.ToggleConfigurationVisibility(Configurability.Drop);
+           // PortalCrystalBlack.Snapshot();
+
+
+            Item PortalKeyYellow = new("portalcrystal", "PortalKeyYellow", "assetsEmbedded");
+            PortalKeyYellow.Name.English("Yellow Portal Key");
+            PortalKeyYellow.Description.English("Unlock Portals Requiring The Yellow Key");
+            PortalKeyYellow.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyYellow.Snapshot();
+
             Item PortalKeyRed = new("portalcrystal", "PortalKeyRed", "assetsEmbedded");
             PortalKeyRed.Name.English("Red Portal Key");
             PortalKeyRed.Description.English("Unlock Portals Requiring The Red Key");
             PortalKeyRed.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyRed.Snapshot();
 
             Item PortalKeyGold = new("portalcrystal", "PortalKeyGold", "assetsEmbedded");
             PortalKeyGold.Name.English("Gold Portal Key");
@@ -973,6 +1025,7 @@ namespace RareMagicPortal
             PortalKeyBlue.Name.English("Blue Portal Key");
             PortalKeyBlue.Description.English("Unlock Portals Requiring The Blue Key");
             PortalKeyBlue.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyBlue.Snapshot();
 
             Item PortalKeyGreen = new("portalcrystal", "PortalKeyGreen", "assetsEmbedded");
             PortalKeyGreen.Name.English("Green Portal Key");
@@ -989,9 +1042,29 @@ namespace RareMagicPortal
             PortalKeyTan.Description.English("Unlock Portals Requiring The Tan Key");
             PortalKeyTan.ToggleConfigurationVisibility(Configurability.Disabled);
 
-            //Item WorldTreeSeed = new("worldtreeseed", "WorldTreeSeed", "assetsEmbedded");
-            //PortalKeyTan.Name.English("WorldTree Seed");
-            //PortalKeyTan.Description.English("A seed dropped from Yggdrasil, it is known to have magical properites");
+            Item PortalKeyCyan = new("portalcrystal", "PortalKeyCyan", "assetsEmbedded");
+            PortalKeyCyan.Name.English("Cyan Portal Key");
+            PortalKeyCyan.Description.English("Unlock Portals Requiring The Cyan Key");
+            PortalKeyCyan.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyCyan.Snapshot();
+
+            Item PortalKeyOrange = new("portalcrystal", "PortalKeyOrange", "assetsEmbedded");
+            PortalKeyOrange.Name.English("Orange Portal Key");
+            PortalKeyOrange.Description.English("Unlock Portals Requiring The Orange Key");
+            PortalKeyOrange.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyOrange.Snapshot();
+
+            Item PortalKeyWhite = new("portalcrystal", "PortalKeyWhite", "assetsEmbedded");
+            PortalKeyWhite.Name.English("White Portal Key");
+            PortalKeyWhite.Description.English("Unlock Portals Requiring The White Key");
+            PortalKeyWhite.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyWhite.Snapshot();
+
+            Item PortalKeyBlack = new("portalcrystal", "PortalKeyBlack", "assetsEmbedded");
+            PortalKeyBlack.Name.English("Black Portal Key");
+            PortalKeyBlack.Description.English("Unlock Portals Requiring The Black Key");
+            PortalKeyBlack.ToggleConfigurationVisibility(Configurability.Disabled);
+            //PortalKeyBlack.Snapshot();
 
 
 
@@ -1559,11 +1632,11 @@ namespace RareMagicPortal
 
             EnabledColors = config("7.Colors", "Enabled Colors for Portals", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are available Colors that can be enabled- maybe in future custom colors");
 
-            FreePassageColor = config("7.Colors", "Free Passage Color", "Yellow", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are the available Colors that can be selected for the Free Passage Color - Only 1 can be set - Default is Yellow");
+            FreePassageColor = config("7.Colors", "Free Passage Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Free Passage Color - Only 1 can be set - Default is none");
 
-            AdminColor = config("7.Colors", "Admin only Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Admin only portals - Only 1 can be set - Default is none, but I recommend Black");
+            AdminColor = config("7.Colors", "Admin only Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Admin only portals - Only 1 can be set - Default is none");
 
-            PortalDrinkColor = config("7.Colors", "Portal Drink Color", "White", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or rainbow are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is rainbow - Don't mess with this option" );
+            PortalDrinkColor = config("7.Colors", "Portal Drink Color", "White", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or rainbow are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is rainbow " );
 
 
         }
