@@ -571,6 +571,7 @@ namespace RareMagicPortal
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
                     return false;
                 }
+
                 if (PortalColorLogic.CrystalandKeyLogic(PortalName))
                 {
                     //RareMagicPortal.LogInfo($"True, so TargetPortalShould Take over");
@@ -656,7 +657,7 @@ namespace RareMagicPortal
                 if (!m_hadTarget) // if no target continuie on with logic
                     return false;
 
-                if (PortalColorLogic.CrystalandKeyLogic(PortalName))
+                if (PortalColorLogic.CrystalandKeyLogic(PortalName, __instance.m_tp.m_nview.m_zdo.GetString(MagicPortalFluid._portalBiomeColorHashCode)) )
                 {
                    // Teleporting = true;
                     return true;
@@ -710,6 +711,7 @@ namespace RareMagicPortal
                                     var index = PName.IndexOf(PortalColorLogic.NameIdentifier);
                                     PName = PName.Substring(0, index);
                                     colorint = Int32.Parse(BiomeC);
+                                    pin.m_name = PName;
                                     //PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName, null,colorint);
                                 }
                                 else
@@ -719,10 +721,11 @@ namespace RareMagicPortal
 
                                 if (colorint == 0 || colorint == 999)
                                     pin.m_icon = IconDefault;
-                                else { 
+                                else {
+                                    
                                     PortalColorLogic.PortalColor givemecolor = (PortalColorLogic.PortalColor)colorint;
-
-                                    pin.m_icon = Icons[nameof(givemecolor)];
+                                    RareMagicPortal.LogInfo(" Icon color here " + givemecolor.ToString());
+                                    pin.m_icon = Icons[givemecolor.ToString()];
                                 }
 
                                 pin.m_icon.name = "TargetPortalIcon"; // test after 2.4
@@ -883,8 +886,21 @@ namespace RareMagicPortal
             
             foreach(var col in PortalColorLogic.PortalColors)
             {
-                IconColor.setTint(col.Value.HexName);
-                Icons.Add(col.Key,IconColor.CreateSprite(tex, true));
+                if (col.Key == "Tan")
+                {
+                    IconColor.setTint(PortalColorLogic.Brown);
+                    Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
+                }
+                else if (col.Key == "Yellow")
+                {
+                    IconColor.setTint(new Color(201f/255f, 204f/255f, 63f/255f, 1f));
+                    Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
+                }
+                else
+                {
+                    IconColor.setTint(col.Value.HexName);
+                    Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
+                }
 
             }
  
