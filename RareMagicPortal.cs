@@ -711,7 +711,7 @@ namespace RareMagicPortal
                                     var index = PName.IndexOf(PortalColorLogic.NameIdentifier);
                                     PName = PName.Substring(0, index);
                                     colorint = Int32.Parse(BiomeC);
-                                    pin.m_name = PName;
+                                    //pin.m_name = PName; Have to pass this crazy
                                     //PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName, null,colorint);
                                 }
                                 else
@@ -724,7 +724,7 @@ namespace RareMagicPortal
                                 else {
                                     
                                     PortalColorLogic.PortalColor givemecolor = (PortalColorLogic.PortalColor)colorint;
-                                    RareMagicPortal.LogInfo(" Icon color here " + givemecolor.ToString());
+                                    //RareMagicPortal.LogInfo(" Icon color here " + givemecolor.ToString());
                                     pin.m_icon = Icons[givemecolor.ToString()];
                                 }
 
