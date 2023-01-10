@@ -29,17 +29,17 @@ Portal Drink = rainbow mode? Or current white override.
 
 // 1 Yellow // free passage - Maybe add Yellow Crystal and Key
 // 2 red
-/   
+// 3 green 
 // 4 blue
 // 5 Purple
 // 6 Tan
 // 7 Cyan
 // 8 Orange
-// 20 Gold // Can be used as mater/engame
+// 20 Black /
 // 21 White (Only allow free passage with PortalDrink or enablecrystals)
-// 22 Black
+// 22 Gold
 
-
+// under 100 doesn't have any
 101 // Yellow Crystal required this many items
 201 Yellow Crystal Grants accesss
 301 Yellow $rmp_redKey_access Key Access
@@ -78,7 +78,8 @@ namespace RareMagicPortal
 {
     //extra
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    [BepInDependency("org.bepinex.plugins.targetportal", BepInDependency.DependencyFlags.SoftDependency)]  // it loads before this mod// not really required, but whatever
+    [BepInDependency("org.bepinex.plugins.targetportal", BepInDependency.DependencyFlags.SoftDependency)] 
+    [BepInDependency("org.bepinex.plugins.jewelcrafting", BepInDependency.DependencyFlags.SoftDependency)]  // it loads before this mod// not really required, but whatever
     internal class MagicPortalFluid : BaseUnityPlugin
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
@@ -176,6 +177,19 @@ namespace RareMagicPortal
         internal static ConfigEntry<string>? FreePassageColor;
         internal static ConfigEntry<string>? AdminColor;
         internal static ConfigEntry<string>? PortalDrinkColor;
+        internal static ConfigEntry<string>? TelePortAnythingColor;
+        internal static ConfigEntry<int>? UseJewelCrafting;
+        internal static ConfigEntry<string>? GemColorGold;
+        internal static ConfigEntry<string>? GemColorRed;
+        internal static ConfigEntry<string>? GemColorGreen;
+        internal static ConfigEntry<string>? GemColorBlue;
+        internal static ConfigEntry<string>? GemColorPurple;
+        internal static ConfigEntry<string>? GemColorTan;
+        internal static ConfigEntry<string>? GemColorYellow;
+        internal static ConfigEntry<string>? GemColorWhite;
+        internal static ConfigEntry<string>? GemColorCyan;
+        internal static ConfigEntry<string>? GemColorBlack;
+        internal static ConfigEntry<string>? GemColorOrange;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -448,12 +462,19 @@ namespace RareMagicPortal
                         List<string> AdditionalProhibitItems;
 
                         string BiomeC = "";
-
+                        string currentColor = "";
+                        var flag = false;
                         if (PortalName.Contains(PortalColorLogic.NameIdentifier))
                         {
                             BiomeC = PortalName.Substring(PortalName.IndexOf(PortalColorLogic.NameIdentifier));//
+                            var BiomeC1 = PortalName.Substring(PortalName.IndexOf(PortalColorLogic.NameIdentifier) + 1);
                             var index = PortalName.IndexOf(PortalColorLogic.NameIdentifier);
                             PortalName = PortalName.Substring(0, index);
+                            flag = true;
+                         
+                            int intS = Int32.Parse(BiomeC1);
+                            PortalColorLogic.PortalColor pcol = (PortalColorLogic.PortalColor)intS;
+                            currentColor = pcol.ToString();
                         }
 
                         if (!PortalColorLogic.PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
@@ -465,7 +486,7 @@ namespace RareMagicPortal
                         TeleportAny = PortalColorLogic.PortalN.Portals[PortalName].TeleportAnything;
                         AdditionalProhibitItems = PortalColorLogic.PortalN.Portals[PortalName].AdditionalProhibitItems;
 
-                        if (TeleportAny && ConfigEnableCrystalsNKeys.Value) // allows for teleport anything portal if EnableCrystals otherwise just white
+                        if (TeleportAny && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // allows for teleport anything portal if EnableCrystals otherwise just white
                             bo2 = true;
 
                         if (!bo2 && AdditionalProhibitItems.Count > 0)
@@ -605,6 +626,35 @@ namespace RareMagicPortal
             }
         }
 
+
+        [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdatePins))]
+        public class AddMinimapRewriteNames {
+            internal static void Postfix(Minimap __instance)
+            {
+                if (__instance == null || __instance.m_pins == null)
+                    return;
+
+                foreach (Minimap.PinData pin in __instance.m_pins)
+                {
+                    if (pin.m_name != "TargetPortalIcon")
+                        continue;
+
+                    if (pin.m_name.Length > 0 && __instance.m_mode == Minimap.MapMode.Large )
+                    {
+                        string NewName = pin.m_name;
+                        if (NewName.Contains(PortalColorLogic.NameIdentifier))
+                        {
+                            var index = NewName.IndexOf(PortalColorLogic.NameIdentifier);
+                            NewName = NewName.Substring(0, index);
+                        }
+
+                        pin.m_nameElement.text = Localization.instance.Localize(NewName); // doesn't work for some reason
+                    }
+
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(TeleportWorldTrigger), nameof(TeleportWorldTrigger.OnTriggerEnter))]  // for Crystals and Keys
         internal class TeleportWorld_Teleport_CheckforCrystal
         {
@@ -705,13 +755,13 @@ namespace RareMagicPortal
                                 PName = pin.m_name; // icons name - Portalname
 
                                 string BiomeC = "";
-                                if (PName.Contains(PortalColorLogic.NameIdentifier))
+                                if (PName.Contains(PortalColorLogic.NameIdentifier) && MagicPortalFluid.ConfigUseBiomeColors.Value)
                                 {
                                     BiomeC = PName.Substring(PName.IndexOf(PortalColorLogic.NameIdentifier) + 1);//
                                     var index = PName.IndexOf(PortalColorLogic.NameIdentifier);
                                     PName = PName.Substring(0, index);
                                     colorint = Int32.Parse(BiomeC);
-                                    //pin.m_name = PName; Have to pass this crazy
+                                    //pin.m_nameElement.text = Localization.instance.Localize(PName); //Have to pass this stupid number, going to patch it in minimap update now, fuck this
                                     //PortalColorLogic.CrystalandKeyLogicColor(out string currentColor, out Color currentColorHex, out string nextcolor, PName, null,colorint);
                                 }
                                 else
@@ -742,17 +792,17 @@ namespace RareMagicPortal
         [HarmonyPatch(typeof(Player), "CheckCanRemovePiece")]
         internal static class Player_CheckforOwnerP
         {
-            [HarmonyPrefix]
             internal static bool Prefix(ref Player __instance, ref Piece piece)
             {
                 if (piece == null)
                     return true;
 
-                if (piece.name == PiecetoLookFor && !__instance.m_noPlacementCost) // portal
+                if (piece.name == PiecetoLookFor+"(Clone)" && !__instance.m_noPlacementCost && ConfigCreator.Value) // portal and Configonly
                 {
+                    RareMagicPortal.LogInfo("Creator " + piece.GetCreator() + " Me " + __instance.GetPlayerID());
                     bool bool2 = piece.IsCreator();// nice
-                    if (bool2 || !ConfigCreator.Value)
-                    { // can remove because is creator or creator only mode is foff
+                    if (bool2)
+                    { // can remove because is creator or creator only mode is On
                         return true;
 
                     }
@@ -773,7 +823,7 @@ namespace RareMagicPortal
             internal static bool Prefix(ref Player __instance, ref Piece piece)
 
             {
-                if (piece == null) return true;
+                if (piece == null || __instance == null ) return true;
 
                 if (piece.name == PiecetoLookFor && !__instance.m_noPlacementCost) // portal
                 {
@@ -783,6 +833,10 @@ namespace RareMagicPortal
                         tempvalue = new Vector3(0, 0, 0); // shouldn't ever be called 
 
                     var paulstation = CraftingStation.HaveBuildStationInRange(piece.m_craftingStation.m_name, tempvalue);
+                    if (paulstation == null &&  !__instance.m_noPlacementCost)
+                    {
+                        return false; // should catch and stop it. 
+                    }
                     var paullvl = paulstation.GetLevel();
                     if (ConfigTableLvl.Value > 10 || ConfigTableLvl.Value < 1)
                         ConfigTableLvl.Value = 1;
@@ -876,7 +930,8 @@ namespace RareMagicPortal
 
 
         }
-        internal void IconColors()
+
+    internal void IconColors()
         {
             context = this;
 
@@ -1628,6 +1683,8 @@ namespace RareMagicPortal
 
             ConfigEnableCrystalsNKeys = config("4.Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
 
+            UseJewelCrafting = config("4.Portal Crystals", "Use JewelCrafting Crystals", 0 , "Use JewlCrafting Crystals, 0 is NO, 1 is Uncut Gemstones, 2 is Simple Gemstone, 3 is Advanced, 4 is Perfect - MUST Reboot - Default is 0, Obviously I want you to use Mine lol");
+
             ConfigEnableGoldAsMaster = config("4.Portal Crystals", "Use Gold as Portal Master", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
 
             //ConfigEnableKeys = config("Portal Keys", "Portal_Keys_Enable", false, "Enable Portal Crystals");
@@ -1652,8 +1709,31 @@ namespace RareMagicPortal
 
             AdminColor = config("7.Colors", "Admin only Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Admin only portals - Only 1 can be set - Default is none");
 
+            TelePortAnythingColor = config("7.Colors", "TelePortAnythingColor", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the TeleportAnything only portals - Only 1 can be set - Default is none");
+
             PortalDrinkColor = config("7.Colors", "Portal Drink Color", "White", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or rainbow are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is rainbow " );
 
+            GemColorGold = config("8.CrystalSelector", "Use for Crystal Gold", CrystalMaster, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+
+            GemColorRed = config("8.CrystalSelector", "Use for Crystal Red", CrystalRed, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+
+            GemColorGreen = config("8.CrystalSelector", "Use for Crystal Green", CrystalGreen, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorBlue = config("8.CrystalSelector", "Use for Crystal Blue", CrystalBlue, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorYellow = config("8.CrystalSelector", "Use for Crystal Yellow", CrystalYellow, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorPurple = config("8.CrystalSelector", "Use for Crystal Purple", CrystalPurple, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorTan = config("8.CrystalSelector", "Use for Crystal Tan", CrystalTan, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorCyan = config("8.CrystalSelector", "Use for Crystal Cyan", CrystalCyan, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorOrange = config("8.CrystalSelector", "Use for Crystal Orange", CrystalOrange, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorWhite = config("8.CrystalSelector", "Use for Crystal White", CrystalWhite, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
+            
+            GemColorBlack = config("8.CrystalSelector", "Use for Crystal Black", CrystalBlack, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
 
         }
 

@@ -6,9 +6,9 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.5.3
+`Server and client side required for Server Sync enforcement.` V2.6.0
 
-MinimumRequiredVersion = "2.5.2"
+MinimumRequiredVersion = "2.6.0"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -37,6 +37,10 @@ Well, I've a mod for you!
   * You can Restrict Wood or Stone or any other item
   * Editing IsTeleportable with wackysDatabase is better, but you can do it here
 
+ * Portal Drink
+  * Allows you to teleport anywhere with anything on you.
+  *Bypasses normal inventory checks - should be rare
+
 * Portal Colors
   * If you just want to see different Portal Colors, this mod is great for that.
 
@@ -57,15 +61,24 @@ https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards,
 
 ### Portal Colors
 * Portal Colors - You can manually edit or cyle through colors with "LeftControl-E" as Admin or Owner with EnableCrystal off
- * > Black Portal -With EnableCrystals- Admin Only Portal
- * > Yellow Portal -With EnableCrystals- Normal Portal, no crystal or key req
- * > Red Portal  -With EnableCrystals- Red Crystal, Red Key, Gold Crystal, Gold Key
- * > Green Portal  -With EnableCrystals- Green Crystal, Green Key, Gold Crystal, Gold Key
- * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key, Gold Crystal, Gold Key
- * > Purple Portal  -With EnableCrystals- Purple Crystal, Purple Key, Gold Crystal, Gold Key
- * > Tan Portal  -With EnableCrystals- Tan Crystal, Tan Key, Gold Crystal, Gold Key
- * > Gold Portal  -With EnableCrystals-  Gold Crystal, Gold Key
- * > White Portal -With EnableCrystals-  Teleport Anything, Traverese with Metals or Ore
+
+    With TargetPortalMod users will see"^" with a number this is the internal value - this is normal, If you remove TargetPortal mod you might have to rename portals to get them to connect
+
+    All Portal Colors can be focred to Use Gold Crystal and Gold Key with USE_GOLD_AS_PORTAL_MASTER
+
+ 
+ * > Yellow Portal -With EnableCrystals- Yellow Portal, Yellow Key  - Value 1
+ * > Red Portal  -With EnableCrystals- Red Crystal, Red Key,  - Value 2
+ * > Green Portal  -With EnableCrystals- Green Crystal, Green Key  - Value 3
+ * > Blue Portal  -With EnableCrystals- Blue Crystal, Blue Key - Value 4
+ * > Purple Portal  -With EnableCrystals- Purple Crystal, Purple Key - Value 5
+ * > Tan Portal  -With EnableCrystals- Tan Crystal, Tan Key, - Value 6
+ * > Cyan Portal  -With EnableCrystals- Cyan Crystal, Cyan Key, - Value 7
+ * > Orange Portal  -With EnableCrystals- Orange Crystal, Orange Key, - Value 8
+ * > White Portal -With EnableCrystals-  White Crystal, White Key - Value 20
+ * > Black Portal -With EnableCrystals- Black Crystal, Black Key  - Value 21
+ * > Gold Portal  -With EnableCrystals-  PortalCrystalMaster (Gold) Crystal, Gold Key - Value 22
+ 
 
 <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="200"/>
 
@@ -84,12 +97,25 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * PortalCrystalBlue
   * PortalCrystalPurple
   * PortalCrystalTan
+  * PortalCrystalYellow
+  * PortalCrystalCyan
+  * PortalCrystalOrange
+  * PortalCrystalWhite
+  * PortalCrystalBlack
+
   * PortalKeyGold
   * PortalKeyRed
   * PortalKeyGreen
   * PortalKeyBlue
   * PortalKeyPurple
   * PortalKeyTan
+  * PortalKeyYellow
+  * PortalKeyCyan
+  * PortalKeyOrange
+  * PortalKeyWhite
+  * PortalKeyBlack
+
+
   * PortalDrink
 
 ## Configuration Options:
@@ -181,6 +207,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
     AdditionalProhibitItems: -- Additional items restricted at this portal or [Stone, Wood]
     - Stone
     - Wood
+    BiomeColor: skip - this doesn't do anything - does update though
+    SpecialMode: 0  - nothing
+    AllowedUsers: [] - nothing
     Admin_only_Access: false -- Only admins
 
 ```
@@ -204,6 +233,12 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
 
 ## Change Log:
+        Version 2.6.0
+            Big update: Added BiomeColorForce, EnabledColors, FreePassageColor, adminColor, TelePortAnythingColor, PortalDrinkColor
+            Was a pain to make compatitle with TargetPortal, you will notice ^(num) on Portals with ConfigUseBiomeColors, just passes info
+            Individual configs for each Crystal Color used, can now set JC crystals to be consumed - which is pretty cool.
+            Fixed - Only Owner can deconstruct
+            More bugs, but hopefully you can live with those.
         Version 2.5.3
             I didn't do spanish correctly, fixed some spanish yml error.
         Version 2.5.2

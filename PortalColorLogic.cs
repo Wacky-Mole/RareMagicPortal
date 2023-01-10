@@ -822,7 +822,7 @@ namespace RareMagicPortal
                     return PortalColors[MagicPortalFluid.FreePassageColor.Value].Pos;
                 }
 
-                if (PortalN.Portals[PortalName].TeleportAnything && MagicPortalFluid.PortalDrinkColor.Value != "none")
+                if (PortalN.Portals[PortalName].TeleportAnything && MagicPortalFluid.TelePortAnythingColor.Value != "none")
                 {
                     //RMP.LogInfo("Logic 3");
                     currentColor = MagicPortalFluid.PortalDrinkColor.Value;
@@ -1057,7 +1057,7 @@ namespace RareMagicPortal
 
             
 
-            if (OdinsKin && MagicPortalFluid.isAdmin && !flag)
+            if (OdinsKin && MagicPortalFluid.isAdmin && !flag || currentColor == MagicPortalFluid.AdminColor.Value)
             {
                 player.Message(MessageHud.MessageType.TopLeft, "$rmp_kin_welcome"); // forgot this one
                 return true;
@@ -1071,7 +1071,7 @@ namespace RareMagicPortal
 
             }
 
-            if (TeleportEvery && !flag || currentColor == MagicPortalFluid.PortalDrinkColor.Value) // if no crystals, then just white, if crystals then free passage
+            if (TeleportEvery && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // if no crystals, then just white, if crystals then free passage
             {
                 player.Message(MessageHud.MessageType.TopLeft, "$rmp_freepassage");
                 if (MagicPortalFluid.ConfigEnableCrystalsNKeys.Value)
@@ -1096,17 +1096,17 @@ namespace RareMagicPortal
                 }
 
 
-                CrystalCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalMaster);
-                CrystalCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalRed);
-                CrystalCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalGreen);
-                CrystalCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlue);
-                CrystalCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalPurple);
-                CrystalCount[nameof(PortalColor.Tan)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalTan);
-                CrystalCount[nameof(PortalColor.Yellow)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalYellow);
-                CrystalCount[nameof(PortalColor.White)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalWhite);
-                CrystalCount[nameof(PortalColor.Black)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalBlack);
-                CrystalCount[nameof(PortalColor.Cyan)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalCyan);
-                CrystalCount[nameof(PortalColor.Orange)] = player.m_inventory.CountItems(MagicPortalFluid.CrystalOrange);
+                CrystalCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorGold.Value);
+                CrystalCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorRed.Value);
+                CrystalCount[nameof(PortalColor.Green)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorGreen.Value);
+                CrystalCount[nameof(PortalColor.Blue)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorBlue.Value);
+                CrystalCount[nameof(PortalColor.Purple)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorPurple.Value);
+                CrystalCount[nameof(PortalColor.Tan)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorTan.Value);
+                CrystalCount[nameof(PortalColor.Yellow)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorYellow.Value);
+                CrystalCount[nameof(PortalColor.White)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorWhite.Value);
+                CrystalCount[nameof(PortalColor.Black)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorBlack.Value);
+                CrystalCount[nameof(PortalColor.Cyan)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorCyan.Value);
+                CrystalCount[nameof(PortalColor.Orange)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorOrange.Value);
 
                 KeyCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyGold);
                 KeyCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.PortalKeyRed);
