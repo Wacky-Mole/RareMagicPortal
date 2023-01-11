@@ -119,11 +119,23 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
 ## Configuration Options:
 ### RareMagicPortal.cfg
-  * [General]
+  * [1.General]
     * Force Server Config: 
       * > Enable/Disable ServerSync enforcement
     * YML Logs
       * > Useful for seeing what a Portal Requirements are: Default: True
+
+  * [2.PortalFluid]
+    * EnablePortalFluid: 
+      * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
+    * PortalMagicFluidSpawn: 
+      * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
+    * PortalFluidValue: Value at trader - 0 means won't sale
+    * portalmagicfluid.DropsFrom.Add("gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids
+      * [Drops for Fluid,Drink and Crystals can be configured in Bepinex Manager, but recommend manually editing]
+    * "gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids for example
+
+  * [3.Portal Config"]
     * CraftingStation_Requirement = $piece_workbench
       * > Default required workbench
     * Level_of_CraftingStation_Req: 
@@ -149,35 +161,52 @@ YML files are synced on creation to the rest of the clients. Server always overr
        * > Default is 0. Which disables checks
        * > Will apply checks to all portals
 
-  * [Portal Crystals]
+  * [4.Portal Crystals]
     * Enable Portal Crystals and Keys = false
-      * > Enable/Disable Crystals and Keys to be loaded and used in game
+      * > Enable/Disable Crystals and Keys to be loaded and used in game - This controls all usage and restrictions
     * Crystal_Consume_Default: 
       * > Default required 1 crystal for each portal
     * Portal_Crystal_Color_Default: 
       * > Default required RED crystal for TP consumption
-      * > Options include Red, Green, Blue, Purple, Tan or None - None makes portals free passage by default
+      * > Options include Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold,none,None - None makes portals free passage by default
     * USE_GOLD_AS_PORTAL_MASTER = true
       * > Will Set Gold to always be true on regular colors - Making Gold Key the Master Key
       * > If you turn this off, you have to cycle through ALL Portals to get rid of Gold setting
     * UseTopLeftMessage
-       *>  false, In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.
+       * >  false, In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.
 
-  * [PortalFluid]
-    * EnablePortalFluid: 
-      * > Enable/Disable Portal Fluid to be loaded and used in game: 2.1.1 Default false
-    * PortalMagicFluidSpawn: 
-      * > Default spawning 3 fluids upon *NEW CHARACTER* created into the world/server
-    * PortalFluidValue: 
-      * > Default 0 coins 
-        >> Set to value of 1 or more to sale at Haldor
-    * portalmagicfluid.DropsFrom.Add("gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids
-
-  * [Portal Drink]
+  * [5.Portal Drink]
     * Portal_drink_timer = 120 : Seconds that PortalDrink lasts
 
-  * [Drops for Fluid,Drink and Crystals]
-    * "gd_king", 1f, 1, 2); // Elder drop 100% 1-2 portalFluids for example
+  * [6.Biome Colors]
+    * Force Biome Colors for Default
+      * > Overrides CrystalKeyDefaultColor and sets UNCHANGED portals to their BiomeColor
+    * BiomeRepColors
+      * > Biome Colors "Meadows:Tan,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biomes and their related Colors. - No spaces
+    
+  * [7.Colors]
+     * Enabled Colors
+        * > Any color not in list will not cycle through, reboot required
+     * Free Passage Color
+        * > Won't collect toll crystal or use key - Only 1 can be selected
+        * > Recommend none
+     * Admin only Color
+        * > Only Admins can pass through this portal, - inventory checks still applied
+        * > Recommended none
+     * TelePortAnythingColor
+        * > This color portal will allow anyone to come through, free of cost and free of inventory checks
+        * > It might be bugged
+        * > recommend none
+     * Portal Drink Color
+        * > Color to let the player know that PortalDrink is active on them. - Rainbow mode alternates randomly every second 
+        * > Rainbow or White recommended
+        * > Doesn't change underlying color if not Rainbow
+  * [8.CrystalSelector]
+    * Set Item usage for different colors - Defaults are entered but you can use JewelCrafting gems
+    * CrystalMaster is Gold, -fyi
+    * JC has around 7 type of base colors, currently RMP has 11. - JC has 5 base type of gems. $jc_shattered_color_crystal, $jc_uncut_color_stone, $jc_color_socket, $jc_adv_color_socket, $jc_perfect_color_socket
+    * You could use combination crystal names if you want to be very very restrictive. name has to be the ItemDrop.shared.m_name
+
 
 
 
@@ -208,7 +237,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
     - Wood
     BiomeColor: skip - this doesn't do anything - does update though
     SpecialMode: 0  - nothing
-    AllowedUsers: [] - nothing
+    AllowedUsers: [] - Only the players in this list will be allowed to go here - manual add only
     Admin_only_Access: false -- Only admins
 
 ```
@@ -221,7 +250,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
 <img src="https://wackymole.com/hosts/TargetPortalRMP2.png" width="600"/> 
 
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
-  * This a recommended mod, it has good compatibility with RMP.  Shows Icon Color in 2.1.2
+  * This a recommended mod, it has good compatibility with RMP. 
+    BiomeColorForce is a tricky for TargetPortal - so Icons will have ^22 next to the name on map. This is to let the mod know what color the icon is for later use
 * and most of the other mods.
 
 ## Author's Note:
@@ -236,7 +266,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
             Big update: Added BiomeColorForce, EnabledColors, FreePassageColor, adminColor, TelePortAnythingColor, PortalDrinkColor
             Was a pain to make compatitle with TargetPortal, you will notice ^(num) on Portals with ConfigUseBiomeColors, just passes info
             Individual configs for each Crystal Color used, can now set JC crystals to be consumed - which is pretty cool.
-            Fixed - Only Owner can deconstruct
+            Fixed - Only Owner can deconstruct, added AllowedUsers - If any added, only players in this list can go through
             More bugs, but hopefully you can live with those.
         Version 2.5.3
             I didn't do spanish correctly, fixed some spanish yml error.

@@ -178,7 +178,6 @@ namespace RareMagicPortal
         internal static ConfigEntry<string>? AdminColor;
         internal static ConfigEntry<string>? PortalDrinkColor;
         internal static ConfigEntry<string>? TelePortAnythingColor;
-        internal static ConfigEntry<int>? UseJewelCrafting;
         internal static ConfigEntry<string>? GemColorGold;
         internal static ConfigEntry<string>? GemColorRed;
         internal static ConfigEntry<string>? GemColorGreen;
@@ -485,6 +484,26 @@ namespace RareMagicPortal
                         Free_Passage = PortalColorLogic.PortalN.Portals[PortalName].Free_Passage;
                         TeleportAny = PortalColorLogic.PortalN.Portals[PortalName].TeleportAnything;
                         AdditionalProhibitItems = PortalColorLogic.PortalN.Portals[PortalName].AdditionalProhibitItems;
+                        var Playerlist = PortalColorLogic.PortalN.Portals[PortalName].AllowedUsers;
+                        if (Playerlist.Count > 0) // block any teleport for a player not on list
+                        {
+                            var found = false;
+                            foreach (var playerc in Playerlist)
+                            {
+                                if (playerc == Player.m_localPlayer.GetPlayerName())
+                                {
+                                    found = true;
+                                }
+                            }
+                            if (!found)
+                            {
+                                RareMagicPortal.LogInfo($"Player is not in the Allowed List for " + PortalName);
+                                Player.m_localPlayer.Message(MessageHud.MessageType.Center, "Odin Deems " + Player.m_localPlayer.GetPlayerName() + " Not Worthy!");
+                                __result = false;
+                                return false;
+                            }
+                        }
+
 
                         if (TeleportAny && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // allows for teleport anything portal if EnableCrystals otherwise just white
                             bo2 = true;
@@ -1685,8 +1704,6 @@ namespace RareMagicPortal
 
             ConfigEnableCrystalsNKeys = config("4.Portal Crystals", "Enable Portal Crystals and Keys", false, "Enable Portal Crystals and Keys");
 
-            UseJewelCrafting = config("4.Portal Crystals", "Use JewelCrafting Crystals", 0 , "Use JewlCrafting Crystals, 0 is NO, 1 is Uncut Gemstones, 2 is Simple Gemstone, 3 is Advanced, 4 is Perfect - MUST Reboot - Default is 0, Obviously I want you to use Mine lol");
-
             ConfigEnableGoldAsMaster = config("4.Portal Crystals", "Use Gold as Portal Master", true, "Enabled Gold Key and Crystal as Master Key to all (Red,Green,Blue,Purple,Tan,Gold)");
 
             //ConfigEnableKeys = config("Portal Keys", "Portal_Keys_Enable", false, "Enable Portal Crystals");
@@ -1701,11 +1718,11 @@ namespace RareMagicPortal
 
             PortalDrinkTimer = config("5.Portal Drink", "Portal Drink Timer", 120, "How Long Odin's Drink lasts");
 
-            ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", true, "This will Override -Portal Crystal Color Default- and Use Specific Colors for Biomes");
+            ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", true, "This will Override - Portal Crystal Color Default - and Use Specific Colors for Biomes");
 
             BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Tan,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biomes and their related Colors. - No spaces");
 
-            EnabledColors = config("7.Colors", "Enabled Colors for Portals", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are available Colors that can be enabled- maybe in future custom colors");
+            EnabledColors = config("7.Colors", "Enabled Colors for Portals", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold are available Colors that can be enabled, removing them disables the color");
 
             FreePassageColor = config("7.Colors", "Free Passage Color", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the Free Passage Color - Only 1 can be set - Default is none");
 
@@ -1713,7 +1730,7 @@ namespace RareMagicPortal
 
             TelePortAnythingColor = config("7.Colors", "TelePortAnythingColor", "none", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or none are the available Colors that can be selected for the TeleportAnything only portals - Only 1 can be set - Default is none");
 
-            PortalDrinkColor = config("7.Colors", "Portal Drink Color", "White", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or rainbow are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is rainbow " );
+            PortalDrinkColor = config("7.Colors", "Portal Drink Color", "Rainbow", "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold or Rainbow (Alternates between colors every second) are the available Colors that can be selected for the Portal Drink Mode for Portals - Only 1 can be set - Default is Rainbow ");
 
             GemColorGold = config("8.CrystalSelector", "Use for Crystal Gold", CrystalMaster, "You can use default or use an item like JewelCrafting crystal - $jc_shattered_orange_crystal, $jc_uncut_purple_stone, $jc_black_socket, $jc_adv_blue_socket, $jc_perfect_purple_socket, " + System.Environment.NewLine + " This is the ItemDrop.shared.m_name, the correct name might not be easy to guess. Annoy Odins discord or use UnityExplorer - must reboot game");
 
