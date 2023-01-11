@@ -1,9 +1,5 @@
 # RareMagicPortal
 
-Support me at https://www.buymeacoffee.com/WackyMole 
-
-<img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
-
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
 `Server and client side required for Server Sync enforcement.` V2.6.0
@@ -45,7 +41,7 @@ Well, I've a mod for you!
   * If you just want to see different Portal Colors, this mod is great for that.
 
 #### How to Get Crystals/Keys/Fluid in your World
-Added Drop Config for Fluid,Drink and Crystals - Keys in the future maybe
+Added Drop Config for Fluid,Drink and Crystals - 
 By Default Fluid drops from Elder - 100% chance for 1-2 drops. 
 The Crystals/Keys/Fluid are mostly meant for Multiplayer Worlds<br>
 The Admins can add them to the world in several different ways. <br>
@@ -198,14 +194,14 @@ YML files are synced on creation to the rest of the clients. Server always overr
         * > It might be bugged
         * > recommend none
      * Portal Drink Color
-        * > Color to let the player know that PortalDrink is active on them. - Rainbow mode alternates randomly every second 
+        * > Color to let the player know that PortalDrink is active on them. - Rainbow mode alternates every second 
         * > Rainbow or White recommended
-        * > Doesn't change underlying color if not Rainbow
+        * > Doesn't change underlying color requirements
   * [8.CrystalSelector]
-    * Set Item usage for different colors - Defaults are entered but you can use JewelCrafting gems
-    * CrystalMaster is Gold, -fyi
-    * JC has around 7 type of base colors, currently RMP has 11. - JC has 5 base type of gems. $jc_shattered_color_crystal, $jc_uncut_color_stone, $jc_color_socket, $jc_adv_color_socket, $jc_perfect_color_socket
-    * You could use combination crystal names if you want to be very very restrictive. name has to be the ItemDrop.shared.m_name
+    * > Set Item usage for different colors - Defaults are entered but you can use JewelCrafting gems
+    * > CrystalMaster is Gold, -fyi
+    * > JC has around 7 type of base colors, currently RMP has 11. - JC has 5 base type of gems. $jc_shattered_color_crystal, $jc_uncut_color_stone, $jc_color_socket, $jc_adv_color_socket, $jc_perfect_color_socket
+    * > You could use combination crystal names if you want to be very very restrictive. name has to be the ItemDrop.shared.m_name
 
 
 
@@ -251,8 +247,9 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
   * https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal/
   * This a recommended mod, it has good compatibility with RMP. 
-    BiomeColorForce is a tricky for TargetPortal - so Icons will have ^22 next to the name on map. This is to let the mod know what color the icon is for later use
-* and most of the other mods.
+
+  * BiomeColorForce is a tricky for TargetPortal - so Icons will have ^(num)(1-22) next to the name on map. This is to let the mod know what color the icon is for later use
+  *  Most of the other mods.
 
 ## Author's Note:
 * Mod was produced with the hope that multiplayer servers will require more teamwork or more PVP to capture the scarce resource.
@@ -260,6 +257,20 @@ YML files are synced on creation to the rest of the clients. Server always overr
 * If you are using *ServerCharacters*,
   * It is suggested to set the starting quantity amount to 0 for dedicated server and let ServerCharacters mod handle the first time spawn in amounts.
   * > https://valheim.thunderstore.io/package/Smoothbrain/ServerCharacters/
+
+<details><summary>Feedback</summary>
+
+Wacky Git https://github.com/Wacky-Mole/RareMagicPortal
+
+For questions or suggestions please join discord channel: [Odin Plus Team](https://discord.gg/odinplus)
+
+It has been a lot of fun making this mod, if you need help find Odin's Server
+
+Support me at https://www.buymeacoffee.com/WackyMole 
+
+<img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
+
+</details> 
 
 ## Change Log:
         Version 2.6.0
