@@ -50,8 +50,9 @@ namespace RareMagicPortal
         public static char NameIdentifier = '\u25B2';
         private static string BiomeStringTempHolder ="";
         internal static bool reloaded = false;
+        internal static Transform CheatswordColor;
 
-        public static List<ParticleSystem> CheatSwordColor { get; } = new List<ParticleSystem>();
+        public static List<ParticleSystem> CheatSwordColor { get; set; } = new List<ParticleSystem>();
         
 
 
@@ -234,7 +235,7 @@ namespace RareMagicPortal
                     if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
                     {
                         // override color for teleportanything color
-                        if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow_switch")
+                        if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow")
                         {
                             Color newCol = Color.yellow;// default
                             Random rnd = new Random();
@@ -256,34 +257,52 @@ namespace RareMagicPortal
                                 teleportWorldData.TargetColor = newCol;
                                 SetTeleportWorldColors(teleportWorldData, true);
                             }
-                        }
-                        else if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow" || MagicPortalFluid.PortalDrinkColor.Value == "rainbow")
+                            
+                        }/*
+                        else if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow") // Trying to copy Rainbow effect from cheatsword to portals, almost worked. ran out of time
                         {
+                            
                             if (CheatSwordColor.Count == 0)
                             {
-                                CheatSwordColor.AddRange(ObjectDB.instance.GetItemPrefab("SwordCheat").GetComponentsInChildren<ParticleSystem>().Where(transform => transform.name == "Particle System"));
+                                RMP.LogInfo("Set cheatsword");
+                                CheatSwordColor.AddRange(ObjectDB.instance.GetItemPrefab("SwordCheat").GetComponentsInChildren<ParticleSystem>());// not used just for init
+                                Transform CheatswordColor = ObjectDB.instance.GetItemPrefab("WackyBox").transform.Find("wackyflames");//ObjectDB.instance.GetItemPrefab("SwordCheat").transform.Find("attach/equiped/Particle System");
                             }
+                            if (CheatswordColor == null)
+                                RMP.LogInfo("Cheatsword is null");
+
                             ParticleSystem.MinMaxGradient holdColor = null;
-                            foreach (ParticleSystem system in CheatSwordColor)
-                            {
-                                ParticleSystem.MainModule main = system.main;
-                                holdColor = main.startColor;
+                            //ParticleSystem.MainModule main = CheatswordColor.GetComponent<ParticleSystem.MainModule>();
+                            //holdColor = main.startColor;
+                            //foreach (ParticleSystem system in CheatSwordColor)
+                            //{
+                               // ParticleSystem.MainModule main = system.main;
+                               // holdColor = main.startColor;
 
+                            //}
+
+                            RMP.LogInfo("Set holdColor");
+
+                            ParticleSystem system = teleportWorldData.BlueFlames[0];
+                            {
+                                //system.GetComponent<Transform>().gameObject.SetActive(false);
+
+                                system = CheatswordColor.GetComponent<ParticleSystem>();
+
+                                
+                                //ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
+                                //colorOverLifetime.color = holdColor;
+
+                                //ParticleSystem.MainModule main2 = system.main;
+                                //main2.startColor = holdColor;
+
+                                system.GetComponent<ParticleSystemRenderer>().material = MagicPortalFluid.originalMaterials["flame"];
+                                //RMP.LogInfo("flame set");
+                                
                             }
 
-                            foreach (ParticleSystem system in teleportWorldData.Systems)
-                            {
-                                ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
-                                colorOverLifetime.color = holdColor;
-
-                                ParticleSystem.MainModule main = system.main;
-                                main.startColor = holdColor;
-
-                                system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["Flame"];
-                            }
-                        }
+                        }*/
                         else
-
                         {
                             teleportWorldData.TargetColor = PortalColors[MagicPortalFluid.PortalDrinkColor.Value].HexName;
                             SetTeleportWorldColors(teleportWorldData, false, false);
@@ -1280,57 +1299,57 @@ namespace RareMagicPortal
                     case 201:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Yellow"]} $rmp_consumed_yellow");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalYellow, Portal_Crystal_Cost["Yellow"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorYellow.Value, Portal_Crystal_Cost["Yellow"], -1);
                         return true;
                     case 202:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Red"]} $rmp_consumed_red");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalRed, Portal_Crystal_Cost["Red"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorRed.Value, Portal_Crystal_Cost["Red"], -1);
                         return true;
                     case 203:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Green"]} $rmp_consumed_green");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalGreen, Portal_Crystal_Cost["Green"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorGreen.Value, Portal_Crystal_Cost["Green"], -1);
                         return true;
                     case 204:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Blue"]} $rmp_consumed_blue");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalBlue, Portal_Crystal_Cost["Blue"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlue.Value, Portal_Crystal_Cost["Blue"], -1);
                         return true;
                     case 205:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Purple"]} $rmp_consumed_purple");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalPurple, Portal_Crystal_Cost["Purple"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorPurple.Value, Portal_Crystal_Cost["Purple"], -1);
                         return true;
                     case 206:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Tan"]} $rmp_consumed_tan");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalTan, Portal_Crystal_Cost["Tan"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorTan.Value, Portal_Crystal_Cost["Tan"], -1);
                         return true;
                     case 207:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Cyan"]} $rmp_consumed_cyan");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalCyan, Portal_Crystal_Cost["Cyan"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorCyan.Value, Portal_Crystal_Cost["Cyan"], -1);
                         return true;
                     case 208:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Orange"]} $rmp_consumed_orange");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalOrange, Portal_Crystal_Cost["Orange"]);
+                        player.m_inventory.RemoveItem( MagicPortalFluid.GemColorOrange.Value, Portal_Crystal_Cost["Orange"], -1);
                         return true;
                     case 220:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["White"]} $rmp_consumed_white");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalWhite, Portal_Crystal_Cost["White"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorWhite.Value, Portal_Crystal_Cost["White"], -1);
                         return true;
                     case 221:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Black"]} $rmp_consumed_black");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalBlack, Portal_Crystal_Cost["Black"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlack.Value, Portal_Crystal_Cost["Black"], -1);
                         return true;
                     case 222:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Gold"]} $rmp_consumed_gold");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.CrystalMaster, Portal_Crystal_Cost["Gold"]);
+                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorGold.Value, Portal_Crystal_Cost["Gold"], -1);
                         return true;
 
                     case 301:

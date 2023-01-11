@@ -997,6 +997,8 @@ namespace RareMagicPortal
 
             //ObjectDB Dat = ObjectDB.instance;
 
+
+
             Item portalmagicfluid = new("portalmagicfluid", "portalmagicfluid", "assetsEmbedded");
             portalmagicfluid.Name.English("Magical Portal Fluid");
             portalmagicfluid.Description.English("Once a mythical essence, now made real with Odin's blessing");

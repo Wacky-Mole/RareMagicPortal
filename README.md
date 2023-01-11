@@ -39,7 +39,7 @@ Well, I've a mod for you!
 
  * Portal Drink
   * Allows you to teleport anywhere with anything on you.
-  *Bypasses normal inventory checks - should be rare
+  * Bypasses normal inventory checks - should be rare
 
 * Portal Colors
   * If you just want to see different Portal Colors, this mod is great for that.
@@ -114,7 +114,6 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * PortalKeyOrange
   * PortalKeyWhite
   * PortalKeyBlack
-
 
   * PortalDrink
 
