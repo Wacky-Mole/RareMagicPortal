@@ -106,7 +106,7 @@ namespace RareMagicPortal
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
         { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.0" };
 
-        internal static MagicPortalFluid? plugin;
+        internal static MagicPortalFluid plugin;
         internal static MagicPortalFluid context;
 
         internal AssetBundle portalmagicfluid;
@@ -149,46 +149,46 @@ namespace RareMagicPortal
         internal static bool Globaliscreator = false;
 
 
-        internal static ConfigEntry<bool>? ConfigFluid;
-        internal static ConfigEntry<int>? ConfigSpawn;
-        internal static ConfigEntry<string>? ConfigTable;
-        internal static ConfigEntry<int>? ConfigTableLvl;
-        internal static ConfigEntry<bool>? ConfigCreator;
-        internal static ConfigEntry<float>? ConfiglHealth;
-        internal static ConfigEntry<bool>? ConfigCreatorLock;
-        internal static ConfigEntry<int>? ConfigFluidValue;
-        internal static ConfigEntry<bool>? ConfigEnableCrystalsNKeys;
-       // internal static ConfigEntry<bool>? ConfigEnableKeys;
-        internal static ConfigEntry<int>? ConfigCrystalsConsumable;
-       // internal static ConfigEntry<bool>? ConfigAdminOnly;
-        internal static ConfigEntry<string>? CrystalKeyDefaultColor;
-        internal static ConfigEntry<int>? PortalDrinkTimer;
-        internal static ConfigEntry<bool>? ConfigEnableYMLLogs;
-        internal static ConfigEntry<string>? ConfigAddRestricted;
-        internal static ConfigEntry<bool>? ConfigEnableGoldAsMaster;
-        internal static ConfigEntry<string>? ConfigEnableColorEnable;
-        internal static ConfigEntry<KeyboardShortcut>? portalRMPKEY = null!;
-        internal static ConfigEntry<bool>? ConfigMessageLeft;
-        internal static ConfigEntry<bool>? ConfigTargetPortalAnimation;
-        internal static ConfigEntry<int>? ConfigMaxWeight;
-        internal static ConfigEntry<bool>? ConfigUseBiomeColors;
-        internal static ConfigEntry<string>? BiomeRepColors;
-        internal static ConfigEntry<string>? EnabledColors;
-        internal static ConfigEntry<string>? FreePassageColor;
-        internal static ConfigEntry<string>? AdminColor;
-        internal static ConfigEntry<string>? PortalDrinkColor;
-        internal static ConfigEntry<string>? TelePortAnythingColor;
-        internal static ConfigEntry<string>? GemColorGold;
-        internal static ConfigEntry<string>? GemColorRed;
-        internal static ConfigEntry<string>? GemColorGreen;
-        internal static ConfigEntry<string>? GemColorBlue;
-        internal static ConfigEntry<string>? GemColorPurple;
-        internal static ConfigEntry<string>? GemColorTan;
-        internal static ConfigEntry<string>? GemColorYellow;
-        internal static ConfigEntry<string>? GemColorWhite;
-        internal static ConfigEntry<string>? GemColorCyan;
-        internal static ConfigEntry<string>? GemColorBlack;
-        internal static ConfigEntry<string>? GemColorOrange;
+        internal static ConfigEntry<bool> ConfigFluid;
+        internal static ConfigEntry<int> ConfigSpawn;
+        internal static ConfigEntry<string> ConfigTable;
+        internal static ConfigEntry<int> ConfigTableLvl;
+        internal static ConfigEntry<bool> ConfigCreator;
+        internal static ConfigEntry<float> ConfiglHealth;
+        internal static ConfigEntry<bool> ConfigCreatorLock;
+        internal static ConfigEntry<int> ConfigFluidValue;
+        internal static ConfigEntry<bool> ConfigEnableCrystalsNKeys;
+       // internal static ConfigEntry<bool> ConfigEnableKeys;
+        internal static ConfigEntry<int> ConfigCrystalsConsumable;
+       // internal static ConfigEntry<bool> ConfigAdminOnly;
+        internal static ConfigEntry<string> CrystalKeyDefaultColor;
+        internal static ConfigEntry<int> PortalDrinkTimer;
+        internal static ConfigEntry<bool> ConfigEnableYMLLogs;
+        internal static ConfigEntry<string> ConfigAddRestricted;
+        internal static ConfigEntry<bool> ConfigEnableGoldAsMaster;
+        internal static ConfigEntry<string> ConfigEnableColorEnable;
+        internal static ConfigEntry<KeyboardShortcut> portalRMPKEY = null!;
+        internal static ConfigEntry<bool> ConfigMessageLeft;
+        internal static ConfigEntry<bool> ConfigTargetPortalAnimation;
+        internal static ConfigEntry<int> ConfigMaxWeight;
+        internal static ConfigEntry<bool> ConfigUseBiomeColors;
+        internal static ConfigEntry<string> BiomeRepColors;
+        internal static ConfigEntry<string> EnabledColors;
+        internal static ConfigEntry<string> FreePassageColor;
+        internal static ConfigEntry<string> AdminColor;
+        internal static ConfigEntry<string> PortalDrinkColor;
+        internal static ConfigEntry<string> TelePortAnythingColor;
+        internal static ConfigEntry<string> GemColorGold;
+        internal static ConfigEntry<string> GemColorRed;
+        internal static ConfigEntry<string> GemColorGreen;
+        internal static ConfigEntry<string> GemColorBlue;
+        internal static ConfigEntry<string> GemColorPurple;
+        internal static ConfigEntry<string> GemColorTan;
+        internal static ConfigEntry<string> GemColorYellow;
+        internal static ConfigEntry<string> GemColorWhite;
+        internal static ConfigEntry<string> GemColorCyan;
+        internal static ConfigEntry<string> GemColorBlack;
+        internal static ConfigEntry<string> GemColorOrange;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -243,7 +243,7 @@ namespace RareMagicPortal
         public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
         
 
-        static Coroutine myCoroutineRMP;
+        //static Coroutine myCoroutineRMP;
         public static ItemDrop.ItemData Crystal { get; internal set; }
 
         internal static readonly int _teleportWorldColorHashCode = "TeleportWorldColorRMP".GetStableHashCode(); // I should probably change this
@@ -421,8 +421,8 @@ namespace RareMagicPortal
                     bo2 = true;
                 }
 
-                
-                Piece portal = null;
+
+                //Piece portal = null;
                 String name = null;
                 Vector3 hi = Player.m_localPlayer.transform.position;
                 List<Piece> piecesfound = new List<Piece>();
@@ -630,7 +630,7 @@ namespace RareMagicPortal
 
 
             }
-            internal static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException2 ? null : __exception;
+            internal static Exception Finalizer(Exception __exception) => __exception is SkipPortalException2 ? null : __exception;
         }
 
         [HarmonyPatch(typeof(Minimap), nameof(Minimap.Start))]
@@ -742,7 +742,7 @@ namespace RareMagicPortal
 
                 //else return true;
             }
-            internal static Exception? Finalizer(Exception __exception) => __exception is SkipPortalException ? null : __exception;
+            internal static Exception Finalizer(Exception __exception) => __exception is SkipPortalException ? null : __exception;
 
             [HarmonyPostfix]
             [HarmonyPriority(Priority.Low)]
@@ -753,7 +753,7 @@ namespace RareMagicPortal
                     //RareMagicPortal.LogInfo($"Made it to Portal Trigger");
                     int colorint;
                     String PName;
-                    String PortalName;
+                    //String PortalName;
                     Minimap instance = Minimap.instance;
                     List<Minimap.PinData> paul = instance.m_pins;
 
@@ -1524,9 +1524,10 @@ namespace RareMagicPortal
                 });
 
                 var CraftingStationforPaul = GetCraftingStation(ConfigTable.Value);
+
                 if (CraftingStationforPaul == null)
                 {
-                    CraftingStationforPaul.m_name = DefaultTable;
+                    CraftingStationforPaul = GetCraftingStation(DefaultTable);
                 }
 
                 Piece petercomponent = peter.GetComponent<Piece>();
@@ -1540,15 +1541,12 @@ namespace RareMagicPortal
 
                 //RareMagicPortal.LogInfo($"There changing fluid value {PortalFluidname}");
                 ObjectDB.instance.GetItemPrefab(PortalFluidname).GetComponent<ItemDrop>().m_itemData.m_shared.m_value = ConfigFluidValue.Value;
-
-            }       // if loop															  			
-
+            }
         }
 
         internal static void StartingFirsttime()
         {
             firstTime = true;
-
         }
 
         internal static void StartingitemPrefab()
@@ -1592,10 +1590,11 @@ namespace RareMagicPortal
 
         internal static CraftingStation GetCraftingStation(string name)
         {
-            if (name == "")
+            if (name.IsNullOrWhiteSpace())
             {
                 return null;
             }
+
             foreach (Recipe recipe in ObjectDB.instance.m_recipes)
             {
                 if (recipe?.m_craftingStation?.m_name == name)
@@ -1604,6 +1603,7 @@ namespace RareMagicPortal
                     return recipe.m_craftingStation;
                 }
             }
+
             return null;
         }
 
@@ -1629,7 +1629,7 @@ namespace RareMagicPortal
 
         #region ConfigOptions
 
-        internal static ConfigEntry<bool>? _serverConfigLocked;
+        internal static ConfigEntry<bool> _serverConfigLocked;
 
 
         internal static readonly CustomSyncedValue<string> YMLPortalData = new(ConfigSync, "PortalYmlData", ""); // doesn't show up in config

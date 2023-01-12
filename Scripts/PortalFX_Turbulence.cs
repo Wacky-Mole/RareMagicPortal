@@ -16,16 +16,19 @@ public class PortalFX_Turbulence : MonoBehaviour
     private float deltaTime;
     private ParticleSystem.Particle[] particleArray;
     private ParticleSystem particleSys;
-    private float time;
+    //private float time;
 
     private void Start()
     {
         particleSys = GetComponent<ParticleSystem>();
 
-        if (particleArray==null || particleArray.Length < particleSys.maxParticles) 
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (particleArray == null || particleArray.Length < particleSys.maxParticles)
+        {
             particleArray = new ParticleSystem.Particle[particleSys.maxParticles];
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
-
 
     private void Update()
     {

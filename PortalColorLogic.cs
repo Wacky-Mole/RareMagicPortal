@@ -20,11 +20,8 @@ using System.Xml.Linq;
 
 namespace RareMagicPortal
 {
-
-
     internal class PortalColorLogic
     {
-
         // setups
         public static readonly ManualLogSource RMP =
             BepInEx.Logging.Logger.CreateLogSource(MagicPortalFluid.ModName);
@@ -44,8 +41,8 @@ namespace RareMagicPortal
 
         internal static PortalName PortalN;
         internal static Player player = null; // need to keep it between patches
-        private static int waitloop = 5;
-        private static int rainbowWait=0;
+        //private static int waitloop = 5;
+        //private static int rainbowWait=0;
         private static string currentRainbow = "Yellow";
         public static char NameIdentifier = '\u25B2';
         private static string BiomeStringTempHolder ="";
@@ -53,8 +50,6 @@ namespace RareMagicPortal
         internal static Transform CheatswordColor;
 
         public static List<ParticleSystem> CheatSwordColor { get; set; } = new List<ParticleSystem>();
-        
-
 
         internal enum PortalColor // gold - master should always be last or highest int
         {
@@ -69,7 +64,6 @@ namespace RareMagicPortal
             White = 20,
             Black = 21,
             Gold = 22,
-
         }
 
         internal static Dictionary<string,(Color HexName, int Pos,bool Enabled, string NextColor, string MessageText) > PortalColors = new Dictionary<string,(Color, int, bool, string, string)>()
@@ -249,7 +243,7 @@ namespace RareMagicPortal
                             currentRainbow = colorna.ToString();
                             //RMP.LogInfo("rainbow currently is " + colorna.ToString());
                             newCol = PortalColors[colorna.ToString()].HexName;
-                            rainbowWait = 0;
+                            //rainbowWait = 0;
 
 
                             if (newCol != teleportWorldData.OldColor)
@@ -946,7 +940,7 @@ namespace RareMagicPortal
             //if (BiomeCol != null) Setting BiomeColor doesn't make since when it only tracks a pair of Portals and not each indiv
                 // PortalN.Portals[PortalName].BiomeColor = BiomeCol;
 
-            string currentcolor = "Yellow"; // for reference only
+            //string currentcolor = "Yellow"; // for reference only
 
             PortalColor Color =  (PortalColor)colorint;
             string ColorName = Color.ToString();
