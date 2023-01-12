@@ -78,9 +78,13 @@ https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards,
 
 <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="200"/>
 
-![https://wackymole.com/hosts/PortalColorVideo.mp4](https://wackymole.com/hosts/PortalColorVideo.mp4)
+
 
 * Portal Drink
+
+https://user-images.githubusercontent.com/25761125/212202220-c49d72c3-f2b8-4ee8-8e3c-81a1aa0dd6df.mp4
+
+
  * Allows you do drink a potion and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
 
 YML files are synced on creation to the rest of the clients. Server always override client files on sync, except on finding a new portal or changing Portal color. 
