@@ -376,7 +376,7 @@ namespace RareMagicPortal
                             }
 
                         }
-                        if (color != teleportWorldData.LinkColor)
+                        if (color != teleportWorldData.LinkColor || color != teleportWorldData.OldColor)
                         {  // don't waste resources
                             teleportWorldData.TargetColor = color;
                             teleportWorldData.LinkColor = color;

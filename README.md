@@ -78,6 +78,8 @@ https://valheim.thunderstore.io/package/NewHaven/Server_Rewards/ Server rewards,
 
 <img src="https://wackymole.com/hosts/White2.png" width="700"/>  <img src="https://wackymole.com/hosts/OdinsBlessing.png" width="200"/>
 
+![https://wackymole.com/hosts/PortalColorVideo.mp4](https://wackymole.com/hosts/PortalColorVideo.mp4)
+
 * Portal Drink
  * Allows you do drink a potion and be able to Teleport Anything for a configurable amount of time. (Turns Any Portal White with base color behind)
 

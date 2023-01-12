@@ -1688,7 +1688,7 @@ namespace RareMagicPortal
             ConfigTableLvl = config("3.Portal Config", "Level of CraftingStation Req", 1,
                 "What level of CraftingStation is required for placing Portal?");
 
-            ConfigCreator = config("3.Portal Config", "Only Creator Can Deconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destoryed");
+            ConfigCreator = config("3.Portal Config", "Only Creator Can Deconstruct", true, "Only the Creator of the Portal can deconstruct it. It can still be destroyed");
 
             ConfiglHealth = config("3.Portal Config", "Portal Health", 400f, "Health of Portal");
 
@@ -1696,7 +1696,7 @@ namespace RareMagicPortal
 
             ConfigCreatorLock = config("3.Portal Config", "Only Creator Can Change Name", false, "Only Creator can change Portal name");
 
-            ConfigTargetPortalAnimation = config("3.Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only config only applies if mod is loaded", false);
+            ConfigTargetPortalAnimation = config("3.Portal Config", "Force Portal Animation", false, "Forces Portal Animation for Target Portal Mod, is not synced and only applies the config if the mod is loaded", false);
 
             portalRMPKEY = config("3.Portal Config", "Modifier key for toggle", new KeyboardShortcut(KeyCode.LeftControl), "Modifier key that has to be pressed while hovering over Portal + E", false);
 
