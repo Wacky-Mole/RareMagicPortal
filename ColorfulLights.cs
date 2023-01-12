@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-
 
 namespace RareMagicPortal // Thank you Redseiko and Comfymods
 {
@@ -23,7 +20,7 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
             ExtractFireplaceData(fireplace.m_fireworks);
         }
 
-        void ExtractFireplaceData(GameObject targetObject)
+        private void ExtractFireplaceData(GameObject targetObject)
         {
             if (targetObject)
             {
@@ -34,7 +31,7 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         }
     }
 
-    class TeleportWorldDataRMP
+    internal class TeleportWorldDataRMP
     {
         public List<Light> Lights { get; } = new List<Light>();
         public List<ParticleSystem> Systems { get; } = new List<ParticleSystem>();
@@ -42,7 +39,7 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         public List<ParticleSystem> BlueFlames { get; } = new List<ParticleSystem>();
         public List<Material> Materials { get; } = new List<Material>();
         public String Biome { get; set; }
-        public String BiomeColor  { get; set; }
+        public String BiomeColor { get; set; }
 
         public Color TargetColor = Color.clear;
         public Color LinkColor = Color.clear;
@@ -50,8 +47,6 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
         public List<Renderer> MeshRend { get; } = new List<Renderer>();
         public String MaterialPortName { get; set; }
         public TeleportWorld TeleportW { get; }
-
-
 
         public TeleportWorldDataRMP(TeleportWorld teleportWorld)
         {
@@ -62,19 +57,19 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
             Sucks.AddRange(teleportWorld.GetComponentsInNamedChild<ParticleSystem>("Black_suck"));
             BlueFlames.AddRange(teleportWorld.GetComponentsInNamedChild<ParticleSystem>("blue flames"));
 
-
             Materials.AddRange(
-                teleportWorld.GetComponentsInNamedChild<ParticleSystemRenderer>("blue flames") // 
+                teleportWorld.GetComponentsInNamedChild<ParticleSystemRenderer>("blue flames") //
                     .Where(psr => psr.material != null)
                     .Select(psr => psr.material));
 
             MeshRend.AddRange(teleportWorld.GetComponentsInNamedChild<Renderer>("small_portal"));
             //  .Where(psr => psr.material != null)
-            //.Select(psr => psr.material)); 
+            //.Select(psr => psr.material));
 
             TeleportW = teleportWorld;
         }
     }
+
     internal static class TeleportWorldExtensionRMP // totally cool
     {
         public static IEnumerable<T> GetComponentsInNamedChild<T>(this TeleportWorld teleportWorld, string childName)
@@ -85,5 +80,4 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
                 .Where(component => component != null);
         }
     }
-
 }

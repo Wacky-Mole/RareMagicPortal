@@ -1,8 +1,6 @@
-using System;
 using UnityEngine;
 
 [ExecuteInEditMode]
-
 public class PortalFX_Turbulence : MonoBehaviour
 {
     public float TurbulenceStrenght = 1;
@@ -33,16 +31,17 @@ public class PortalFX_Turbulence : MonoBehaviour
     private void Update()
     {
         int numParticlesAlive = particleSys.GetParticles(particleArray);
-        if (!Application.isPlaying) {
+        if (!Application.isPlaying)
+        {
             deltaTime = Time.realtimeSinceStartup - lastStopTime;
             lastStopTime = Time.realtimeSinceStartup;
         }
         else
             deltaTime = Time.deltaTime;
         currentOffset += OffsetSpeed * deltaTime;
-       
-        
-        for (int i = 0; i < numParticlesAlive; i++) {
+
+        for (int i = 0; i < numParticlesAlive; i++)
+        {
             var particle = particleArray[i];
             float timeTurbulenceStrength = 1;
             var pos = particle.position;
@@ -56,7 +55,7 @@ public class PortalFX_Turbulence : MonoBehaviour
 
             turbulenceVector *= TurbulenceStrenght * timeTurbulenceStrength;
             particleArray[i].position += turbulenceVector;
-		}
+        }
         particleSys.SetParticles(particleArray, numParticlesAlive);
     }
 }

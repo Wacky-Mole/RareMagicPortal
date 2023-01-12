@@ -40,7 +40,7 @@ public class PortalFX_UVAnimation : MonoBehaviour
     private void InitDefaultVariables()
     {
         currentRenderer = GetComponent<Renderer>();
-        if (currentRenderer==null)
+        if (currentRenderer == null)
             throw new Exception("UvTextureAnimator can't get renderer");
         if (!currentRenderer.enabled)
             currentRenderer.enabled = true;
@@ -53,11 +53,13 @@ public class PortalFX_UVAnimation : MonoBehaviour
         StartFrameOffset = StartFrameOffset - (StartFrameOffset / count) * count;
         var size = new Vector2(1f / TilesX, 1f / TilesY);
 
-        if (currentRenderer!=null) {
+        if (currentRenderer != null)
+        {
             instanceMaterial = currentRenderer.material;
             instanceMaterial.SetTextureScale("_MainTex", size);
             instanceMaterial.SetTextureOffset("_MainTex", offset);
-            if (IsBump) {
+            if (IsBump)
+            {
                 instanceMaterial.SetTextureScale("_BumpMap", size);
                 instanceMaterial.SetTextureOffset("_BumpMap", offset);
             }
@@ -99,11 +101,11 @@ public class PortalFX_UVAnimation : MonoBehaviour
         CancelInvoke("PlayDelay");
     }
 
-
     private IEnumerator UpdateCorutine()
     {
         animationStartTime = Time.time;
-        while (isVisible && (IsLoop || !animationStoped)) {
+        while (isVisible && (IsLoop || !animationStoped))
+        {
             if (!IsReverse)
                 UpdateFrame();
             else
@@ -127,17 +129,18 @@ public class PortalFX_UVAnimation : MonoBehaviour
         ++index;
         if (index >= count)
             index = 0;
-        if (count==allCount) {
+        if (count == allCount)
+        {
             animationStartTime = Time.time;
             allCount = 0;
             animationStoped = true;
         }
         var offset = new Vector2((float)index / TilesX - (int)(index / TilesX), 1 - (int)(index / TilesX) / (float)TilesY);
-        if (currentRenderer!=null) {
+        if (currentRenderer != null)
+        {
             instanceMaterial.SetTextureOffset("_MainTex", offset);
             if (IsBump)
                 instanceMaterial.SetTextureOffset("_BumpMap", offset);
-            
         }
     }
 
@@ -154,21 +157,22 @@ public class PortalFX_UVAnimation : MonoBehaviour
             animationStoped = true;
         }
         var offset = new Vector2((float)index / TilesX - (int)(index / TilesX), 1 - (int)(index / TilesX) / (float)TilesY);
-        if (currentRenderer!=null) {
+        if (currentRenderer != null)
+        {
             instanceMaterial.SetTextureOffset("_MainTex", offset);
             if (IsBump)
                 instanceMaterial.SetTextureOffset("_BumpMap", offset);
         }
     }
 
-
     private void OnDestroy()
     {
-        if (instanceMaterial!=null) {
+        if (instanceMaterial != null)
+        {
             Destroy(instanceMaterial);
             instanceMaterial = null;
         }
     }
 
-    #endregion
+    #endregion Non-public methods
 }

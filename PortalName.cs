@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RareMagicPortal
 {
@@ -38,12 +34,10 @@ namespace RareMagicPortal
 
             public string BiomeColor { get; set; }
 
-            public int SpecialMode {get; set; } = 0; // 0 - normal, 1 - rainbow, 2 -password lock, - 3 Manual ID lock, -4 AllowedList is Moderator List
+            public int SpecialMode { get; set; } = 0; // 0 - normal, 1 - rainbow, 2 -password lock, - 3 Manual ID lock, -4 AllowedList is Moderator List
             public List<string> AllowedUsers { get; set; } = new List<string>();// { "SteamID1", "SteamID2" };
 
             public bool Admin_only_Access { get; set; } = false;
-
         }
-
     }
 }
