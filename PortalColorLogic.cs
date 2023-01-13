@@ -934,7 +934,7 @@ namespace RareMagicPortal
                 return PortalColors[currentColor].Pos;
             }
 
-            RMP.LogInfo(" Logic going to default yellow");
+            //RMP.LogInfo(" Logic going to default yellow");
             currentColor = "Yellow";
             currentColorHex = PortalColors["Yellow"].HexName;
             nextcolor = "Red";

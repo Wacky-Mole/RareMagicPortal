@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.6.0
+`Server and client side required for Server Sync enforcement.` V2.6.1
 
-MinimumRequiredVersion = "2.6.0"
+MinimumRequiredVersion = "2.6.1"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -281,6 +281,9 @@ Support me at https://www.buymeacoffee.com/WackyMole
 </details> 
 
 ## Change Log:
+        Version 2.6.1
+            Fixed some log spam, set some defaults to mirror more closely vanilla.
+            If you see ▲ 6 or numbers in a portalname that is just displaying for Forced Biome Color: lets other mods know the color
         Version 2.6.0
             Big update: Added BiomeColorForce, EnabledColors, FreePassageColor, adminColor, TelePortAnythingColor, PortalDrinkColor
             Was a pain to make compatitle with TargetPortal, you will notice ^(num) on Portals with ConfigUseBiomeColors, just passes info

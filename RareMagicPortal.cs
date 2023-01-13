@@ -84,7 +84,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.0";
+        public const string PluginVersion = "2.6.1";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -104,7 +104,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.0" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.1" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -1712,13 +1712,13 @@ namespace RareMagicPortal
 
             //ConfigAdminOnly = config("Portal Config", "Only_Admin_Can_Build", false, "Only The Admins Can Build Portals");
 
-            CrystalKeyDefaultColor = config("4.Portal Crystals", "Portal Crystal Color Default", "Red", "Default Color for New Portals? " + System.Environment.NewLine + "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold,none,None" + System.Environment.NewLine + " None - will set Portals to Free Passage (Yellow) by default");
+            CrystalKeyDefaultColor = config("4.Portal Crystals", "Portal Crystal Color Default", "Yellow", "Default Color for New Portals? " + System.Environment.NewLine + "Yellow,Red,Green,Blue,Purple,Tan,Cyan,Orange,White,Black,Gold,none,None" + System.Environment.NewLine + " None - will set Portals to Free Passage (Yellow) by default");
 
             ConfigMessageLeft = config("4.Portal Crystals", "Use Top Left Message", false, "In case a mod is interfering with Center Messages for Portal tags, display on TopLeft instead.");
 
             PortalDrinkTimer = config("5.Portal Drink", "Portal Drink Timer", 120, "How Long Odin's Drink lasts");
 
-            ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", true, "This will Override - Portal Crystal Color Default - and Use Specific Colors for Biomes");
+            ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", false, "This will Override - Portal Crystal Color Default - and Use Specific Colors for Biomes");
 
             BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Tan,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biomes and their related Colors. - No spaces");
 
