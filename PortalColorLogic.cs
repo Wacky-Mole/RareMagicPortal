@@ -492,7 +492,7 @@ namespace RareMagicPortal
                     if (BiomeStringTempHolder != "")
                     {
                         __instance.SetText(BiomeStringTempHolder);
-                        RMP.LogInfo("BiomeHolder CopiedBack name");
+                        RMP.LogDebug("BiomeHolder CopiedBack name");
                     }
 
                 }
@@ -503,6 +503,7 @@ namespace RareMagicPortal
         public static class TeleportHaveTargetFix
         {
             private static string HoldMeDaddy = "";
+            private static int count3 = 0;
             static void Prefix(ref TeleportWorld __instance) {
 
                 string PortalName = __instance.m_nview.m_zdo.GetString("tag");
@@ -518,10 +519,14 @@ namespace RareMagicPortal
 
             }
             [HarmonyPriority(Priority.Low)]
-            static void Postfix(ref TeleportWorld __instance)
+            static void Postfix(ref TeleportWorld __instance,  bool __result)
             {
                 if(HoldMeDaddy != "")
                     __instance.SetText(HoldMeDaddy);
+
+                if (!__result) {
+                    RMP.LogDebug("Portal Did not find Matching Portal - real name is " + HoldMeDaddy);
+                }
             }
 
         }
@@ -593,7 +598,7 @@ namespace RareMagicPortal
                 || __instance.m_nview.m_zdo.m_vec3 == null
                 || __instance.m_nview.m_zdo.GetString(MagicPortalFluid._portalBiomeHashCode) == "")
                 {
-                    RMP.LogInfo("Setting Portal Color For First Time");
+                    //RMP.LogInfo("Setting Portal Color For First Time");
                     if (MagicPortalFluid._teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData))
                     {
                         teleportWorldData.Biome = Biome;
@@ -929,7 +934,7 @@ namespace RareMagicPortal
                 return PortalColors[currentColor].Pos;
             }
 
-            RMP.LogInfo("Warning- Logic going to default yellow");
+            RMP.LogInfo(" Logic going to default yellow");
             currentColor = "Yellow";
             currentColorHex = PortalColors["Yellow"].HexName;
             nextcolor = "Red";
@@ -950,7 +955,7 @@ namespace RareMagicPortal
 
             PortalColor Color =  (PortalColor)colorint;
             string ColorName = Color.ToString();
-            RMP.LogWarning("Make sure to remove in release color "+ ColorName);
+            //RMP.LogWarning("Make sure to remove in release color "+ ColorName);
 
             //main set loop
             PortalN.Portals[PortalName].TeleportAnything = false;

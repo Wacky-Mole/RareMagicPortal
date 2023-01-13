@@ -255,6 +255,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * This a recommended mod, it has good compatibility with RMP. 
 
   * BiomeColorForce is a tricky for TargetPortal - so Icons will have ^(num)(1-22) next to the name on map. This is to let the mod know what color the icon is for later use
+  * Warning - Removing TargetPortal mod with ForcedBiomes, might make Portals unable to connect with each other. You might have to deconstruct and rebuild them or change names. - Debug Logs should show Portal Real name
+
   *  Most of the other mods.
 
 ## Author's Note:
