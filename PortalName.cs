@@ -14,21 +14,21 @@ namespace RareMagicPortal
         {
             public Dictionary<string, int> Portal_Crystal_Cost =
                     new Dictionary<string, int>(){
-                                  {"Red", 1},
+                                  {"Red", 0},
                                   {"Green", 0},
                                   {"Blue", 0 },
                                   {"Purple", 0 },
                                   {"Tan", 0 },
-                                  {"Gold", 1 }};
+                                  {"Gold", 0 }};
 
             public Dictionary<string, bool> Portal_Key =
                     new Dictionary<string, bool>(){
-                                  {"Red", true},
+                                  {"Red", false},
                                   {"Green", false },
                                   {"Blue", false },
                                   {"Purple", false },
                                   {"Tan", false },
-                                  {"Gold", true } };
+                                  {"Gold", false } };
 
             public bool Free_Passage { get; set; } = false;
 

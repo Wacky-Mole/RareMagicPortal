@@ -166,6 +166,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
   * [4.Portal Crystals]
     * Enable Portal Crystals and Keys = false
       * > Enable/Disable Crystals and Keys to be loaded and used in game - This controls all usage and restrictions
+      * > If this is not enabled then, Free Passage Color, Admin Color and Teleport anything color do NOT WORK,  PortalDrink will still work.
     * Crystal_Consume_Default: 
       * > Default required 1 crystal for each portal
     * Portal_Crystal_Color_Default: 
