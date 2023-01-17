@@ -695,7 +695,7 @@ namespace RareMagicPortal
                 }
                 TeleportingforWeight = 1;
 
-                PortalColorLogic.player = collider.GetComponent<Player>();
+                //PortalColorLogic.player = collider.GetComponent<Player>();
                 string PortalName = "";
                 if (!Chainloader.PluginInfos.ContainsKey("com.sweetgiorni.anyportal"))
                 { // check to see if AnyPortal is loaded // don't touch when anyportal is loaded
@@ -1767,6 +1767,7 @@ namespace RareMagicPortal
             */
             PortalColorLogic.reloaded = true;
             AllowTeleEverything.Effect.m_cooldown = PortalDrinkTimer.Value;
+
         }
 
 /* maybe keep?

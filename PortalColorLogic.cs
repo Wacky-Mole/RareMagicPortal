@@ -43,7 +43,7 @@ namespace RareMagicPortal
         public static Color Yellow2 = new Color(139f/255f,128f/255f, 0f, 1f);
 
         internal static PortalName PortalN;
-        internal static Player player = null; // need to keep it between patches
+        //internal static Player player = null; // need to keep it between patches
         private static int waitloop = 5;
         private static int rainbowWait=0;
         private static string currentRainbow = "Yellow";
@@ -51,6 +51,8 @@ namespace RareMagicPortal
         private static string BiomeStringTempHolder ="";
         internal static bool reloaded = false;
         internal static Transform CheatswordColor;
+        internal static bool inventoryRemove = false;
+        internal static Dictionary<string, int> removeItems = new Dictionary<string, int>();
 
         public static List<ParticleSystem> CheatSwordColor { get; set; } = new List<ParticleSystem>();
         
@@ -525,9 +527,9 @@ namespace RareMagicPortal
                 if(HoldMeDaddy != "" && MagicPortalFluid.TargetPortalLoaded) // only write back if target portal loaded otherwise erase ^2
                     __instance.SetText(HoldMeDaddy);
 
-                if (!__result) {
-                    RMP.LogDebug("Portal Did not find Matching Portal - real name is " + HoldMeDaddy);
-                }
+                //if (!__result) { spam
+                  //  RMP.LogDebug("Portal Did not find Matching Portal - real name is " + HoldMeDaddy);
+               // }
             }
 
         }
@@ -571,9 +573,30 @@ namespace RareMagicPortal
                     PortalName = PortalName.Substring(0, index);
                     //RMP.LogInfo("PortalName " + PortalName);
                 }
-                if (currentcolor == MagicPortalFluid.FreePassageColor.Value && !MagicPortalFluid.ConfigUseBiomeColors.Value && !PortalN.Portals[PortalName].Free_Passage)
+                if (currentcolor == MagicPortalFluid.FreePassageColor.Value && !MagicPortalFluid.ConfigUseBiomeColors.Value && !PortalN.Portals[PortalName].Free_Passage && MagicPortalFluid.JustSent == 0) // to fix existing player issues
                     updateYmltoColorChange(PortalName, PortalColors[MagicPortalFluid.FreePassageColor.Value].Pos);  // WritetoYML(PortalName, currentcolor);// updates for people
 
+                
+
+                if (PortalName == "" &&  reloaded) { // catch cases
+                    RMP.LogInfo("Updating Blank Portals");
+                    updateYmltoColorChange("", colorint); // update No Tag Portals
+                    reloaded = false; // only after reload
+                    /*
+                    if (MagicPortalFluid.FreePassageColor.Value != currentcolor && PortalN.Portals[PortalName].Free_Passage)
+                        updateYmltoColorChange("", colorint);
+
+                    if (MagicPortalFluid.TelePortAnythingColor.Value != currentcolor && PortalN.Portals[PortalName].TeleportAnything)
+                        updateYmltoColorChange("", colorint);
+
+                    if (MagicPortalFluid.AdminColor.Value != currentcolor && PortalN.Portals[PortalName].Admin_only_Access)
+                        updateYmltoColorChange("", colorint);
+
+                    if (MagicPortalFluid.FreePassageColor.Value == currentcolor && !PortalN.Portals[PortalName].Free_Passage)
+                        updateYmltoColorChange("", colorint);
+                    */
+
+                }
 
                 string text;
                 Color color = currentcolorHex;
@@ -632,7 +655,7 @@ namespace RareMagicPortal
                         RMP.LogInfo("Setting ZDO Color For First Time");
                     }
                     if (PortalName == "")
-                       updateYmltoColorChange("", colorint); // update only once
+                       updateYmltoColorChange("", colorint); // update only once// this is a problem
                 }// end FirstPass
                 bool write = false;
                 if (MagicPortalFluid._teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData2)) // run at every hover unfortunetly
@@ -759,7 +782,7 @@ namespace RareMagicPortal
                                     );
 
                 }
-                
+               
                 string comparestring = PortalName + tempholdstring;
                 if (__instance.m_nview.m_zdo.GetString("tag") != comparestring && write)
                 {
@@ -1011,6 +1034,12 @@ namespace RareMagicPortal
             if (BiomeCol != null)
              PortalN.Portals[PortalName].BiomeColor = BiomeCol;
 
+            if (PortalName == "")
+            {
+                if (MagicPortalFluid.ConfigAddRestricted.Value != "")
+                    PortalN.Portals[PortalName].AdditionalProhibitItems = MagicPortalFluid.ConfigAddRestricted.Value.Split(',').ToList();
+            }
+
 
             if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
             {
@@ -1094,7 +1123,7 @@ namespace RareMagicPortal
                 flag = true;
             }
 
-            MagicPortalFluid.RareMagicPortal.LogInfo($"Portal name is " + PortalName +" currentcolor " + currentColor + " BiomeC " + BiomeC + "BiomeColor" + BiomeColor);
+            MagicPortalFluid.RareMagicPortal.LogInfo($"Portal name is " + PortalName);//+" currentcolor " + currentColor + " BiomeC " + BiomeC + "BiomeColor" + BiomeColor);
             if (!PortalN.Portals.ContainsKey(PortalName)) // if doesn't contain use defaults
             {
                 WritetoYML(PortalName);
@@ -1106,11 +1135,7 @@ namespace RareMagicPortal
             var Portal_Key_Cost = PortalN.Portals[PortalName].Portal_Key; // rgbG
             var TeleportEvery = PortalN.Portals[PortalName].TeleportAnything;
 
-            if (flag)
-            {
-
-            }
-
+            Player player = Player.m_localPlayer;// whoops
             if (OdinsKin && MagicPortalFluid.isAdmin && !flag || currentColor == MagicPortalFluid.AdminColor.Value)
             {
                 player.Message(MessageHud.MessageType.TopLeft, "$rmp_kin_welcome"); // forgot this one
@@ -1148,7 +1173,7 @@ namespace RareMagicPortal
                     player.Message(MessageHud.MessageType.TopLeft, "$rmp_freepassage");
                     return true;
                 }
-
+               
 
                 CrystalCount[nameof(PortalColor.Gold)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorGold.Value);
                 CrystalCount[nameof(PortalColor.Red)] = player.m_inventory.CountItems(MagicPortalFluid.GemColorRed.Value);
@@ -1333,58 +1358,80 @@ namespace RareMagicPortal
 
                     case 201:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
-                        player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Yellow"]} $rmp_consumed_yellow");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorYellow.Value, Portal_Crystal_Cost["Yellow"], -1);
+                        player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Yellow"]} $rmp_consumed_yellow"); 
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorYellow.Value, Portal_Crystal_Cost["Yellow"], -1); // becareful of server devcommands and god, debug! Spent so much time and this probably still works!
+                        removeItems.Add(MagicPortalFluid.GemColorYellow.Value, Portal_Crystal_Cost["Yellow"]);
+                        inventoryRemove = true;
                         return true;
                     case 202:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Red"]} $rmp_consumed_red");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorRed.Value, Portal_Crystal_Cost["Red"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorRed.Value, Portal_Crystal_Cost["Red"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorRed.Value, Portal_Crystal_Cost["Red"]);
+                        inventoryRemove = true;
                         return true;
                     case 203:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Green"]} $rmp_consumed_green");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorGreen.Value, Portal_Crystal_Cost["Green"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorGreen.Value, Portal_Crystal_Cost["Green"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorGreen.Value, Portal_Crystal_Cost["Green"]);
+                        inventoryRemove = true;
                         return true;
                     case 204:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Blue"]} $rmp_consumed_blue");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlue.Value, Portal_Crystal_Cost["Blue"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlue.Value, Portal_Crystal_Cost["Blue"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorBlue.Value, Portal_Crystal_Cost["Blue"]);
+                        inventoryRemove = true;
                         return true;
                     case 205:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Purple"]} $rmp_consumed_purple");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorPurple.Value, Portal_Crystal_Cost["Purple"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorPurple.Value, Portal_Crystal_Cost["Purple"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorPurple.Value, Portal_Crystal_Cost["Purple"]);
+                        inventoryRemove = true;
                         return true;
                     case 206:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Tan"]} $rmp_consumed_tan");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorTan.Value, Portal_Crystal_Cost["Tan"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorTan.Value, Portal_Crystal_Cost["Tan"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorTan.Value, Portal_Crystal_Cost["Tan"]);
+                        inventoryRemove = true;
                         return true;
                     case 207:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Cyan"]} $rmp_consumed_cyan");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorCyan.Value, Portal_Crystal_Cost["Cyan"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorCyan.Value, Portal_Crystal_Cost["Cyan"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorCyan.Value, Portal_Crystal_Cost["Cyan"]);
+                        inventoryRemove = true;
                         return true;
                     case 208:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Orange"]} $rmp_consumed_orange");
-                        player.m_inventory.RemoveItem( MagicPortalFluid.GemColorOrange.Value, Portal_Crystal_Cost["Orange"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem( MagicPortalFluid.GemColorOrange.Value, Portal_Crystal_Cost["Orange"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorOrange.Value, Portal_Crystal_Cost["Orange"]);
+                        inventoryRemove = true;
                         return true;
                     case 220:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["White"]} $rmp_consumed_white");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorWhite.Value, Portal_Crystal_Cost["White"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorWhite.Value, Portal_Crystal_Cost["White"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorWhite.Value, Portal_Crystal_Cost["White"]);
+                        inventoryRemove = true;
                         return true;
                     case 221:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Black"]} $rmp_consumed_black");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlack.Value, Portal_Crystal_Cost["Black"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorBlack.Value, Portal_Crystal_Cost["Black"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorBlack.Value, Portal_Crystal_Cost["Black"]);
+                        inventoryRemove = true;
                         return true;
                     case 222:
                         player.Message(MessageHud.MessageType.Center, $"$rmp_crystalgrants_access");
                         player.Message(MessageHud.MessageType.TopLeft, $"$rmp_consumed {Portal_Crystal_Cost["Gold"]} $rmp_consumed_gold");
-                        player.m_inventory.RemoveItem(MagicPortalFluid.GemColorGold.Value, Portal_Crystal_Cost["Gold"], -1);
+                        //Player.m_localPlayer.m_inventory.RemoveItem(MagicPortalFluid.GemColorGold.Value, Portal_Crystal_Cost["Gold"], -1);
+                        removeItems.Add(MagicPortalFluid.GemColorGold.Value, Portal_Crystal_Cost["Gold"]);
+                        inventoryRemove = true;
                         return true;
 
                     case 301:
@@ -1436,10 +1483,39 @@ namespace RareMagicPortal
 
         }
 
+        [HarmonyPatch(typeof(Player), nameof(Player.Update))]
+        public static class UpdateRemoveItem
+        {
+            static void Prefix(ref Player __instance)
+            {
+                if (inventoryRemove)
+                {
+                    if (!__instance.m_nview.IsValid() || !__instance.m_nview.IsOwner())
+                    {
+                        return;
+                    }
+                    //RMP.LogInfo("Actual Removal");
+                    var itemhere = __instance.m_inventory.GetItem(removeItems.Last().Key);
+                    if (itemhere == null)
+                    {
+                        RMP.LogInfo("item is null");
+                    }
+                    //itemhere.m_stack
+                    //__instance.m_inventory.m_inventory.Remove(itemhere); 
+                    __instance.m_inventory.RemoveItem(itemhere, removeItems.Last().Value);
+                    removeItems.Remove(removeItems.Last().Key);
+                    inventoryRemove = false;
+                    //__instance.m_inventory.Changed();
+                }
+            }
+        }
+
         internal static void WritetoYML(string PortalName, string updateP = null) // this only happens if portal is not in yml file at all
         {
             RMP.LogInfo("Writing New YML");
             int colorint = 1; // freepassage yellow = 1
+            //if (PortalName == "")
+               // return;
             if (updateP == null)
             {
 
@@ -1745,6 +1821,8 @@ namespace RareMagicPortal
             value = default;
             return false;
         }
+
+
 
     }
 

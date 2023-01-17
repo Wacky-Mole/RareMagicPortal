@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.6.1
+`Server and client side required for Server Sync enforcement.` V2.6.2
 
-MinimumRequiredVersion = "2.6.1"
+MinimumRequiredVersion = "2.6.2"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -151,6 +151,8 @@ YML files are synced on creation to the rest of the clients. Server always overr
     * Portal_D_Restrict:
       * > Additional Items to Restrict by Default. 
       * > For Example you can add - Wood,Stone - And those items will restricted
+      * > Will only work for New Portals. You need to edit existing Portals in .YML files
+      * > Make sure '' has your restrictions in YML file
     * Modifier key for toggle = LeftControl 
       * > Default Shortcut for admin and !EnabledCrystal && owner color cycling
       * > If Crystals and Keys is disabled than the owner can change coloring. 
@@ -217,30 +219,41 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
 ### YML (config/Portal_Names/*.yml)
   * > *The mod will auto generate default data into each yml named after your current world **upon getting close to ANY portal.***
+  * > Free_Passage, TeleportAnything, AdditionalProhibitItems, Admin_only_Access may have to be manually edited if you changed settings after setting up portals!
 ```
   Demo_Portal_Name:
     Portal_Crystal_Cost:
-      Red: 1
+      Red: 0
       Green: 0
       Blue: 0
       Purple: 0
       Tan: 0
       Gold: 1
+      Yellow: 1
+      Cyan: 0
+      Orange: 0
+      White: 0
+      Black: 0
     Portal_Key:
-      Red: true
+      Red: false
       Green: false
       Blue: false
       Purple: false
       Tan: false
       Gold: true
+      Yellow: true
+      Cyan: false
+      Orange: false
+      White: false
+      Black: false
     Free_Passage: false  - No Crystal or Key requirement
     TeleportAnything: false  - Portal allows you to Teleport Anything
     AdditionalProhibitItems: -- Additional items restricted at this portal or [Stone, Wood]
     - Stone
     - Wood
-    BiomeColor: skip - this doesn't do anything - does update though
+    BiomeColor: skip - this doesn't do much
     SpecialMode: 0  - nothing
-    AllowedUsers: [] - Only the players in this list will be allowed to go here - manual add only
+    AllowedUsers: [] - Only the players in this list will be allowed to go here - manual add only, [WackaMole, Player2] - Empty allows all
     Admin_only_Access: false -- Only admins
 
 ```
@@ -282,6 +295,8 @@ Support me at https://www.buymeacoffee.com/WackyMole
 </details> 
 
 ## Change Log:
+        Version 2.6.2
+            Bug Fixes - Careful of serverdevcommands mod - will not consume crystals with even devcommands enabled
         Version 2.6.1
             Fixed some log spam, set some defaults to mirror more closely vanilla.
             If you see ▲ 6 or numbers in a portalname that is just displaying for Forced Biome Color: lets other mods know the color
