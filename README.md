@@ -166,6 +166,7 @@ YML files are synced on creation to the rest of the clients. Server always overr
        * > Will apply checks to all portals
 
   * [4.Portal Crystals]
+    * Careful of serverdevcommands mod - will not consume crystals with even devcommands enabled
     * Enable Portal Crystals and Keys = false
       * > Enable/Disable Crystals and Keys to be loaded and used in game - This controls all usage and restrictions
       * > If this is not enabled then, Free Passage Color, Admin Color and Teleport anything color do NOT WORK,  PortalDrink will still work.
@@ -198,10 +199,12 @@ YML files are synced on creation to the rest of the clients. Server always overr
      * Admin only Color
         * > Only Admins can pass through this portal, - inventory checks still applied
         * > Recommended none
+        * > Does nohting when Enable Portal Crystals and Keys = false
      * TelePortAnythingColor
         * > This color portal will allow anyone to come through, free of cost and free of inventory checks
         * > It might be bugged
         * > recommend none
+        * > Does nothing when Enable Portal Crystals and Keys = false
      * Portal Drink Color
         * > Color to let the player know that PortalDrink is active on them. - Rainbow mode alternates every second 
         * > Rainbow or White recommended
@@ -296,7 +299,7 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 ## Change Log:
         Version 2.6.2
-            Bug Fixes - Careful of serverdevcommands mod - will not consume crystals with even devcommands enabled
+            Bug Fixes - A lot
         Version 2.6.1
             Fixed some log spam, set some defaults to mirror more closely vanilla.
             If you see ▲ 6 or numbers in a portalname that is just displaying for Forced Biome Color: lets other mods know the color

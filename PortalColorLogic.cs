@@ -871,7 +871,7 @@ namespace RareMagicPortal
                     return PortalColors[currentColor].Pos;
                 }
 
-                if (Free_Passage && MagicPortalFluid.FreePassageColor.Value != "none")
+                if (Free_Passage && MagicPortalFluid.FreePassageColor.Value != "none" && BiomeC != "" && BiomeCol != "")
                 {
                     //RMP.LogInfo("Logic 2");
                     currentColor = MagicPortalFluid.FreePassageColor.Value;
@@ -1009,6 +1009,11 @@ namespace RareMagicPortal
             }
             PortalN.Portals[PortalName].Portal_Crystal_Cost[ColorName] = MagicPortalFluid.ConfigCrystalsConsumable.Value; // set to default consume for int
             PortalN.Portals[PortalName].Portal_Key[ColorName] = true; // set to true
+
+            if (MagicPortalFluid.FreePassageColor.Value == ColorName ) // for starting Portal Yellow
+            {
+                PortalN.Portals[PortalName].Free_Passage = true;
+            }
 
             if (MagicPortalFluid.ConfigEnableCrystalsNKeys.Value)
             {
