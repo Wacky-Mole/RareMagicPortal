@@ -713,7 +713,7 @@ namespace RareMagicPortal
                                     MagicPortalFluid.portalRMPKEY.Value + " + " + "E",//_changePortalReq,
                                     nextcolor,
                                     15,
-                                    "Yellow",
+                                     "#" + ColorUtility.ToHtmlStringRGB(Color.yellow),
                                     text,
                                     "#" + ColorUtility.ToHtmlStringRGB(color),
                                     "#" + ColorUtility.ToHtmlStringRGB(PortalColors[nextcolor].HexName)
@@ -729,10 +729,10 @@ namespace RareMagicPortal
                                     MagicPortalFluid.portalRMPKEY.Value + " + " + "E", //_changePortalReq,
                                     nextcolor,
                                     15,
-                                    "Yellow",
-                                    "#"+ColorUtility.ToHtmlStringRGB(color),
+                                    "#" + ColorUtility.ToHtmlStringRGB(Color.yellow),
+                                    "#" + ColorUtility.ToHtmlStringRGB(color),
                                     "#" + ColorUtility.ToHtmlStringRGB(PortalColors[nextcolor].HexName)
-                                    );
+                                    ); ;
                         }
                     }
                     else
@@ -745,7 +745,7 @@ namespace RareMagicPortal
                                     __result,
                                     currentcolor,
                                     15,
-                                    "Yellow",
+                                     "#" + ColorUtility.ToHtmlStringRGB(Color.yellow),
                                     text,
                                     "#" + ColorUtility.ToHtmlStringRGB(color)
                                     );
@@ -758,7 +758,7 @@ namespace RareMagicPortal
                                     __result,
                                     currentcolor,
                                     15,
-                                    "Yellow",
+                                     "#" + ColorUtility.ToHtmlStringRGB(Color.yellow),
                                     "#" + ColorUtility.ToHtmlStringRGB(color)
                                     );
                         }
@@ -775,7 +775,7 @@ namespace RareMagicPortal
                                     __result,
                                     15,
                                     jo,
-                                    "Yellow",
+                                    "#" + ColorUtility.ToHtmlStringRGB(Color.yellow),
                                     "#" + ColorUtility.ToHtmlStringRGB(color),
                                     hi,
                                     currentcolor

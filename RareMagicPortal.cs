@@ -86,7 +86,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.2";
+        public const string PluginVersion = "2.6.3";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -669,7 +669,7 @@ namespace RareMagicPortal
                             NewName = NewName.Substring(0, index);
                         }
 
-                        pin.m_nameElement.text = Localization.instance.Localize(NewName); // doesn't work for some reason
+                        pin.m_NamePinData.PinNameText.name = Localization.instance.Localize(NewName); // doesn't work for some reason
                     }
 
                 }
