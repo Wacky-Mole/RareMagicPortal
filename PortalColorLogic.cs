@@ -17,6 +17,7 @@ using static Heightmap;
 using static RareMagicPortal.PortalColorLogic;
 using Random = System.Random;
 using System.Xml.Linq;
+using System.Runtime.Remoting.Contexts;
 
 namespace RareMagicPortal
 {
@@ -92,8 +93,48 @@ namespace RareMagicPortal
 
 
         internal static Dictionary<string, int> CrystalCount = new Dictionary<string, int>();
-        internal static Dictionary<string, int> KeyCount = new Dictionary<string, int>(); 
-        
+        internal static Dictionary<string, int> KeyCount = new Dictionary<string, int>();
+
+
+
+        [HarmonyPatch(typeof(ZNet), "Shutdown")]
+        internal class PatchZNetDisconnect
+        {
+
+            internal static bool Prefix()
+            {
+                MagicPortalFluid.RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
+
+                MagicPortalFluid.context.StopCoroutine(MagicPortalFluid.RemovedDestroyedTeleportWorldsCoroutine());
+                //context.StopCoroutine(myCoroutineRMP);
+
+                MagicPortalFluid.NoMoreLoading = true;
+                MagicPortalFluid.JustWaitforInventory = true;
+
+                if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated() && MagicPortalFluid.RiskyYMLSave.Value)
+                {
+                    var serializer = new SerializerBuilder()
+                     .Build();
+                    var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+                    MagicPortalFluid.JustWrote = 1;
+                    File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
+                    string lines = "";
+                    foreach (string line in System.IO.File.ReadLines(MagicPortalFluid.YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+                    {
+                        lines += line + Environment.NewLine;
+                        if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+                        { lines += Environment.NewLine; }
+                    }
+                    File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
+
+                    MagicPortalFluid.JustWrote = 2;
+
+                }
+                return true;
+            }
+        }
+
         public static void initRCL ()
         {
 
@@ -991,7 +1032,6 @@ namespace RareMagicPortal
             //if (BiomeCol != null) Setting BiomeColor doesn't make since when it only tracks a pair of Portals and not each indiv
                 // PortalN.Portals[PortalName].BiomeColor = BiomeCol;
 
-            string currentcolor = "Yellow"; // for reference only
 
             PortalColor Color =  (PortalColor)colorint;
             string ColorName = Color.ToString();
@@ -1045,40 +1085,37 @@ namespace RareMagicPortal
                     PortalN.Portals[PortalName].AdditionalProhibitItems = MagicPortalFluid.ConfigAddRestricted.Value.Split(',').ToList();
             }
 
+            var wacky = PortalN.Portals[PortalName];
+            ClientORServerYMLUpdate(wacky, PortalName, colorint);
+
+
+
+        }
+
+
+
+        internal static void ClientORServerYMLUpdate(Portal wacky, string PortNam, int colorint)
+        {
+            var serializer = new SerializerBuilder()
+                .Build();
+
+            var somName = PortNam + MagicPortalFluid.StringSeparator;
+            var ymlsmall = somName + serializer.Serialize(PortalN.Portals[PortNam]);
+            //MagicPortalFluid.RareMagicPortal.LogInfo(ymlsmall);
+
 
             if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
             {
                 MagicPortalFluid.RareMagicPortal.LogInfo("You are a dedicated Server");
-                var serializer = new SerializerBuilder()
-                .Build();
-                var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
-                MagicPortalFluid.JustWrote = 1;
-                File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
-                string lines = "";
-                foreach (string line in System.IO.File.ReadLines(MagicPortalFluid.YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+
+                string yamlfull = null;
+                //if (!MagicPortalFluid.UseSmallUpdates.Value)
+                yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+
+                if (!MagicPortalFluid.RiskyYMLSave.Value)
                 {
-                    lines += line + Environment.NewLine;
-                    if (line.Contains("Admin_only_Access")) // three spaces for non main objects
-                    { lines += Environment.NewLine; }
-                }
-                File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
-                MagicPortalFluid.JustWrote = 2;
-                MagicPortalFluid.YMLPortalData.Value = yamlfull; // send out to clients from server only
-            }
-            else
-            {
-                if (!ZNet.instance.IsServer())
-                {
-                    MagicPortalFluid.RareMagicPortal.LogInfo("You are connect to a Server");
-                    functions.ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
-                }
-                else // single client only or Server but not dedicated
-                {
-                    MagicPortalFluid.RareMagicPortal.LogInfo("Single client only or Server but not dedicated");
-                    var serializer = new SerializerBuilder()
-                    .Build();
-                    var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
 
                     MagicPortalFluid.JustWrote = 1;
                     File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
@@ -1090,10 +1127,54 @@ namespace RareMagicPortal
                         { lines += Environment.NewLine; }
                     }
                     File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
+
+                    MagicPortalFluid.JustWrote = 2;
+
+                }
+                if (MagicPortalFluid.UseSmallUpdates.Value)
+                    MagicPortalFluid.YMLPortalSmallData.Value = ymlsmall;
+                else
+                    MagicPortalFluid.YMLPortalData.Value = yamlfull; // send out to clients from server only
+
+
+
+            }
+            else
+            {
+                if (!ZNet.instance.IsServer())
+                {
+                    MagicPortalFluid.RareMagicPortal.LogInfo("You are connect to a Server");
+                    functions.ServerZDOymlUpdate(colorint, PortNam);// send to server to update and push yml
+                }
+                else // single client only or Server but not dedicated
+                {
+                    MagicPortalFluid.RareMagicPortal.LogInfo("Single client only or Server but not dedicated");
+                    var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
+
+
+                    if (!MagicPortalFluid.RiskyYMLSave.Value)
+                    {
+
+                        MagicPortalFluid.JustWrote = 1;
+                        File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
+                        string lines = "";
+                        foreach (string line in System.IO.File.ReadLines(MagicPortalFluid.YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
+                        {
+                            lines += line + Environment.NewLine;
+                            if (line.Contains("Admin_only_Access")) // three spaces for non main objects
+                            { lines += Environment.NewLine; }
+                        }
+                        File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
+
+                        MagicPortalFluid.JustWrote = 2;
+
+                    }
+
                     if (MagicPortalFluid.ConfigEnableYMLLogs.Value)
                         MagicPortalFluid.RareMagicPortal.LogInfo(yamlfull);
-                    MagicPortalFluid.JustWrote = 2;
-                    if (ZNet.instance.IsServer()) // not just dedicated
+
+
+                    if (ZNet.instance.IsServer()) // not just dedicated COOP
                         MagicPortalFluid.YMLPortalData.Value = yamlfull;
                 }
             }
@@ -1584,57 +1665,8 @@ namespace RareMagicPortal
                 PortalN.Portals[PortalName].AdditionalProhibitItems = MagicPortalFluid.ConfigAddRestricted.Value.Split(',').ToList(); // one time
 
 
-            if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
-            {
-                RMP.LogInfo("You are a dedicated Server");
-                var serializer = new SerializerBuilder()
-                .Build();
-                var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-
-                MagicPortalFluid.JustWrote = 1;
-                File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
-                string lines = "";
-                foreach (string line in System.IO.File.ReadLines(MagicPortalFluid.YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
-                {
-                    lines += line + Environment.NewLine;
-                    if (line.Contains("Admin_only_Access")) // three spaces for non main objects
-                    { lines += Environment.NewLine; }
-                }
-                File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
-                MagicPortalFluid.JustWrote = 2;
-                MagicPortalFluid.YMLPortalData.Value = yamlfull; // send out to clients from server only
-            }
-            else
-            {
-                if (!ZNet.instance.IsServer()) // is not server
-                {
-                    RMP.LogInfo("You are connect to a Server");
-                    functions.ServerZDOymlUpdate(colorint, PortalName);// send to server to update and push yml
-                }
-                else // single client only or Server but not dedicated
-                {
-                    RMP.LogInfo("Single client only or Server but not dedicated");
-                    var serializer = new SerializerBuilder()
-                    .Build();
-                    var yamlfull = MagicPortalFluid.WelcomeString + Environment.NewLine + serializer.Serialize(PortalN); // build everytime
-
-                    MagicPortalFluid.JustWrote = 1;
-                    File.WriteAllText(MagicPortalFluid.YMLCurrentFile, yamlfull); //overwrite
-                    string lines = "";
-                    foreach (string line in System.IO.File.ReadLines(MagicPortalFluid.YMLCurrentFile)) // rethrough lines manually and add spaces, stupid
-                    {
-                        lines += line + Environment.NewLine;
-                        if (line.Contains("Admin_only_Access")) // three spaces for non main objects
-                        { lines += Environment.NewLine; }
-                    }
-                    File.WriteAllText(MagicPortalFluid.YMLCurrentFile, lines); //overwrite with extra goodies
-                    if (MagicPortalFluid.ConfigEnableYMLLogs.Value)
-                        RMP.LogInfo(yamlfull);
-                    MagicPortalFluid.JustWrote = 2;
-                    if (ZNet.instance.IsServer())
-                        MagicPortalFluid.YMLPortalData.Value = yamlfull; // is coop server so send update to client
-                }
-            }
+            var wacky = PortalN.Portals[PortalName];
+            ClientORServerYMLUpdate(wacky, PortalName, colorint);
 
         }
 

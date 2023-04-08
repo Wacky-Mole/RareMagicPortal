@@ -86,7 +86,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.3";
+        public const string PluginVersion = "2.6.4";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -106,7 +106,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.2" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.4" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -191,6 +191,8 @@ namespace RareMagicPortal
         internal static ConfigEntry<string>? GemColorCyan;
         internal static ConfigEntry<string>? GemColorBlack;
         internal static ConfigEntry<string>? GemColorOrange;
+        internal static ConfigEntry<bool>? RiskyYMLSave;
+        internal static ConfigEntry<bool>? UseSmallUpdates;
 
         public static string crystalcolorre = ""; // need to reset everytime maybe?
         public string message_eng_NO_Portal = $"Portal Crystals/Key Required"; // Blue Portal Crystal
@@ -240,6 +242,7 @@ namespace RareMagicPortal
         public static List<StatusEffect> statusEffectactive;
 
         internal static readonly List<string> portalPrefabs = new List<string>();
+        internal static char StringSeparator = 'Ⰴ'; // handcuffs  The fifth letter of the Glagolitic alphabet.
 
 
         public static string WelcomeString = "#Hello, this is the Portal yml file. It keeps track of all portals you enter";
@@ -261,7 +264,7 @@ namespace RareMagicPortal
         static readonly KeyboardShortcut _changePortalReq = new(KeyCode.E, KeyCode.LeftControl);
 
 
-        static IEnumerator RemovedDestroyedTeleportWorldsCoroutine()
+        internal static IEnumerator RemovedDestroyedTeleportWorldsCoroutine()
         {
             WaitForSeconds waitThirtySeconds = new(seconds: 30f);
             List<KeyValuePair<TeleportWorld, TeleportWorldDataRMP>> existingPortals = new();
@@ -414,8 +417,8 @@ namespace RareMagicPortal
                 {
                     return true;
                 }
-               // __instance.GetTotalWeight()
-
+                // __instance.GetTotalWeight()
+                //RareMagicPortal.LogInfo("Here 0");
                 //Player.m_localPlayer
                 bool bo2 = false;
                 if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
@@ -423,8 +426,8 @@ namespace RareMagicPortal
                     bo2 = true;
                 }
 
-                
-                Piece portal = null;
+                //RareMagicPortal.LogInfo("Here 1");
+               Piece portal = null;
                 String name = null;
                 Vector3 hi = Player.m_localPlayer.transform.position;
                 List<Piece> piecesfound = new List<Piece>();
@@ -448,11 +451,13 @@ namespace RareMagicPortal
                         break;
                     }
                 }
+               // RareMagicPortal.LogInfo("Here 2");
 
                 if (portalW != null)
                 {
                     //portalW = portal.GetComponent<TeleportWorld>();
                     name = portalW.GetText(); // much better
+                    //RareMagicPortal.LogInfo("Here 2.1");
                     if (name != null)
                     {
 
@@ -482,6 +487,7 @@ namespace RareMagicPortal
                         {
                             PortalColorLogic.WritetoYML(PortalName);
                         }
+                        //RareMagicPortal.LogInfo("Here 3");
                         OdinsKin = PortalColorLogic.PortalN.Portals[PortalName].Admin_only_Access;
                         Free_Passage = PortalColorLogic.PortalN.Portals[PortalName].Free_Passage;
                         TeleportAny = PortalColorLogic.PortalN.Portals[PortalName].TeleportAnything;
@@ -510,6 +516,7 @@ namespace RareMagicPortal
                         if (TeleportAny && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // allows for teleport anything portal if EnableCrystals otherwise just white
                             bo2 = true;
 
+                        //RareMagicPortal.LogInfo("Here 4");
                         if (!bo2 && AdditionalProhibitItems.Count > 0)
                         {
                             var instan = ObjectDB.instance;
@@ -537,6 +544,7 @@ namespace RareMagicPortal
                                 }
                             }
                         }// end !bo2
+                        //RareMagicPortal.LogInfo("Here 5");
                         if (!bo2 && ConfigMaxWeight.Value > 0 && (TeleportingforWeight > 0 || Teleporting))
                         {
                             var playerweight = __instance.GetTotalWeight();
@@ -893,22 +901,6 @@ namespace RareMagicPortal
             }
         }
 
-        [HarmonyPatch(typeof(ZNet), "Shutdown")]
-        internal class PatchZNetDisconnect
-        {
-
-            internal static bool Prefix()
-            {
-                RareMagicPortal.LogInfo("Logoff? Save text file, don't delete");
-
-                context.StopCoroutine(RemovedDestroyedTeleportWorldsCoroutine());
-                //context.StopCoroutine(myCoroutineRMP);
-
-                NoMoreLoading = true;
-                JustWaitforInventory = true;
-                return true;
-            }
-        }
 
 
         [HarmonyPatch(typeof(ZNet), "OnDestroy")]
@@ -942,6 +934,7 @@ namespace RareMagicPortal
             
 
             YMLPortalData.ValueChanged += CustomSyncEventDetected;
+            YMLPortalSmallData.ValueChanged += CustomSyncSmallEvent;
 
             IconColors();
             PortalColorLogic.initRCL();
@@ -1221,6 +1214,49 @@ namespace RareMagicPortal
                 JustWrote = 2;
             }
         }
+
+        internal void CustomSyncSmallEvent()
+        {
+            if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())
+            {
+
+            }
+            else
+            {
+
+
+                RareMagicPortal.LogInfo("Receiving small Portal Update"); // temp
+                string SyncedString = YMLPortalSmallData.Value;
+
+                var ind = SyncedString.IndexOf(StringSeparator);
+                string PortNam = SyncedString.Substring(0, ind);
+                SyncedString = SyncedString.Remove(0, ind + 1);
+
+                if (ConfigEnableYMLLogs.Value)
+                    RareMagicPortal.LogInfo("Portalname " + PortNam + " String: " + SyncedString);
+
+
+                var deserializer = new DeserializerBuilder()
+                    .Build();
+
+                var ymlsmall = deserializer.Deserialize<PortalName.Portal>(SyncedString);
+                string portalNCheck = PortNam;
+
+                if (PortalColorLogic.PortalN.Portals.ContainsKey(portalNCheck))
+                {
+                    PortalColorLogic.PortalN.Portals[portalNCheck] = ymlsmall;
+
+                }
+                else
+                {
+                    PortalColorLogic.PortalN.Portals.Add(portalNCheck, ymlsmall);
+                }
+
+                JustWrote = 2;
+                JustSent = 0; // ready for another send
+
+            }
+        }
         internal void CustomSyncEventDetected()
         {
             //Worldname = ZNet.instance.GetWorldName();
@@ -1236,6 +1272,7 @@ namespace RareMagicPortal
                     RareMagicPortal.LogInfo("You are now connected to Server World" + Worldname);
                     LoggingOntoServerFirst = false;
                 }
+                //RareMagicPortal.LogInfo("Recieving PortalUpdate"); // temp
 
                 string SyncedString = YMLPortalData.Value;
 
@@ -1254,7 +1291,7 @@ namespace RareMagicPortal
                 }
                 JustWrote = 2;
                 JustSent = 0; // ready for another send
-                              //StartCoroutine(WaitforJustSent());
+
 
             }
             if (!ZNet.instance.IsServer())
@@ -1635,6 +1672,7 @@ namespace RareMagicPortal
 
 
         internal static readonly CustomSyncedValue<string> YMLPortalData = new(ConfigSync, "PortalYmlData", ""); // doesn't show up in config
+        internal static readonly CustomSyncedValue<string> YMLPortalSmallData = new(ConfigSync, "PortalYmlSmallData", ""); // doesn't show up in config
         internal ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
             bool synchronizedSetting = true)
         {
@@ -1672,6 +1710,11 @@ namespace RareMagicPortal
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
             ConfigEnableYMLLogs = config("1.General", "YML Portal Logs", false, "Show YML Portal Logs after Every update", false);
+
+            RiskyYMLSave = config("1.General", "Risky Server Save", false, "Only save YML updates when server shuts down");
+
+            UseSmallUpdates = config("1.General", "Use Small Server Updates", true, "Only sends a tiny part of the YML to clients");
+
 
             // Add server config which gets pushed to all clients connecting and can only be edited by admins
             // In local/single player games the player is always considered the admin
