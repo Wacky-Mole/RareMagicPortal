@@ -2,9 +2,9 @@
 
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.6.3
+`Server and client side required for Server Sync enforcement.` V2.6.4
 
-MinimumRequiredVersion = "2.6.2"
+MinimumRequiredVersion = "2.6.4"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -298,6 +298,8 @@ Support me at https://www.buymeacoffee.com/WackyMole
 </details> 
 
 ## Change Log:
+        Version 2.6.4
+             Added Use Small Server Updates to replace the bulk YML file change sync. Risky Server Save - ONLY SAVES YML on SERVER Exit (not recommended, except for large servers)
         Version 2.6.3
             Fix for 214.2, Upated ItemManager and Localiz Mananger. 
         Version 2.6.2

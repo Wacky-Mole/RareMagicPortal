@@ -1221,40 +1221,48 @@ namespace RareMagicPortal
             {
 
             }
-            else
+            else 
             {
+                if (NoMoreLoading) return;
 
-
-                RareMagicPortal.LogInfo("Receiving small Portal Update"); // temp
-                string SyncedString = YMLPortalSmallData.Value;
-
-                var ind = SyncedString.IndexOf(StringSeparator);
-                string PortNam = SyncedString.Substring(0, ind);
-                SyncedString = SyncedString.Remove(0, ind + 1);
-
-                if (ConfigEnableYMLLogs.Value)
-                    RareMagicPortal.LogInfo("Portalname " + PortNam + " String: " + SyncedString);
-
-
-                var deserializer = new DeserializerBuilder()
-                    .Build();
-
-                var ymlsmall = deserializer.Deserialize<PortalName.Portal>(SyncedString);
-                string portalNCheck = PortNam;
-
-                if (PortalColorLogic.PortalN.Portals.ContainsKey(portalNCheck))
+                if (!JustWait && !NoMoreLoading)
                 {
-                    PortalColorLogic.PortalN.Portals[portalNCheck] = ymlsmall;
+
+                    RareMagicPortal.LogInfo("Receiving small Portal Update"); // temp
+                    string SyncedString = YMLPortalSmallData.Value;
+                    if (string.IsNullOrEmpty(SyncedString))
+                    {
+                        return;
+                    }
+
+                    var ind = SyncedString.IndexOf(StringSeparator);
+                    string PortNam = SyncedString.Substring(0, ind);
+                    SyncedString = SyncedString.Remove(0, ind + 1);
+
+                    if (ConfigEnableYMLLogs.Value)
+                        RareMagicPortal.LogInfo("Portalname " + PortNam + " String: " + SyncedString);
+
+
+                    var deserializer = new DeserializerBuilder()
+                        .Build();
+
+                    var ymlsmall = deserializer.Deserialize<PortalName.Portal>(SyncedString);
+                    string portalNCheck = PortNam;
+
+                    if (PortalColorLogic.PortalN.Portals.ContainsKey(portalNCheck))
+                    {
+                        PortalColorLogic.PortalN.Portals[portalNCheck] = ymlsmall;
+
+                    }
+                    else
+                    {
+                        PortalColorLogic.PortalN.Portals.Add(portalNCheck, ymlsmall);
+                    }
+
+                    JustWrote = 2;
+                    JustSent = 0; // ready for another send
 
                 }
-                else
-                {
-                    PortalColorLogic.PortalN.Portals.Add(portalNCheck, ymlsmall);
-                }
-
-                JustWrote = 2;
-                JustSent = 0; // ready for another send
-
             }
         }
         internal void CustomSyncEventDetected()
