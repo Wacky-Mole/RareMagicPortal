@@ -1308,9 +1308,9 @@ namespace RareMagicPortal
                 bool admin = ConfigSync.IsAdmin;
                 isAdmin = admin;
                 if (isAdmin)
-                    RareMagicPortal.LogInfo("You are RMP admin");
+                    RareMagicPortal.LogInfo("You are RMP admin - full update");
                 else
-                    RareMagicPortal.LogInfo("You are NOT RMP admin");
+                    RareMagicPortal.LogInfo("You are NOT RMP admin - full update");
             }
 
         }

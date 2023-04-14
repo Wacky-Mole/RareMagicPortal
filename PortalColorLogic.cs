@@ -1106,7 +1106,7 @@ namespace RareMagicPortal
 
             if (ZNet.instance.IsServer() && ZNet.instance.IsDedicated())// only for server 
             {
-                MagicPortalFluid.RareMagicPortal.LogInfo("You are a dedicated Server");
+               // MagicPortalFluid.RareMagicPortal.LogInfo("You are a dedicated Server");
 
 
                 string yamlfull = null;
@@ -1143,7 +1143,7 @@ namespace RareMagicPortal
             {
                 if (!ZNet.instance.IsServer())
                 {
-                    MagicPortalFluid.RareMagicPortal.LogInfo("You are connect to a Server");
+                   // MagicPortalFluid.RareMagicPortal.LogInfo("You are connect to a Server");
                     functions.ServerZDOymlUpdate(colorint, PortNam);// send to server to update and push yml
                 }
                 else // single client only or Server but not dedicated
