@@ -1,50 +1,51 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.IO;
 using System.Reflection;
-using System;
-using System.IO;
+using UnityEngine;
 
 namespace RareMagicPortal
 {
     public class SpriteTools
     {
-        Sprite outcome;
-        Texture2D texture;
-        Texture2D rawTexture;
-        Texture2D secondaryLayer;
-        Sprite source;
-        Color tint;
+        private Sprite outcome;
+        private Texture2D texture;
+        private Texture2D rawTexture;
+        private Texture2D secondaryLayer;
+        private Sprite source;
+        private Color tint;
         public float ratio = 0.5f;
-
 
         public void setTint(Color tint)
         {
             this.tint = tint;
         }
+
         public void setSecondaryLayer(Texture2D secondaryLayer)
         {
             this.secondaryLayer = secondaryLayer;
         }
+
         public void setRatio(int ratio)
         {
             this.ratio = ((float)ratio / 100);
         }
+
         public void setRatio(float ratio)
         {
             this.ratio = ratio;
         }
+
         private byte[] ReadEmbeddedFileBytes(string name)
         {
             using MemoryStream stream = new();
             Assembly.GetExecutingAssembly().GetManifestResourceStream("RareMagicPortal." + name)?.CopyTo(stream);
             return stream.ToArray();
         }
+
         public Texture2D loadTexture(string name)
         {
             Texture2D texture = new(64, 64);
             texture.LoadImage(ReadEmbeddedFileBytes(name));
-        
+
             return texture;
         }
 
@@ -72,7 +73,7 @@ namespace RareMagicPortal
             return texture;
         }
 
-        void MakeGrayscale()
+        private void MakeGrayscale()
         {
             for (int x = 0; x < texture.width; x++)
             {
@@ -82,7 +83,7 @@ namespace RareMagicPortal
                     if (pixel.a > 0)
                     {
                         var gray = pixel.grayscale;
-                        Color grayish = new Color(gray, gray, gray,pixel.a);
+                        Color grayish = new Color(gray, gray, gray, pixel.a);
                         texture.SetPixel(x, y, grayish);
                     }
                 }
@@ -90,13 +91,13 @@ namespace RareMagicPortal
             texture.Apply();
         }
 
-        public Sprite CreateSprite(Sprite source, bool useTint,bool grayscale = false)
+        public Sprite CreateSprite(Sprite source, bool useTint, bool grayscale = false)
         {
             this.source = source;
             makeTexture((int)source.rect.width, (int)source.rect.height);
             getSpritePixels();
 
-            if(grayscale)
+            if (grayscale)
             {
                 MakeGrayscale();
             }
@@ -109,7 +110,7 @@ namespace RareMagicPortal
             return outcome;
         }
 
-        public Sprite CreateSprite(Texture2D rawTexture, bool useTint,bool grayscale = false)
+        public Sprite CreateSprite(Texture2D rawTexture, bool useTint, bool grayscale = false)
         {
             this.rawTexture = rawTexture;
             makeTexture(rawTexture.width, rawTexture.height);
@@ -126,18 +127,20 @@ namespace RareMagicPortal
             MakeSprite();
             return outcome;
         }
+
         public void makeTexture(int width, int height)
         {
             texture = new Texture2D(width, height);
         }
-        void getTexturePixels()
+
+        private void getTexturePixels()
         {
             var pixels = rawTexture.GetPixels();
             texture.SetPixels(pixels);
             texture.Apply();
         }
 
-        void getSpritePixels()
+        private void getSpritePixels()
         {
             var pixels = source.texture.GetPixels((int)source.textureRect.x,
                                                     (int)source.textureRect.y,
@@ -147,7 +150,7 @@ namespace RareMagicPortal
             texture.Apply();
         }
 
-        void BlendTexture()
+        private void BlendTexture()
         {
             for (int x = 0; x < texture.width; x++)
             {
@@ -176,10 +179,11 @@ namespace RareMagicPortal
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
         }
 
-        void MakeSprite()
+        private void MakeSprite()
         {
             outcome = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         }
+
         public Texture2D GetTexture2D()
         {
             return texture;
@@ -190,5 +194,4 @@ namespace RareMagicPortal
             return outcome;
         }
     }
-
 }

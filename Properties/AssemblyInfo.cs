@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using RareMagicPortal;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using RareMagicPortal;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -10,7 +10,7 @@ using RareMagicPortal;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MagicPortalFluid")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

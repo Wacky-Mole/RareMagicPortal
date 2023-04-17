@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace RareMagicPortal
 {
     internal class functions
     {
-
         public static void GetAllMaterials()
         {
             Material[] array = Resources.FindObjectsOfTypeAll<Material>();
@@ -37,7 +33,6 @@ namespace RareMagicPortal
 		}
 		*/
 
-
         internal static void ServerZDOymlUpdate(int Colorint, string Portalname) // MESSAGE SENDER
         {
             if (ZNet.instance.IsServer())// && ZNet.instance.IsDedicated()) removed dedicated  // so no singleplayer announcement
@@ -47,7 +42,6 @@ namespace RareMagicPortal
                 MagicPortalFluid.JustSent++;
                 return;
             }
-
 
             ZPackage pkg = new ZPackage(); // Create ZPackage
             string textSplit = Portalname + "," + Colorint;
@@ -90,6 +84,7 @@ namespace RareMagicPortal
                 }
             }
         }
+
         /*
 		public static void RPC_EventServerAnnouncementRMP(long sender, ZPackage pkg)
 
@@ -97,14 +92,12 @@ namespace RareMagicPortal
 		}
 		*/
 
-
         internal static string GetColorHtmlString(Color color)
         {
             return color.a == 1.0f
                 ? ColorUtility.ToHtmlStringRGB(color)
                 : ColorUtility.ToHtmlStringRGBA(color);
         }
-
 
         internal static string HandlePortalClick()
         {
