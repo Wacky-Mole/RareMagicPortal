@@ -299,7 +299,7 @@ Support me at https://www.buymeacoffee.com/WackyMole
 
 ## Change Log:
         Version 2.6.4
-             Added Use Small Server Updates to replace the bulk YML file change sync. Risky Server Save - ONLY SAVES YML on SERVER Exit (not recommended, except for large servers)
+             Added Use Small Server Updates to replace the bulk YML file change sync. </br> Risky Server Save - ONLY SAVES YML on SERVER Exit (not recommended, except for large servers)
         Version 2.6.3
             Fix for 214.2, Upated ItemManager and Localiz Mananger. 
         Version 2.6.2

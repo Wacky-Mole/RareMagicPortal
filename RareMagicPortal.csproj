@@ -187,8 +187,6 @@
     <EmbeddedResource Include="assetsEmbedded\assetsEmbedded.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="assetsEmbedded\exampleswordtest" />
-    <Content Include="assetsEmbedded\exampleswordtest.manifest" />
     <EmbeddedResource Include="assetsEmbedded\portalcrystal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
