@@ -44,12 +44,7 @@ namespace RareMagicPortal
             }
 
             ZPackage pkg = new ZPackage(); // Create ZPackage
-            string textSplit = Portalname + "," + Colorint;
-            string msg = "";
-            for (int i = 1; i < textSplit.Length; i++)
-            {
-                msg += textSplit[i] + " ";
-            }
+
             pkg.Write(Portalname + "," + Colorint);
             MagicPortalFluid.RareMagicPortal.LogInfo($"Sending the Server a update for {Portalname} with Color {Colorint}");
 
