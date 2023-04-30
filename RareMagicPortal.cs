@@ -77,7 +77,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.4";
+        public const string PluginVersion = "2.6.5";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -98,7 +98,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.4" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.5" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -137,6 +137,7 @@ namespace RareMagicPortal
         internal static string checkiftagisPortal = null;
         internal static bool JustStop = false;
         internal static bool JustWaitforInventory = true;
+        internal static List<string> PortalDrinkDenyloc = new List<string>();
 
         internal static bool m_hadTarget = false;
         internal static List<Minimap.PinData> HoldPins;
@@ -159,6 +160,7 @@ namespace RareMagicPortal
         internal static ConfigEntry<string>? CrystalKeyDefaultColor;
 
         internal static ConfigEntry<int>? PortalDrinkTimer;
+        internal static ConfigEntry<string>? PortalDrinkDeny;
         internal static ConfigEntry<bool>? ConfigEnableYMLLogs;
         internal static ConfigEntry<string>? ConfigAddRestricted;
         internal static ConfigEntry<bool>? ConfigEnableGoldAsMaster;
@@ -398,9 +400,11 @@ namespace RareMagicPortal
                 //RareMagicPortal.LogInfo("Here 0");
                 //Player.m_localPlayer
                 bool bo2 = false;
+                bool drinkactive = false;
                 if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
                 {
                     bo2 = true;
+                    drinkactive = true;
                 }
 
                 //RareMagicPortal.LogInfo("Here 1");
@@ -539,8 +543,37 @@ namespace RareMagicPortal
                     }
                 }
 
-                if (bo2) // if status effect is active
+                if (bo2) // if status effect is active or teleportany color
                 {
+                    if (PortalDrinkDenyloc.Count == 0 || !drinkactive) // might expand upon this in future
+                    {
+                        __result = true;
+                        return false;
+                    }else
+                    {
+                        var instan = ObjectDB.instance;
+                        foreach (ItemDrop.ItemData allItem in __instance.GetAllItems())
+                        {
+                            foreach (var item in PortalDrinkDenyloc)
+                            {
+                                GameObject go = instan.GetItemPrefab(item);
+                                if (go != null)
+                                {
+                                    ItemDrop.ItemData data = go.GetComponent<ItemDrop>().m_itemData;
+                                    if (data != null)
+                                    {
+                                        if (data.m_shared.m_name == allItem.m_shared.m_name)
+                                        {
+                                            RareMagicPortal.LogInfo($"Odin does not allow {data.m_shared.m_name} even with Portal Drink");
+                                            Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, "Odin still doesn't allow " + data.m_shared.m_name);
+                                            __result = false;
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     __result = true;
                     return false;
                 }
@@ -1670,6 +1703,8 @@ namespace RareMagicPortal
 
             PortalDrinkTimer = config("5.Portal Drink", "Portal Drink Timer", 120, "How Long Odin's Drink lasts");
 
+            PortalDrinkDeny = config("5.Portal Drink", "Portal Drink Wont Allow", "", "Deny list even with Portal Drink, 'Bronze,BlackMetal,BlackMetalScrap,Copper,CopperOre,CopperScrap,Tin,TinOre,IronOre,Iron,IronScrap,Silver,SilverOre,DragonEgg'");
+
             ConfigUseBiomeColors = config("6.BiomeColors", "Force Biome Colors for Default", false, "This will Override - Portal Crystal Color Default - and Use Specific Colors for Biomes");
 
             BiomeRepColors = config("6.BiomeColors", "Biome Colors", "Meadows:Tan,BlackForest:Blue,Swamp:Green,Mountain:Black,Plains:Orange,Mistlands:Purple,DeepNorth:Cyan,AshLands:Red,Ocean:Blue", "Biomes and their related Colors. - No spaces");
@@ -1714,6 +1749,9 @@ namespace RareMagicPortal
                 CraftingStationlvl = 1;
 
             */
+            if (PortalDrinkDeny.Value != "")
+                PortalDrinkDenyloc = MagicPortalFluid.PortalDrinkDeny.Value.Split(',').ToList();
+
             PortalColorLogic.reloaded = true;
             AllowTeleEverything.Effect.m_cooldown = PortalDrinkTimer.Value;
         }
