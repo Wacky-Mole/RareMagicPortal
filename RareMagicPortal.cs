@@ -64,6 +64,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UIElements;
 using YamlDotNet.Serialization;
 
 namespace RareMagicPortal
@@ -77,7 +78,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.5";
+        public const string PluginVersion = "2.6.6";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -98,7 +99,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.5" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.6" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -347,7 +348,7 @@ namespace RareMagicPortal
         {
             internal static bool Prefix(ref bool __result)
             {
-                if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+                if (Player.m_localPlayer.m_seman.HaveStatusEffect("yippeTele"))
                 {
                     __result = true;
                     return false;
@@ -401,7 +402,7 @@ namespace RareMagicPortal
                 //Player.m_localPlayer
                 bool bo2 = false;
                 bool drinkactive = false;
-                if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+                if (Player.m_localPlayer.m_seman.HaveStatusEffect("yippeTele"))
                 {
                     bo2 = true;
                     drinkactive = true;
@@ -412,7 +413,9 @@ namespace RareMagicPortal
                 String name = null;
                 Vector3 hi = Player.m_localPlayer.transform.position;
                 List<Piece> piecesfound = new List<Piece>();
-                Piece.GetAllPiecesInRadius(hi, 5f, piecesfound);
+                GetAllTheDamnPiecesinRadius(hi, 5f, piecesfound);
+
+                //Piece.
                 /*
 				foreach (Piece piece in piecesfound)
                 {
@@ -581,6 +584,19 @@ namespace RareMagicPortal
             }
         }
 
+        internal static void GetAllTheDamnPiecesinRadius(Vector3 p, float radius, List<Piece> pieces)
+        {
+            foreach (Piece piece in Piece.s_allPieces)
+            {
+                if (piece.gameObject.layer == Piece.s_ghostLayer
+                    || Vector3.Distance(p, piece.transform.position) >= radius)
+                {
+                    continue;
+                }
+                pieces.Add(piece);
+            }
+        }
+
         [HarmonyPatch(typeof(Minimap), nameof(Minimap.OnMapLeftClick))]
         internal class MapLeftClickForRareMagic // for magic portal
         {
@@ -689,10 +705,10 @@ namespace RareMagicPortal
             private static string OutsideP = null;
 
             [HarmonyPriority(Priority.HigherThanNormal)]
-            internal static bool Prefix(TeleportWorldTrigger __instance, Collider collider)
+            internal static bool Prefix(TeleportWorldTrigger __instance, Collider colliderIn)
             {
                 //finding portal name
-                if (collider.GetComponent<Player>() != Player.m_localPlayer)
+                if (colliderIn.GetComponent<Player>() != Player.m_localPlayer)
                 {
                     throw new SkipPortalException();
                 }
@@ -702,11 +718,11 @@ namespace RareMagicPortal
                 string PortalName = "";
                 if (!Chainloader.PluginInfos.ContainsKey("com.sweetgiorni.anyportal"))
                 { // check to see if AnyPortal is loaded // don't touch when anyportal is loaded
-                    PortalName = __instance.m_tp.GetText();
+                    PortalName = __instance.m_teleportWorld.GetText();
                 }
                 else // for anyportal
                 {
-                    ZDOID zDOID = __instance.m_tp.m_nview.GetZDO().GetZDOID("target");
+                    ZDOID zDOID = __instance.m_teleportWorld.m_nview.GetZDO().GetZDOID("target");
                     ZDO zDO = ZDOMan.instance.GetZDO(zDOID);
                     if (zDO == null || !zDO.IsValid())
                     {
@@ -717,7 +733,7 @@ namespace RareMagicPortal
                     }
                 }
                 // end finding portal name
-                m_hadTarget = __instance.m_tp.m_hadTarget;
+                m_hadTarget = __instance.m_teleportWorld.m_hadTarget;
                 OutsideP = PortalName;
                 // keep player and m_hadTarget for future patch for targetportal
 
@@ -730,7 +746,7 @@ namespace RareMagicPortal
                 if (!m_hadTarget) // if no target continuie on with logic
                     return false;
 
-                if (PortalColorLogic.CrystalandKeyLogic(PortalName, __instance.m_tp.m_nview.m_zdo.GetString(MagicPortalFluid._portalBiomeColorHashCode)))
+                if (PortalColorLogic.CrystalandKeyLogic(PortalName, __instance.m_teleportWorld.m_nview.m_zdo.GetString(MagicPortalFluid._portalBiomeColorHashCode)))
                 {
                     // Teleporting = true;
                     return true;
@@ -981,7 +997,7 @@ namespace RareMagicPortal
             AllowTeleEverything.Effect.m_time = 0f;// starts at 0
             AllowTeleEverything.Effect.m_flashIcon = true;
             //AllowTeleEverything.Effect.m_cooldown = DrinkDuration;
-            AllowTeleEverything.Effect.IsDone();// well be true if done
+            //AllowTeleEverything.Effect.IsDone();// well be true if done
             AllowTeleEverything.AddSEToPrefab(AllowTeleEverything, "PortalDrink");
         }
 

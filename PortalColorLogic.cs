@@ -234,9 +234,7 @@ namespace RareMagicPortal
                 if (//!ConfigEnableCrystalsNKeys.Value
                       !__instance
                     || !__instance.m_nview
-                    || __instance.m_nview.m_zdo == null
-                    || __instance.m_nview.m_zdo.m_zdoMan == null
-                    || __instance.m_nview.m_zdo.m_vec3 == null)
+                    || __instance.m_nview.m_zdo == null)
                 //|| !__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode)) // going to ask for it below, so no reason to get a null
                 //|| !_teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData)) // I don't think this will break anything
                 {
@@ -247,7 +245,7 @@ namespace RareMagicPortal
                     //if (!__instance.m_nview.m_zdo.m_vec3.ContainsKey(_teleportWorldColorHashCode))
                     //	__instance.m_nview.m_zdo.Set(_teleportWorldColorHashCode, Utils.ColorToVec3(color));
                     bool isthistrue = MagicPortalFluid._teleportWorldDataCache.TryGetValue(__instance, out TeleportWorldDataRMP teleportWorldData);
-                    if (Player.m_localPlayer.m_seman.GetStatusEffect("yippeTele") != null)
+                    if (Player.m_localPlayer.m_seman.HaveStatusEffect("yippeTele"))
                     {
                         // override color for teleportanything color
                         if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow")
@@ -611,8 +609,6 @@ namespace RareMagicPortal
                 if (
                 !__instance.m_nview
                 || __instance.m_nview.m_zdo == null
-                || __instance.m_nview.m_zdo.m_zdoMan == null
-                || __instance.m_nview.m_zdo.m_vec3 == null
                 || __instance.m_nview.m_zdo.GetString(MagicPortalFluid._portalBiomeHashCode) == "")
                 {
                     //RMP.LogInfo("Setting Portal Color For First Time");

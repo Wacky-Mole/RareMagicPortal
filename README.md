@@ -1,10 +1,14 @@
 # RareMagicPortal
 
+Support me!
+
+<a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 36px !important;" ></a>   <a href='https://ko-fi.com/H2H6LL5GA' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.6.2
+`Server and client side required for Server Sync enforcement.` V2.6.6
 
-MinimumRequiredVersion = "2.6.2"
+MinimumRequiredVersion = "2.6.6"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -287,17 +291,27 @@ YML files are synced on creation to the rest of the clients. Server always overr
 
 Wacky Git https://github.com/Wacky-Mole/RareMagicPortal
 
-For questions or suggestions please join discord channel: [Odin Plus Team](https://discord.gg/odinplus)
+For questions or suggestions please join discord channel: [Odin Plus Team](https://discord.gg/odinplus) or my discord at [Wolf Den](https://discord.gg/yPj7xjs3Xf)
 
-It has been a lot of fun making this mod, if you need help find Odin's Server
+Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wackymole
 
-Support me at https://www.buymeacoffee.com/WackyMole 
+<a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+<a href='https://ko-fi.com/H2H6LL5GA' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 <img src="https://wackymole.com/hosts/bmc_qr.png" width="100"/>
 
 </details> 
 
 ## Change Log:
+        Version 2.6.6
+            Updated for 216.9, Updated ItemManager
+        Version 2.6.5
+            Update ItemManager, Added Portal Drink Wont Allow, for admins to restrict drink for some items. 
+        Version 2.6.4
+             Added Use Small Server Updates to replace the bulk YML file change sync. </br> Risky Server Save - ONLY SAVES YML on SERVER Exit (not recommended, except for large servers)
+        Version 2.6.3
+            Fix for 214.2, Upated ItemManager and Localiz Mananger. 
         Version 2.6.2
             Bug Fixes - A lot
         Version 2.6.1
