@@ -6,9 +6,9 @@ Support me!
 
 ![https://wackymole.com/hosts/Attributes_basic.png](https://wackymole.com/hosts/Attributes_basic.png)
 
-`Server and client side required for Server Sync enforcement.` V2.6.7
+`Server and client side required for Server Sync enforcement.` V2.6.8
 
-MinimumRequiredVersion = "2.6.7"
+MinimumRequiredVersion = "2.6.8"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -304,6 +304,8 @@ Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wacky
 </details> 
 
 ## Change Log:
+        Version 2.6.8
+            Thunderstore really needs to let modders edit the readme without another upload.
         Version 2.6.7
             Bug Fixes, Fixed issue when not allowing all Colors on multiplayer. 
         Version 2.6.6
