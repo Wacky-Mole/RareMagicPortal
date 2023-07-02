@@ -78,7 +78,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.6";
+        public const string PluginVersion = "2.6.7";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -99,7 +99,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.6" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.7" };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
@@ -348,17 +348,20 @@ namespace RareMagicPortal
         {
             internal static bool Prefix(ref bool __result)
             {
+                if (Player.m_localPlayer == null)
+                    return true;
+
                 if (Player.m_localPlayer.m_seman.HaveStatusEffect("yippeTele"))
                 {
                     __result = true;
                     return false;
                 }
-                if (TargetPortalLoaded && !ConfigTargetPortalAnimation.Value) // I should make a config for this instead
+                if (TargetPortalLoaded && !ConfigTargetPortalAnimation.Value)
                 {
                     __result = false;
                     return false;
                 }
-                if (TargetPortalLoaded && ConfigTargetPortalAnimation.Value) // I should make a config for this instead
+                if (TargetPortalLoaded && ConfigTargetPortalAnimation.Value) 
                 {
                     __result = true;
                     return false;
@@ -397,9 +400,8 @@ namespace RareMagicPortal
                 {
                     return true;
                 }
-                // __instance.GetTotalWeight()
-                //RareMagicPortal.LogInfo("Here 0");
-                //Player.m_localPlayer
+
+
                 bool bo2 = false;
                 bool drinkactive = false;
                 if (Player.m_localPlayer.m_seman.HaveStatusEffect("yippeTele"))
@@ -415,18 +417,6 @@ namespace RareMagicPortal
                 List<Piece> piecesfound = new List<Piece>();
                 GetAllTheDamnPiecesinRadius(hi, 5f, piecesfound);
 
-                //Piece.
-                /*
-				foreach (Piece piece in piecesfound)
-                {
-					//RareMagicPortal.LogInfo($"Piece found {piece.name}");
-					if (piece.name == "portal_wood(Clone)") // list of pieces that have teleport world
-                    {
-						portal = piece;
-						//RareMagicPortal.LogInfo($"Inventory found Portal");
-						break;
-                    }
-                }*/
                 TeleportWorld portalW = null;
                 foreach (Piece piece in piecesfound)
                 {
@@ -495,7 +485,7 @@ namespace RareMagicPortal
                             }
                         }
 
-                        if (TeleportAny && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // allows for teleport anything portal if EnableCrystals otherwise just white
+                        if (TeleportAny && !flag || currentColor == MagicPortalFluid.TelePortAnythingColor.Value) // allows for teleport anything portal if EnableCrystals otherwise just white // currentcolor is often ""
                             bo2 = true;
 
                         //RareMagicPortal.LogInfo("Here 4");
@@ -939,7 +929,7 @@ namespace RareMagicPortal
             YMLPortalSmallData.ValueChanged += CustomSyncSmallEvent;
 
             IconColors();
-            PortalColorLogic.initRCL();
+            
 
             RareMagicPortal.LogInfo($"MagicPortalFluid has loaded start assets");
         }
@@ -977,6 +967,7 @@ namespace RareMagicPortal
             LoggingOntoServerFirst = true;
             setupYMLFile();
             ReadYMLValuesBoring();
+            PortalColorLogic.reloadcolors();
         }
 
         // end startup
@@ -1770,6 +1761,8 @@ namespace RareMagicPortal
 
             PortalColorLogic.reloaded = true;
             AllowTeleEverything.Effect.m_cooldown = PortalDrinkTimer.Value;
+
+            PortalColorLogic.reloadcolors();
         }
 
         /* maybe keep?

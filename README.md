@@ -2,13 +2,13 @@
 
 Support me!
 
-<a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 36px !important;" ></a>   <a href='https://ko-fi.com/H2H6LL5GA' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height='36' style="height: 36px;" ></a>  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H6LL5GA)
 
-<img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
+![https://wackymole.com/hosts/Attributes_basic.png](https://wackymole.com/hosts/Attributes_basic.png)
 
-`Server and client side required for Server Sync enforcement.` V2.6.6
+`Server and client side required for Server Sync enforcement.` V2.6.7
 
-MinimumRequiredVersion = "2.6.6"
+MinimumRequiredVersion = "2.6.7"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -304,6 +304,8 @@ Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wacky
 </details> 
 
 ## Change Log:
+        Version 2.6.7
+            Bug Fixes, Fixed issue when not allowing all Colors on multiplayer. 
         Version 2.6.6
             Updated for 216.9, Updated ItemManager
         Version 2.6.5

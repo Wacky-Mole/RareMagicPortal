@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using YamlDotNet.Serialization;
+using static RareMagicPortal.PortalColorLogic;
 using static RareMagicPortal.PortalName;
 using Random = System.Random;
 
@@ -118,14 +119,31 @@ namespace RareMagicPortal
             }
         }
 
-        public static void initRCL()
+        public static void reloadcolors()
         {
+            
+            CrystalCount.Clear();
+            KeyCount.Clear();
+      
+            foreach (var temp3 in PortalColors.Keys.ToList()) // enabled from config
+            {
+                var temp2 = PortalColors[temp3]; 
+                temp2.Enabled = false;
+                PortalColors[temp3] = temp2;
+            }
+
+            // done reset
+
             List<string> coloren = MagicPortalFluid.EnabledColors.Value.Split(',').ToList();
+
             foreach (var temp in coloren) // enabled from config
             {
-                var temp2 = PortalColors[temp];
-                temp2.Enabled = true;
-                PortalColors[temp] = temp2;
+                if (PortalColors.ContainsKey(temp))
+                {
+                    var temp2 = PortalColors[temp];
+                    temp2.Enabled = true;
+                    PortalColors[temp] = temp2;
+                }
             }
             foreach (var cols in PortalColors) // setup for all that don't have a count or crystal/key
             {
@@ -533,7 +551,7 @@ namespace RareMagicPortal
         {
             private static void Postfix(ref TeleportWorld __instance, ref string __result)
             {
-                if (!__instance)
+                if (!__instance || MagicPortalFluid.NoMoreLoading)
                 {
                     return;
                 }
