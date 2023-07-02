@@ -1,0 +1,9 @@
+﻿{
+  "name": "RareMagicPortal",
+  "version_number": "2.6.7",
+  "website_url": "https://www.nexusmods.com/valheim/mods/1663",
+  "description": "Adds rare magical requirements to making and using Portals. Colors Individual Portals",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2105"
+  ]
+}
