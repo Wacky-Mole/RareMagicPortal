@@ -4,7 +4,8 @@ Support me!
 
 <a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height='36' style="height: 36px;" ></a>  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H6LL5GA)
 
-![https://wackymole.com/hosts/Attributes_basic.png](https://wackymole.com/hosts/Attributes_basic.png)
+
+<img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
 `Server and client side required for Server Sync enforcement.` V2.6.8
 
