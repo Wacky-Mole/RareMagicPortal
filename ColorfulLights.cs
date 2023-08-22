@@ -17,7 +17,7 @@ namespace RareMagicPortal // Thank you Redseiko and Comfymods
             ExtractFireplaceData(fireplace.m_enabledObject);
             ExtractFireplaceData(fireplace.m_enabledObjectHigh);
             ExtractFireplaceData(fireplace.m_enabledObjectLow);
-            ExtractFireplaceData(fireplace.m_fireworks);
+           // ExtractFireplaceData(fireplace.m_fireworks);
         }
 
         private void ExtractFireplaceData(GameObject targetObject)

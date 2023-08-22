@@ -4,12 +4,9 @@ Support me!
 
 <a href="https://www.buymeacoffee.com/WackyMole" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height='36' style="height: 36px;" ></a>  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H6LL5GA)
 
-
 <img src="https://wackymole.com/hosts/FireandIce.png" width="500"/>  <img src="https://wackymole.com/hosts/GoldPortal.png" width="500"/>
 
-`Server and client side required for Server Sync enforcement.` V2.6.8
 
-MinimumRequiredVersion = "2.6.8"
 
 Tired of portals being the end all, be all of Valheim?<br>
 You don't want to unnecessarily restrict which items can be teleported or not?<br>
@@ -305,6 +302,8 @@ Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wacky
 </details> 
 
 ## Change Log:
+        Version 2.6.9
+            Hildr's Update
         Version 2.6.8
             Thunderstore really needs to let modders edit the readme without another upload.
         Version 2.6.7

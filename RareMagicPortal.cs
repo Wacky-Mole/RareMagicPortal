@@ -78,7 +78,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.8";
+        public const string PluginVersion = "2.6.9";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -99,7 +99,7 @@ namespace RareMagicPortal
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         internal static readonly ConfigSync ConfigSync = new(ModGUID)
-        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.6.8" };
+        { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = PluginVersion };
 
         internal static MagicPortalFluid? plugin;
         internal static MagicPortalFluid context;
