@@ -301,6 +301,7 @@ namespace RareMagicPortal
                     }
                     else // everyone else
                     {
+                        functions.GetAllMaterials();
                     }
                 }
             }
@@ -1162,7 +1163,7 @@ namespace RareMagicPortal
             Worldname = ZNet.instance.GetWorldName();
             RareMagicPortal.LogInfo("WorldName " + Worldname);
             YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
-            functions.GetAllMaterials();
+            
 
             if (!File.Exists(YMLCurrentFile))
             {
