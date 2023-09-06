@@ -2,6 +2,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -545,13 +546,27 @@ namespace RareMagicPortal
                 // }
             }
         }
+        [HarmonyPatch(typeof(Game), nameof(Game.SpawnPlayer))]
+        public static class PlayerspawnExtarWait
+        {
+            private static void Postfix()
+            {
+                MagicPortalFluid.context.StartCoroutine((IEnumerator)WaitforMe()); // maybe
+            }
+
+        }
+        internal static IEnumerable WaitforMe()
+        {
+            yield return new WaitForSeconds(10);
+            MagicPortalFluid.WaitSomeMore = false;
+        }
 
         [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.GetHoverText))]
         public static class TeleportWorldGetHoverTextPostfixRMP
         {
             private static void Postfix(ref TeleportWorld __instance, ref string __result)
             {
-                if (!__instance || MagicPortalFluid.NoMoreLoading)
+                if (!__instance || MagicPortalFluid.NoMoreLoading || MagicPortalFluid.WaitSomeMore)
                 {
                     return;
                 }

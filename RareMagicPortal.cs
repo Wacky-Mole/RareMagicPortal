@@ -133,6 +133,7 @@ namespace RareMagicPortal
         internal static int JustSent = 0;
         internal static bool JustRespawn = false;
         internal static bool NoMoreLoading = false;
+        internal static bool WaitSomeMore = true;
         internal static bool Teleporting = false;
         internal static int TeleportingforWeight = 0;
         internal static string checkiftagisPortal = null;
