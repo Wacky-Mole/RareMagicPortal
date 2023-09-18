@@ -133,7 +133,7 @@ namespace RareMagicPortal
         internal static int JustSent = 0;
         internal static bool JustRespawn = false;
         internal static bool NoMoreLoading = false;
-        internal static bool WaitSomeMore = true;
+        internal static bool WaitSomeMore = false;
         internal static bool Teleporting = false;
         internal static int TeleportingforWeight = 0;
         internal static string checkiftagisPortal = null;
@@ -284,6 +284,24 @@ namespace RareMagicPortal
                 }
             }
         }
+
+        [HarmonyPatch(typeof(Game), nameof(Game.SpawnPlayer))]
+        public static class PlayerspawnExtarWait
+        {
+            private static void Postfix()
+            {
+                
+               // Coroutine coroutine = context.StartCoroutine(WaitforMe()); // maybe
+            }
+
+        }
+        internal IEnumerable WaitforMe()
+        {
+            yield return new WaitForSeconds(10);
+            MagicPortalFluid.WaitSomeMore = false;
+            yield break;
+        }
+
 
         [HarmonyPatch(typeof(ZNetScene), "Awake")]
         [HarmonyPriority(Priority.Last)]

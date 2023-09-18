@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 using YamlDotNet.Serialization;
 using static RareMagicPortal.PortalColorLogic;
 using static RareMagicPortal.PortalName;
@@ -49,7 +50,7 @@ namespace RareMagicPortal
         internal static bool inventoryRemove = false;
         internal static Dictionary<string, int> removeItems = new Dictionary<string, int>();
 
-        public static List<ParticleSystem> CheatSwordColor { get; set; } = new List<ParticleSystem>();
+        public static ParticleSystem CheatSwordColor = null; //{ get; set; }// = new List<ParticleSystem>();
 
         internal enum PortalColor // gold - master should always be last or highest int
         {
@@ -288,20 +289,22 @@ namespace RareMagicPortal
                                 teleportWorldData.TargetColor = newCol;
                                 SetTeleportWorldColors(teleportWorldData, true);
                             }
-                        }/*
-                        else if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow") // Trying to copy Rainbow effect from cheatsword to portals, almost worked. ran out of time
+                        }
+                        else if (MagicPortalFluid.PortalDrinkColor.Value == "Rainbow2") // Trying to copy Rainbow effect from cheatsword to portals, almost worked. ran out of time
                         {
-                            if (CheatSwordColor.Count == 0)
+                            if (CheatSwordColor == null)
                             {
                                 RMP.LogInfo("Set cheatsword");
-                                CheatSwordColor.AddRange(ObjectDB.instance.GetItemPrefab("SwordCheat").GetComponentsInChildren<ParticleSystem>());// not used just for init
-                                Transform CheatswordColor = ObjectDB.instance.GetItemPrefab("WackyBox").transform.Find("wackyflames");//ObjectDB.instance.GetItemPrefab("SwordCheat").transform.Find("attach/equiped/Particle System");
+                                var itemCS = ObjectDB.instance.GetItemPrefab("SwordCheat");// not used just for init
+                                CheatSwordColor = itemCS.GetComponentInChildren<ParticleSystem>(true);
+                                // Transform CheatswordColor = ObjectDB.instance.GetItemPrefab("WackyBox").transform.Find("wackyflames");//ObjectDB.instance.GetItemPrefab("SwordCheat").transform.Find("attach/equiped/Particle System");
                             }
-                            if (CheatswordColor == null)
+                            if (CheatSwordColor == null)
                                 RMP.LogInfo("Cheatsword is null");
 
-                            ParticleSystem.MinMaxGradient holdColor = null;
+                            ParticleSystem.MinMaxGradient holdColor = CheatSwordColor.main.startColor;
                             //ParticleSystem.MainModule main = CheatswordColor.GetComponent<ParticleSystem.MainModule>();
+                            //main.startColor = holdColor;
                             //holdColor = main.startColor;
                             //foreach (ParticleSystem system in CheatSwordColor)
                             //{
@@ -316,8 +319,12 @@ namespace RareMagicPortal
                             {
                                 //system.GetComponent<Transform>().gameObject.SetActive(false);
 
-                                system = CheatswordColor.GetComponent<ParticleSystem>();
-
+                                var main2 = system.GetComponent<ParticleSystem.MainModule>();
+                                var colover = system.GetComponent<ParticleSystem.ColorOverLifetimeModule>();
+                                //system = CheatswordColor.GetComponent<ParticleSystem>();
+                                //system.GetComponent<color>
+                               // main2.startColor = holdColor;
+                                colover.color = holdColor;
                                 //ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
                                 //colorOverLifetime.color = holdColor;
 
@@ -327,7 +334,7 @@ namespace RareMagicPortal
                                 system.GetComponent<ParticleSystemRenderer>().material = MagicPortalFluid.originalMaterials["flame"];
                                 //RMP.LogInfo("flame set");
                             }
-                        }*/
+                        }
                         else
                         {
                             teleportWorldData.TargetColor = PortalColors[MagicPortalFluid.PortalDrinkColor.Value].HexName;
@@ -545,20 +552,6 @@ namespace RareMagicPortal
                 //  RMP.LogDebug("Portal Did not find Matching Portal - real name is " + HoldMeDaddy);
                 // }
             }
-        }
-        [HarmonyPatch(typeof(Game), nameof(Game.SpawnPlayer))]
-        public static class PlayerspawnExtarWait
-        {
-            private static void Postfix()
-            {
-                MagicPortalFluid.context.StartCoroutine((IEnumerator)WaitforMe()); // maybe
-            }
-
-        }
-        internal static IEnumerable WaitforMe()
-        {
-            yield return new WaitForSeconds(10);
-            MagicPortalFluid.WaitSomeMore = false;
         }
 
         [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.GetHoverText))]
@@ -1775,19 +1768,77 @@ namespace RareMagicPortal
                 main.startColor = teleportWorldData.TargetColor;
             }
 
-            foreach (Material material in teleportWorldData.Materials) // flames
+
+            // change blue flames material
+
+
+           
+
+        /*
+            foreach (Material material in teleportWorldData.Materials) // flames old way
             {
+                //material.color = teleportWorldData.TargetColor; old way with flames
+                .
+            }*/
+
+            foreach (ParticleSystem system in teleportWorldData.BlueFlames)
+            {
+
+                var shape = system.shape.radius;
+                shape = 1.26f;
+                var partcolor = teleportWorldData.TargetColor;
+
                 if (teleportWorldData.TargetColor == Purple) // trying to reset to default
                 {
-                    material.color = new Color(63f / 255f, 0f, 231f / 255f, 1f); // wierd purple problem
+                   //partcolor = new Color(164f / 255f, 16f/255f, 120f / 255f, 1f); //good pink
+                   partcolor = new Color(37f / 255f, 0, 58f / 255f, 1f); 
+
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["dragon_death_trail"];                   
+                    //shape = 1.5f;
+                }
+                else if (teleportWorldData.TargetColor == Gold) // trying to reset to default
+                {
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["dragon_death_trail"];
+                    //shape = 1.5f;
                 }
                 else if (teleportWorldData.TargetColor == Cornsilk) // trying to reset to default
                 {
-                    material.color = Brown;
+                    partcolor = Brown;
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["teleport_suck"];
                 }
-                else
-                    material.color = teleportWorldData.TargetColor;
+                else if (teleportWorldData.TargetColor == Color.blue) 
+                {
+                    //system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["teleport_suck"];
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["flame"];
+                   // shape = 1.5f;
+                }
+                else if (teleportWorldData.TargetColor == Color.white) 
+                {
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["teleport_suck"];
+                } else
+                {
+                    system.GetComponent<Renderer>().material = MagicPortalFluid.originalMaterials["portal_flame"];
+                }
+
+                ParticleSystem.ColorOverLifetimeModule colorOverLifetime = system.colorOverLifetime;
+                colorOverLifetime.color = partcolor; //new ParticleSystem.MinMaxGradient(partcolor, partcolor);
+                
+
+                if (teleportWorldData.TargetColor == Color.yellow) // trying to reset to default
+                {
+                    //colorOverLifetime.color = new ParticleSystem.MinMaxGradient(flamesstart, flamesend);
+                } 
+
+                ParticleSystem.MainModule main = system.main;
+
+                main.startColor = partcolor;
+
+                system.Clear();
+                system.Simulate(0f);
+                system.Play();
             }
+
+
 
             if (SetcolorTarget)
             {
