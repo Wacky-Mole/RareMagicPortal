@@ -78,7 +78,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.6.9";
+        public const string PluginVersion = "2.7.0";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -1139,7 +1139,7 @@ namespace RareMagicPortal
             PortalKeyOrange.Name.English("Orange Portal Key");
             PortalKeyOrange.Description.English("Unlock Portals Requiring The Orange Key");
             PortalKeyOrange.ToggleConfigurationVisibility(Configurability.Disabled);
-            //PortalKeyOrange.Snapshot();
+            PortalKeyOrange.Snapshot();
 
             Item PortalKeyWhite = new("portalcrystal", "PortalKeyWhite", "assetsEmbedded");
             PortalKeyWhite.Name.English("White Portal Key");
