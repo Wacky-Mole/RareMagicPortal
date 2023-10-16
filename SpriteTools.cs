@@ -36,6 +36,8 @@ namespace RareMagicPortal
 
         private byte[] ReadEmbeddedFileBytes(string name)
         {
+            var myType = typeof(SpriteTools);
+            var n = myType.Namespace;
             using MemoryStream stream = new();
             Assembly.GetExecutingAssembly().GetManifestResourceStream("RareMagicPortal." + name)?.CopyTo(stream);
             return stream.ToArray();

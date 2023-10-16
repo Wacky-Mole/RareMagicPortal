@@ -302,6 +302,9 @@ Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wacky
 </details> 
 
 ## Change Log:
+        Version 2.7.1
+            Wacky learned Vulkan
+            Changed Cyan flame a bit. 
         Version 2.7.0
             217.24 Update
             Fix for Portal Colors

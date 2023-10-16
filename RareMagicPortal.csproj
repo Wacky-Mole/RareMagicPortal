@@ -177,12 +177,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
-    <EmbeddedResource Include="assetsEmbedded\assetsEmbedded">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="assetsEmbedded\assetsEmbedded.manifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="assetsEmbedded\portalcrystal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -195,10 +189,6 @@
     <EmbeddedResource Include="assetsEmbedded\portalmagicfluid.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="assetsEmbedded\wackyportals" />
-    <Content Include="assetsEmbedded\wackyportals.manifest" />
-    <Content Include="assetsEmbedded\worldtreeseed" />
-    <Content Include="assetsEmbedded\worldtreeseed.manifest" />
     <EmbeddedResource Include="icons\portaldrink.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
