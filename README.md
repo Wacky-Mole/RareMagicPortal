@@ -302,7 +302,10 @@ Support me at https://www.buymeacoffee.com/WackyMole  or https://ko-fi.com/wacky
 </details> 
 
 ## Change Log:
-        Version 2.7.1
+        Version 2.7.2
+            Update for 217.29
+            Known bug for relog portal craftingstation changing to default
+        ersion 2.7.1
             Wacky learned Vulkan
             Changed Cyan flame a bit. 
         Version 2.7.0

@@ -78,7 +78,7 @@ namespace RareMagicPortal
     {
         public const string PluginGUID = "WackyMole.RareMagicPortal";
         public const string PluginName = "RareMagicPortal";
-        public const string PluginVersion = "2.7.1";
+        public const string PluginVersion = "2.7.2";
 
         internal const string ModName = PluginName;
         internal const string ModVersion = PluginVersion;
@@ -126,7 +126,7 @@ namespace RareMagicPortal
 
         public static bool FluidwasTrue = false;
         public static bool piecehaslvl = false;
-        public static string DefaultTable = "$piece_workbench";
+        //public static string DefaultTable = "$piece_workbench";
         internal static string YMLCurrentFile = Path.Combine(YMLFULLFOLDER, Worldname + ".yml");
         internal static int JustWrote = 0;
         internal static bool JustWait = false;
@@ -966,12 +966,17 @@ namespace RareMagicPortal
             {
                 if (col.Key == "Tan")
                 {
-                    IconColor.setTint(PortalColorLogic.Brown);
+                    IconColor.setTint(new Color(133f / 255f, 92f / 255f, 62f/255f, 1f));
                     Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
                 }
                 else if (col.Key == "Yellow")
                 {
-                    IconColor.setTint(new Color(201f / 255f, 204f / 255f, 63f / 255f, 1f));
+                    IconColor.setTint(new Color(240f / 255f, 245f / 255f, 0f, 1f));
+                    Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
+                }
+                else if (col.Key == "Gold")
+                {
+                    IconColor.setTint(new Color(101f / 255f, 102f / 255f, 36f / 255f, 1f));
                     Icons.Add(col.Key, IconColor.CreateSprite(tex, true));
                 }
                 else
@@ -1509,7 +1514,6 @@ namespace RareMagicPortal
             {
                 WearNTear por = peter.GetComponent<WearNTear>();
                 por.m_health = ConfiglHealth.Value; // set New Portal Health
-
                 List<Piece.Requirement> requirements = new List<Piece.Requirement>();
                 requirements.Add(new Piece.Requirement
                 {
@@ -1538,13 +1542,11 @@ namespace RareMagicPortal
                     m_resItem = ObjectDB.instance.GetItemPrefab("SurtlingCore").GetComponent<ItemDrop>(),
                     m_recover = true
                 });
-
                 var CraftingStationforPaul = GetCraftingStation(ConfigTable.Value);
                 if (CraftingStationforPaul == null)
                 {
-                    CraftingStationforPaul.m_name = DefaultTable;
+                    RareMagicPortal.LogWarning("bad, station is null");
                 }
-
                 Piece petercomponent = peter.GetComponent<Piece>();
                 petercomponent.m_craftingStation = GetCraftingStation(CraftingStationforPaul.m_name); // sets crafting station workbench/forge /ect
 
@@ -1602,15 +1604,21 @@ namespace RareMagicPortal
         {
             if (name == "")
             {
-                return null;
+                name = ConfigTable.Value;
             }
             foreach (Recipe recipe in ObjectDB.instance.m_recipes)
             {
                 if (recipe?.m_craftingStation?.m_name == name)
                 {
-                    //Jotunn.Logger.LogMessage("got crafting station " + name);
                     return recipe.m_craftingStation;
                 }
+            }
+            CraftingStation[] array = Resources.FindObjectsOfTypeAll<CraftingStation>();
+            foreach (CraftingStation piece in array)
+            {
+                //RareMagicPortal.LogWarning(piece);
+                if (piece.name == "piece_workbench")
+                    return piece;
             }
             return null;
         }
@@ -1694,7 +1702,7 @@ namespace RareMagicPortal
 
             ConfigFluidValue = config("2.PortalFluid", "Portal Fluid Value", 0, "What is the value of MagicPortalFluid? " + System.Environment.NewLine + "A Value of 1 or more, makes the item saleable to trader");
 
-            ConfigTable = config("3.Portal Config", "CraftingStation Requirement", DefaultTable,
+            ConfigTable = config("3.Portal Config", "CraftingStation Requirement", "$piece_workbench",
                 "Which CraftingStation is required nearby?" + System.Environment.NewLine + "Default is Workbench = $piece_workbench, forge = $piece_forge, Artisan station = $piece_artisanstation " + System.Environment.NewLine + "Pick a valid table otherwise default is workbench"); // $piece_workbench , $piece_forge , $piece_artisanstation
 
             ConfigTableLvl = config("3.Portal Config", "Level of CraftingStation Req", 1,
